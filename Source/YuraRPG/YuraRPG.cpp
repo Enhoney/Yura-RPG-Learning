@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright Muci Yun.
 
 #include "YuraRPG.h"
 #include "Modules/ModuleManager.h"
