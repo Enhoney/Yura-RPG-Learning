@@ -13,11 +13,13 @@ public class YuraRPG : ModuleRules
 			"CoreUObject", 
 			"Engine", 
 			"InputCore", 
-			"EnhancedInput" });
+			"EnhancedInput" 
+		});
 
 		PublicIncludePaths.AddRange(new string[]
 		{
 			"YuraRPG/Public/Character",
+			"YuraRPG/Public/Player",
 		});
 
 
