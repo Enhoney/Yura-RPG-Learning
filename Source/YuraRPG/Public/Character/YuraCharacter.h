@@ -20,6 +20,16 @@ class YURARPG_API AYuraCharacter : public AYuraCharacterBase
 public:
 	AYuraCharacter();
 
+	// 被Controlelr掌控的时候--服务端在这里初始化ASC
+	virtual void PossessedBy(AController* NewController) override;
+
+	// PlayerState网络复制过来的时候
+	virtual void OnRep_PlayerState() override;
+
+private:
+
+	void InitAbilityActorInfo();
+
 private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Camera")

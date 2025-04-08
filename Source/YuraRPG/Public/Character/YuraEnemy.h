@@ -22,6 +22,9 @@ public:
 	virtual void HighlightActor() override;
 	virtual void UnhighlightActor() override;
 
+protected:
+	void BeginPlay() override;
+
 
 public:
 	UPROPERTY(BlueprintReadOnly)

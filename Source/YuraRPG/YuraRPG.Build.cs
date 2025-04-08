@@ -13,8 +13,12 @@ public class YuraRPG : ModuleRules
 			"CoreUObject", 
 			"Engine", 
 			"InputCore", 
-			"EnhancedInput" 
-		});
+			"EnhancedInput",
+
+            "GameplayAbilities",
+            "GameplayTags",
+            "GameplayTasks",
+        });
 
 		PublicIncludePaths.AddRange(new string[]
 		{
@@ -23,10 +27,17 @@ public class YuraRPG : ModuleRules
 			"YuraRPG/Public/Player",
 			"YuraRPG/Public/Game",
             "YuraRPG/Public/Interaction",
+
+            "YuraRPG/Public/AbilitySystem",
+            "YuraRPG/Public/AbilitySystem/AttributeSets",
+
 		});
 
 
-        PrivateDependencyModuleNames.AddRange(new string[] {  });
+        PrivateDependencyModuleNames.AddRange(new string[] 
+		{ 
+			
+		});
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

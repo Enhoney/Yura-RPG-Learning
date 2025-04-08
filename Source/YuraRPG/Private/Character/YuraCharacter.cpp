@@ -7,6 +7,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
 
+#include "YuraAbilitySystemComponent.h"
+#include "YuraPlayerState.h"
+
 AYuraCharacter::AYuraCharacter()
 {
 	// 实例化相机肝
@@ -43,4 +46,42 @@ AYuraCharacter::AYuraCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
+}
+
+void AYuraCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	// 如果是在服务器（这个函数只会在服务器才会被调用，加上这个是为了保险）
+	if (GetLocalRole() == ENetRole::ROLE_Authority)
+	{
+		InitAbilityActorInfo();
+	}
+}
+
+void AYuraCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	// 因为我们不清楚这个函数会被调用几次，所以加上一个条件
+	// 如果是在客户端（主机代理和模拟代理都会复制），并且是第一次
+	if (AbilitySystemComponent == nullptr)
+	{
+		if (GetNetMode() == ENetMode::NM_Client)
+		{
+			InitAbilityActorInfo();
+		}
+	}
+	
+}
+
+void AYuraCharacter::InitAbilityActorInfo()
+{
+	AYuraPlayerState* YuraPlayerState = GetPlayerState<AYuraPlayerState>();
+
+	check(YuraPlayerState);
+	YuraPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(YuraPlayerState, this);
+
+	AbilitySystemComponent = YuraPlayerState->GetAbilitySystemComponent();
+	AttributeSet = YuraPlayerState->GetAttributeSet();
 }

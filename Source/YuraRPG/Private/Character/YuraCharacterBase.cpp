@@ -13,6 +13,16 @@ AYuraCharacterBase::AYuraCharacterBase()
 
 }
 
+UAbilitySystemComponent* AYuraCharacterBase::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+
+UAttributeSet* AYuraCharacterBase::GetAttributeSet() const
+{
+	return AttributeSet;
+}
+
 void AYuraCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();

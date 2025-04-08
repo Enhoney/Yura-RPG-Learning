@@ -5,10 +5,21 @@
 #include "Components/CapsuleComponent.h"
 #include "YuraRPG.h"
 
+#include "YuraAbilitySystemComponent.h"
+#include "YuraAttributeSet.h"
+
 AYuraEnemy::AYuraEnemy()
 {
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// 实例化ASC
+	AbilitySystemComponent = CreateDefaultSubobject<UYuraAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
+
+	// 实例化AS
+	AttributeSet = CreateDefaultSubobject<UYuraAttributeSet>(TEXT("AttributeSet"));
 }
 
 void AYuraEnemy::HighlightActor()
@@ -25,4 +36,11 @@ void AYuraEnemy::UnhighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(false);
 	Weapon->SetRenderCustomDepth(false);
+}
+
+void AYuraEnemy::BeginPlay()
+{
+	Super::BeginPlay();
+	// 初始化
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 }

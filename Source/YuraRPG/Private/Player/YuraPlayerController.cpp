@@ -11,8 +11,6 @@
 
 AYuraPlayerController::AYuraPlayerController()
 {
-	// 开启网络复制
-	bReplicates = true;
 
 	// 开启tick
 	PrimaryActorTick.bCanEverTick = true;
