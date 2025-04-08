@@ -18,8 +18,11 @@ public class YuraRPG : ModuleRules
 
 		PublicIncludePaths.AddRange(new string[]
 		{
+			"YuraRPG",
 			"YuraRPG/Public/Character",
 			"YuraRPG/Public/Player",
+			"YuraRPG/Public/Game",
+            "YuraRPG/Public/Interaction",
 		});
 
 

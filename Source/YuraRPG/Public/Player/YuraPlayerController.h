@@ -9,6 +9,8 @@
 class UInputMappingContext;
 class UInputAction;
 
+class IEnemyInterface;
+
 struct FInputActionValue;
 
 /**
@@ -22,6 +24,9 @@ class YURARPG_API AYuraPlayerController : public APlayerController
 public:
 
 	AYuraPlayerController();
+
+	virtual void PlayerTick(float DeltaTime) override;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -31,10 +36,17 @@ private:
 
 	void Move(const FInputActionValue& InputActionValue);
 
+	// 执行调用敌人高亮逻辑
+	void CursorTrace();
+
 private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputMappingContext> YuraContext;
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> MoveAction;
+
+	// 记录上一帧和这一帧命中的对象
+	IEnemyInterface* LastActor =  nullptr;
+	IEnemyInterface* ThisActor = nullptr;
 };

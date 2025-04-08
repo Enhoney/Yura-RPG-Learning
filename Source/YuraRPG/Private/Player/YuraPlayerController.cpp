@@ -7,10 +7,22 @@
 #include "InputActionValue.h"
 #include "EnhancedInputComponent.h"
 
+#include "EnemyInterface.h"
+
 AYuraPlayerController::AYuraPlayerController()
 {
 	// 开启网络复制
 	bReplicates = true;
+
+	// 开启tick
+	PrimaryActorTick.bCanEverTick = true;
+}
+
+void AYuraPlayerController::PlayerTick(float DeltaTime)
+{
+	Super::PlayerTick(DeltaTime);
+
+	CursorTrace();
 }
 
 void AYuraPlayerController::BeginPlay()
@@ -64,4 +76,59 @@ void AYuraPlayerController::Move(const FInputActionValue& InputActionValue)
 		ControlledPawn->AddMovementInput(ForawrdDirection, InputAxisVector.X);
 		ControlledPawn->AddMovementInput(RightDirection, InputAxisVector.Y);
 	}
+}
+
+void AYuraPlayerController::CursorTrace()
+{
+	FHitResult CursorHit;
+
+	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
+
+	// 如果没有命中目标
+	if (!CursorHit.bBlockingHit)
+	{
+		return;
+	}
+
+	LastActor = ThisActor;
+
+	ThisActor = Cast<IEnemyInterface>(CursorHit.GetActor());
+
+	/** 
+	 * 下面是几个场景
+	 * 1、两个都是空指针--啥也不干
+	 * 2、LastActor是空指针，ThisActor不是--有命中的对象了--开启高亮
+	 * 3、LastActor不是空指针，ThisActor是空指针--关闭高亮
+	 * 4、两个都不是空指针，并且二者相同--啥也不干--维持高亮
+	 * 5、两个都不是空指针，但是两个对象不一样了--关闭上一个的高亮，开启这个的高亮
+	 */
+
+	if (LastActor == nullptr)
+	{
+		if (ThisActor != nullptr)
+		{
+			// Case 2
+			ThisActor->HighlightActor();
+		}
+		// Case 1
+	}
+	else
+	{
+		if (ThisActor == nullptr)
+		{
+			// Case 3
+			LastActor->UnhighlightActor();
+		}
+		else
+		{
+			if (ThisActor != LastActor)
+			{
+				// Case 5
+				LastActor->UnhighlightActor();
+				ThisActor->HighlightActor();
+			}
+			// Case 4
+		}
+	}
+
 }
