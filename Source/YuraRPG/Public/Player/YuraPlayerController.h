@@ -47,6 +47,6 @@ private:
 	TObjectPtr<UInputAction> MoveAction;
 
 	// 记录上一帧和这一帧命中的对象
-	IEnemyInterface* LastActor =  nullptr;
-	IEnemyInterface* ThisActor = nullptr;
+	TObjectPtr<IEnemyInterface> LastActor =  nullptr;
+	TObjectPtr<IEnemyInterface> ThisActor = nullptr;
 };

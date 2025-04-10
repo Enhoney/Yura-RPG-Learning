@@ -7,7 +7,7 @@
 
 UYuraAttributeSet::UYuraAttributeSet()
 {
-	InitHealth(100.f);
+	InitHealth(50.f);
 	InitMaxHealth(100.f);
 	InitMana(150.f);
 	InitMaxMana(150.f);

@@ -30,8 +30,10 @@ void AYuraPlayerController::BeginPlay()
 	check(YuraContext);
 	// 获取增强输入子系统
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	check(Subsystem);
-	Subsystem->AddMappingContext(YuraContext, 0);
+	if (Subsystem) 
+	{
+		Subsystem->AddMappingContext(YuraContext, 0);
+	}
 
 	// 显示鼠标光标并设置光标样式
 	bShowMouseCursor = true;
