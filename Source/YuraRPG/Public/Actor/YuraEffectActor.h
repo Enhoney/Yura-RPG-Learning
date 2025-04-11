@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "YuraEffectActor.generated.h"
 
-class USphereComponent;
+class UGameplayEffect;
 
 UCLASS()
 class YURARPG_API AYuraEffectActor : public AActor
@@ -16,22 +16,15 @@ class YURARPG_API AYuraEffectActor : public AActor
 public:	
 	AYuraEffectActor();
 
-
-	// 重叠回调
-	UFUNCTION()
-	virtual void OnOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	UFUNCTION()
-	virtual void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
 protected:
 	virtual void BeginPlay() override;
 
+	UFUNCTION(BlueprintCallable)
+	void ApplyGmaeplayEffectToActor(AActor* TargetActor);
 
-private:
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<USphereComponent> Sphere;
+protected:
 
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UStaticMeshComponent> Mesh;
+	UPROPERTY(EditDefaultsOnly, Category = "Effect Actor")
+	TSubclassOf<UGameplayEffect> InstantGameplayEffectClass;
 
 };
