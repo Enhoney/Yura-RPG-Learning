@@ -20,11 +20,14 @@ protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable)
-	void ApplyGmaeplayEffectToActor(AActor* TargetActor);
+	bool ApplyGameplayEffectToActor(AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass);
 
 protected:
 
-	UPROPERTY(EditDefaultsOnly, Category = "Effect Actor")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Effect Actor")
 	TSubclassOf<UGameplayEffect> InstantGameplayEffectClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Effect Actor")
+	TSubclassOf<UGameplayEffect> DurationGameplayEffectClass;
 
 };

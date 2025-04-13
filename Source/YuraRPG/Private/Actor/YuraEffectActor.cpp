@@ -22,7 +22,7 @@ void AYuraEffectActor::BeginPlay()
 
 }
 
-void AYuraEffectActor::ApplyGmaeplayEffectToActor(AActor* TargetActor)
+bool AYuraEffectActor::ApplyGameplayEffectToActor(AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass)
 {
 	// 查找ASC，我们有两种方法，一种是直接调用接口的GetAbilitySystemComponent函数
 	// 还有一种更通用的，由蓝图静态函数库提供的方法，这种更好更通用，如果我们没有实现这个接口，但是也为它添加了ASC，
@@ -32,18 +32,21 @@ void AYuraEffectActor::ApplyGmaeplayEffectToActor(AActor* TargetActor)
 
 	if (TargrtASC == nullptr)
 	{
-		return;
+		return false;
 	}
 
-	check(InstantGameplayEffectClass);
+	check(GameplayEffectClass);
 	FGameplayEffectContextHandle GameplayEffectContextHandle = TargrtASC->MakeEffectContext();
 	// 效果的直接来源
 	GameplayEffectContextHandle.AddSourceObject(this);
 	// 生成Spec
-	FGameplayEffectSpecHandle GameplayEffectSpecHandle = TargrtASC->MakeOutgoingSpec(InstantGameplayEffectClass, 1.0f, GameplayEffectContextHandle);
+	FGameplayEffectSpecHandle GameplayEffectSpecHandle = TargrtASC->MakeOutgoingSpec(GameplayEffectClass, 1.0f, GameplayEffectContextHandle);
 	
 	// 施加效果
 	TargrtASC->ApplyGameplayEffectSpecToSelf(*GameplayEffectSpecHandle.Data.Get());
 
+	return true;
+
 }
+
 
