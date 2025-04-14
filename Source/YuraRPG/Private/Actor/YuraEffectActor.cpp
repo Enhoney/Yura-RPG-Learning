@@ -4,8 +4,7 @@
 #include "Actor/YuraEffectActor.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
-#include "AbilitySystemComponent.h"
-#include "GameplayEffectTypes.h"
+
 
 // Sets default values
 AYuraEffectActor::AYuraEffectActor()
@@ -40,13 +39,85 @@ bool AYuraEffectActor::ApplyGameplayEffectToActor(AActor* TargetActor, TSubclass
 	// 效果的直接来源
 	GameplayEffectContextHandle.AddSourceObject(this);
 	// 生成Spec
-	FGameplayEffectSpecHandle GameplayEffectSpecHandle = TargrtASC->MakeOutgoingSpec(GameplayEffectClass, 1.0f, GameplayEffectContextHandle);
+	const FGameplayEffectSpecHandle GameplayEffectSpecHandle = TargrtASC->MakeOutgoingSpec(GameplayEffectClass, ActorLevel, GameplayEffectContextHandle);
 	
 	// 施加效果
-	TargrtASC->ApplyGameplayEffectSpecToSelf(*GameplayEffectSpecHandle.Data.Get());
+	const FActiveGameplayEffectHandle ActiveGEHandle = TargrtASC->ApplyGameplayEffectSpecToSelf(*GameplayEffectSpecHandle.Data.Get());
+
+	// 获取DurationType
+	const EGameplayEffectDurationType GEDurationType = (GameplayEffectSpecHandle.Data.Get())->Def.Get()->DurationPolicy;
+	// 如果是无限的，并且后面会移除的，就保存句柄
+	if (GEDurationType == EGameplayEffectDurationType::Infinite && InfiniteEffectRemovePolicy ==EEffectRemovePolicy::RemoveOnEndOverlap)
+	{
+		ActiveEffectHandles.Add(ActiveGEHandle, TargrtASC);
+	}
 
 	return true;
 
+}
+
+void AYuraEffectActor::OnBeginOverlap(AActor* TargetActor)
+{
+	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnBeginOverlap)
+	{
+		ApplyGameplayEffectToActor(TargetActor, InstantGameplayEffectClass);
+	}
+
+	if (DurationEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnBeginOverlap)
+	{
+		ApplyGameplayEffectToActor(TargetActor, DurationGameplayEffectClass);
+	}
+
+	if (InfiniteEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnBeginOverlap)
+	{
+		ApplyGameplayEffectToActor(TargetActor, InfiniteGameplayEffectClass);
+	}
+}
+
+void AYuraEffectActor::OnEndOverlap(AActor* TargetActor)
+{
+	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnEndOverlap)
+	{
+		ApplyGameplayEffectToActor(TargetActor, InstantGameplayEffectClass);
+	}
+
+	if (DurationEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnEndOverlap)
+	{
+		ApplyGameplayEffectToActor(TargetActor, DurationGameplayEffectClass);
+	}
+
+	if (InfiniteEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnEndOverlap)
+	{
+		ApplyGameplayEffectToActor(TargetActor, InfiniteGameplayEffectClass);
+	}
+
+	// Infinite GE的移除
+	
+	if (InfiniteEffectRemovePolicy == EEffectRemovePolicy::RemoveOnEndOverlap)
+	{
+		UAbilitySystemComponent* TargrtASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+		if (!IsValid(TargrtASC))
+		{
+			return;
+		}
+		TArray<FActiveGameplayEffectHandle> EffectHandleToRemove;
+		// 容器遍历的时候不能直接移除
+		for (auto TmpHandlePair : ActiveEffectHandles)
+		{
+			if (TmpHandlePair.Value == TargrtASC)
+			{
+				// 效果移除，存储一下要移除的handle
+				TargrtASC->RemoveActiveGameplayEffect(TmpHandlePair.Key, 1);
+				EffectHandleToRemove.Add(TmpHandlePair.Key);
+			}
+		}
+		// 从容器中移除
+		// 如果这个Key不存在，就触发断言
+		for (auto& TmpHandle : EffectHandleToRemove)
+		{
+			ActiveEffectHandles.FindAndRemoveChecked(TmpHandle);
+		}
+	}
 }
 
 

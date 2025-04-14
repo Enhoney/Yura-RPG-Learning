@@ -4,6 +4,10 @@
 #include "AttributeSets/YuraAttributeSet.h"
 
 #include "Net/UnrealNetwork.h"
+#include "GameplayEffectExtension.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
+#include "GameFramework/Character.h"
 
 UYuraAttributeSet::UYuraAttributeSet()
 {
@@ -24,6 +28,79 @@ void UYuraAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION_NOTIFY(UYuraAttributeSet, MaxHealth,	COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UYuraAttributeSet, Mana,			COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UYuraAttributeSet, MaxMana,		COND_None, REPNOTIFY_Always);
+}
+
+void UYuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& OutProps) const
+{
+	OutProps.GEContectHandle = Data.EffectSpec.GetContext();
+	OutProps.SourceASC = OutProps.GEContectHandle.GetInstigatorAbilitySystemComponent();
+
+	if (IsValid(OutProps.SourceASC) && OutProps.SourceASC->AbilityActorInfo.IsValid() && OutProps.SourceASC->AbilityActorInfo->AvatarActor.IsValid())
+	{
+		OutProps.SourceAvatorActor = OutProps.SourceASC->AbilityActorInfo->AvatarActor.Get();
+		OutProps.SourceController = OutProps.SourceASC->AbilityActorInfo->PlayerController.Get();
+
+		if (OutProps.SourceController == nullptr && OutProps.SourceAvatorActor != nullptr)
+		{
+			if (const APawn* Pawn = Cast<APawn>(OutProps.SourceAvatorActor))
+			{
+				OutProps.SourceController = Pawn->GetController();
+			}
+		}
+
+		if (OutProps.SourceController)
+		{
+			OutProps.SourceCharacter = Cast<ACharacter>(OutProps.SourceController->GetPawn());
+		}
+	}
+
+	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
+	{
+		OutProps.TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
+		OutProps.TargetAvatorActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
+
+		OutProps.TargetCharacter = Cast<ACharacter>(OutProps.TargetAvatorActor);
+		OutProps.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OutProps.TargetAvatorActor);
+
+	}
+
+}
+
+void UYuraAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
+{
+	Super::PreAttributeChange(Attribute, NewValue);
+
+	if (Attribute == GetHealthAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxHealth());
+	}
+
+	if (Attribute == GetMaxHealthAttribute())
+	{
+		NewValue = FMath::Max(0.f, NewValue);
+	}
+
+	if (Attribute == GetManaAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxMana());
+	}
+
+	if (Attribute == GetMaxManaAttribute())
+	{
+		NewValue = FMath::Max(0.f, NewValue);
+	}
+}
+
+void UYuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
+{
+	Super::PostGameplayEffectExecute(Data);
+
+	// 通过EvaluatedData可以拿到被修改的属性
+	// 这个FGameplayEffectModCallbackData结构体十分复杂，嵌套层数很多
+	// 几乎可以通过它拿到和GE相关的任何信息
+	FEffectProperties EffectProps;
+	SetEffectProperties(Data, EffectProps);
+
 }
 
 void UYuraAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const
@@ -51,3 +128,5 @@ void UYuraAttributeSet::OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) 
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UYuraAttributeSet, MaxMana, OldMaxMana);
 }
+
+
