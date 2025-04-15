@@ -5,6 +5,7 @@
 
 #include "YuraAttributeSet.h"
 #include "GameplayEffectTypes.h"
+#include "YuraAbilitySystemComponent.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
 {
@@ -32,6 +33,18 @@ void UOverlayWidgetController::BindCallbacksToDependiencies()
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 		YuraAttributeSet->GetMaxManaAttribute()).AddUObject(this, &UOverlayWidgetController::BroadcastMaxManaChanged);
+
+	Cast<UYuraAbilitySystemComponent>(AbilitySystemComponent)->OnEffectAssetTags.AddLambda(
+		[](const FGameplayTagContainer& InGameplayTagContainer)
+		{
+			for (const FGameplayTag& TmpTag : InGameplayTagContainer)
+			{
+				FString TagString = FString::Printf(TEXT("GE Tag: %s"), *TmpTag.ToString());
+
+				GEngine->AddOnScreenDebugMessage(-1, 4.f, FColor::Green, TagString);
+			}
+		});
+
 }
 
 void UOverlayWidgetController::BroadcastHealthChanged(const FOnAttributeChangeData& Data) const

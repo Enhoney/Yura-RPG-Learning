@@ -29,3 +29,7 @@ void AYuraCharacterBase::BeginPlay()
 	
 }
 
+void AYuraCharacterBase::InitAbilityActorInfo()
+{
+}
+

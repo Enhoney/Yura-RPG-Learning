@@ -41,6 +41,14 @@ void AYuraEnemy::UnhighlightActor()
 void AYuraEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+	InitAbilityActorInfo();
+}
+
+void AYuraEnemy::InitAbilityActorInfo()
+{
 	// 初始化
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+
+	// 自定义函数，绑定代理
+	Cast<UYuraAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 }

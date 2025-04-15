@@ -25,7 +25,9 @@ public:
 protected:
 	void BeginPlay() override;
 
+private:
 
+	virtual void InitAbilityActorInfo() override;
 public:
 	UPROPERTY(BlueprintReadOnly)
 	bool bHighlight = false;
