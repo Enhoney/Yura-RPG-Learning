@@ -101,6 +101,26 @@ void UYuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	FEffectProperties EffectProps;
 	SetEffectProperties(Data, EffectProps);
 
+	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	{
+		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
+	}
+
+	if (Data.EvaluatedData.Attribute == GetMaxHealthAttribute())
+	{
+		SetMaxHealth(FMath::Max(0.f, GetMaxHealth()));
+	}
+
+	if (Data.EvaluatedData.Attribute == GetManaAttribute())
+	{
+		SetMana(FMath::Clamp(GetMana(), 0.f, GetMana()));
+	}
+
+	if (Data.EvaluatedData.Attribute == GetMaxManaAttribute())
+	{
+		SetMaxMana(FMath::Max(0.f, GetMaxMana()));
+	}
+
 }
 
 void UYuraAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const

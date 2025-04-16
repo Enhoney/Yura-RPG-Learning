@@ -7,6 +7,8 @@
 #include "GameplayEffectTypes.h"
 #include "YuraAbilitySystemComponent.h"
 
+#include "Engine/DataTable.h"
+
 void UOverlayWidgetController::BroadcastInitialValues()
 {
 	const UYuraAttributeSet* YuraAttributeSet = CastChecked<UYuraAttributeSet>(AttributeSet);
@@ -23,46 +25,51 @@ void UOverlayWidgetController::BindCallbacksToDependiencies()
 
 	// 绑定回调
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		YuraAttributeSet->GetHealthAttribute()).AddUObject(this, &UOverlayWidgetController::BroadcastHealthChanged);
+		YuraAttributeSet->GetHealthAttribute()).AddLambda(
+			[this](const FOnAttributeChangeData& Data)
+			{
+				OnHealthChanged.Broadcast(Data.NewValue);
+			});
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		YuraAttributeSet->GetMaxHealthAttribute()).AddUObject(this, &UOverlayWidgetController::BroadcasMaxHealthChanged);
+		YuraAttributeSet->GetMaxHealthAttribute()).AddLambda(
+			[this](const FOnAttributeChangeData& Data)
+			{
+				OnMaxHealthChanged.Broadcast(Data.NewValue);
+			});
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		YuraAttributeSet->GetManaAttribute()).AddUObject(this, &UOverlayWidgetController::BroadcastManaChanged);
+		YuraAttributeSet->GetManaAttribute()).AddLambda(
+			[this](const FOnAttributeChangeData& Data)
+			{
+				OnManaChanged.Broadcast(Data.NewValue);
+			});
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		YuraAttributeSet->GetMaxManaAttribute()).AddUObject(this, &UOverlayWidgetController::BroadcastMaxManaChanged);
+		YuraAttributeSet->GetMaxManaAttribute()).AddLambda(
+			[this](const FOnAttributeChangeData& Data)
+			{
+				OnMaxManaChanged.Broadcast(Data.NewValue);
+			});
 
 	Cast<UYuraAbilitySystemComponent>(AbilitySystemComponent)->OnEffectAssetTags.AddLambda(
-		[](const FGameplayTagContainer& InGameplayTagContainer)
+		[this](const FGameplayTagContainer& InGameplayTagContainer)
 		{
 			for (const FGameplayTag& TmpTag : InGameplayTagContainer)
 			{
-				FString TagString = FString::Printf(TEXT("GE Tag: %s"), *TmpTag.ToString());
+				// 这会去项目配置中找这个Tag，找不到默认会报错
+				FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag(FName("Message"));
+				// 只要包含就会是true
+				bool bIsMessageTag = TmpTag.MatchesTag(MessageTag);
 
-				GEngine->AddOnScreenDebugMessage(-1, 4.f, FColor::Green, TagString);
+				if (bIsMessageTag)
+				{
+					FUIWidgeRow* RowData = GetDataTableRowByTag<FUIWidgeRow>(TmpTag, MessageTable.Get());
+
+					OnMessageWidgetRowDelegate.Broadcast(*RowData);
+				}
+				
 			}
 		});
 
-}
-
-void UOverlayWidgetController::BroadcastHealthChanged(const FOnAttributeChangeData& Data) const
-{
-	OnHealthChanged.Broadcast(Data.NewValue);
-}
-
-void UOverlayWidgetController::BroadcasMaxHealthChanged(const FOnAttributeChangeData& Data) const
-{
-	OnMaxHealthChanged.Broadcast(Data.NewValue);
-}
-
-void UOverlayWidgetController::BroadcastManaChanged(const FOnAttributeChangeData& Data) const
-{
-	OnManaChanged.Broadcast(Data.NewValue);
-}
-
-void UOverlayWidgetController::BroadcastMaxManaChanged(const FOnAttributeChangeData& Data) const
-{
-	OnMaxManaChanged.Broadcast(Data.NewValue);
 }

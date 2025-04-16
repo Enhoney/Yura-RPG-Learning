@@ -36,6 +36,8 @@ struct FUIWidgeRow : public FTableRowBase
 	UTexture2D* MessageImage = nullptr;
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageWidgetRowSignature, FUIWidgeRow, Message);
+
 /**
  * 
  */
@@ -49,15 +51,9 @@ public:
 
 	virtual void BindCallbacksToDependiencies() override;
 
-protected:
-	/** 属性变更回调*/
-	void BroadcastHealthChanged(const FOnAttributeChangeData& Data) const;
+	template<typename T>
+	T* GetDataTableRowByTag(const FGameplayTag& InTag, UDataTable* DataTable);
 
-	void BroadcasMaxHealthChanged(const FOnAttributeChangeData& Data) const;
-
-	void BroadcastManaChanged(const FOnAttributeChangeData& Data) const;
-
-	void BroadcastMaxManaChanged(const FOnAttributeChangeData& Data) const;
 
 public:
 	UPROPERTY(BlueprintAssignable,Category = "GAS|Attributes")
@@ -72,14 +68,12 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
 	FOnAttributeChangedSignature OnMaxManaChanged;
 
+	UPROPERTY(BlueprintAssignable, Category = "GAS|GE Asset Massage")
+	FMessageWidgetRowSignature OnMessageWidgetRowDelegate;
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
 	TObjectPtr<UDataTable> MessageTable;
 
-	template<typename T>
-	T* GetDataTableRowByTag(const FGameplayTag& InTag, UDataTable* DataTable);
-	
-	
 };
 
 template<typename T>
