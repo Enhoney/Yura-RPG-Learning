@@ -78,6 +78,14 @@ void AYuraCharacter::OnRep_PlayerState()
 	
 }
 
+int32 AYuraCharacter::GetCharacterLevel()
+{
+	const AYuraPlayerState* YuraPlayerState = GetPlayerState<AYuraPlayerState>();
+	check(YuraPlayerState);
+
+	return YuraPlayerState->GetCharacterLevel();
+}
+
 void AYuraCharacter::InitAbilityActorInfo()
 {
 	AYuraPlayerState* YuraPlayerState = GetPlayerState<AYuraPlayerState>();
@@ -87,6 +95,9 @@ void AYuraCharacter::InitAbilityActorInfo()
 
 	AbilitySystemComponent = YuraPlayerState->GetAbilitySystemComponent();
 	AttributeSet = YuraPlayerState->GetAttributeSet();
+
+	// 初始化属性
+	InitializeDefaultAttributes();
 
 	// 自定义函数，绑定代理
 	Cast<UYuraAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();

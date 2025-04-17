@@ -38,6 +38,11 @@ void AYuraEnemy::UnhighlightActor()
 	Weapon->SetRenderCustomDepth(false);
 }
 
+int32 AYuraEnemy::GetCharacterLevel()
+{
+	return Level;
+}
+
 void AYuraEnemy::BeginPlay()
 {
 	Super::BeginPlay();

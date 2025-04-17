@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Character/YuraCharacterBase.h"
 #include "EnemyInterface.h"
+#include "Interaction/CombatInterface.h"
 #include "YuraEnemy.generated.h"
 
 /**
@@ -19,8 +20,14 @@ public:
 
 	AYuraEnemy();
 
+	/** Enemy Interface start*/
 	virtual void HighlightActor() override;
 	virtual void UnhighlightActor() override;
+	/** Enemy Interface end*/
+
+	/** Combat Interface start*/
+	virtual int32 GetCharacterLevel() override;
+	/** Combat Interface end*/
 
 protected:
 	void BeginPlay() override;
@@ -31,5 +38,9 @@ private:
 public:
 	UPROPERTY(BlueprintReadOnly)
 	bool bHighlight = false;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Default Class")
+	int32 Level = 1;
 	
 };

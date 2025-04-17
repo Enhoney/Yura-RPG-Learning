@@ -4,15 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-
+#include "Interaction/CombatInterface.h"
 #include "AbilitySystemInterface.h"
 #include "YuraCharacterBase.generated.h"
 
 class UAbilitySystemComponent;
 class UAttributeSet;
+class UGameplayEffect;
 
 UCLASS(Abstract)
-class YURARPG_API AYuraCharacterBase : public ACharacter, public IAbilitySystemInterface
+class YURARPG_API AYuraCharacterBase : public ACharacter, public IAbilitySystemInterface, public ICombatInterface
 {
 	GENERATED_BODY()
 
@@ -29,10 +30,14 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	void InitializeDefaultAttributes() const;
+
+
 private:
 
 	virtual void InitAbilityActorInfo();
 
+	void ApplyGameplayEffectToSelf(const TSubclassOf<UGameplayEffect>& GEForAttributes, float Level = 1.0f) const;
 
 protected:
 
@@ -44,5 +49,11 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attribute")
+	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attribute")
+	TSubclassOf<UGameplayEffect> DefaultSedcondaryAttributes;
 
 };

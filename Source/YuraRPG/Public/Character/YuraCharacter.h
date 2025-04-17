@@ -26,6 +26,10 @@ public:
 	// PlayerState网络复制过来的时候
 	virtual void OnRep_PlayerState() override;
 
+	/** Combat Interface start*/
+	virtual int32 GetCharacterLevel() override;
+	/** Combat Interface end*/
+
 private:
 
 	virtual void InitAbilityActorInfo() override;
