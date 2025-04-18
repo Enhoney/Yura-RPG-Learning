@@ -38,6 +38,8 @@ void AYuraCharacterBase::InitializeDefaultAttributes() const
 	ApplyGameplayEffectToSelf(DefaultPrimaryAttributes);
 	// 初始化SecondaryAttributes，这个必须在初始化完PrimaryAttribute之后
 	ApplyGameplayEffectToSelf(DefaultSedcondaryAttributes);
+	// 初始化生命值和魔法值，这个必须在MaxHealth和HealthMana初始化之后
+	ApplyGameplayEffectToSelf(DefaultVitalAttributes);
 	
 }
 
@@ -46,8 +48,8 @@ void AYuraCharacterBase::ApplyGameplayEffectToSelf(const TSubclassOf<UGameplayEf
 	check(IsValid(GetAbilitySystemComponent()));
 	check(GEForAttributes);
 
-	const FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
-
+	FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+	ContextHandle.AddSourceObject(this);
 	const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(GEForAttributes, Level, ContextHandle);
 	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), GetAbilitySystemComponent());
 }

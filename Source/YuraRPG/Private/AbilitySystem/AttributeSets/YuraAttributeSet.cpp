@@ -11,8 +11,6 @@
 
 UYuraAttributeSet::UYuraAttributeSet()
 {
-	InitHealth(50.f);
-	InitMana(100.f);
 }
 
 void UYuraAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
