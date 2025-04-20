@@ -2,6 +2,7 @@
 
 
 #include "YuraAbilitySystemComponent.h"
+#include "YuraGameplayTags.h"
 
 void UYuraAbilitySystemComponent::AbilityActorInfoSet()
 {
