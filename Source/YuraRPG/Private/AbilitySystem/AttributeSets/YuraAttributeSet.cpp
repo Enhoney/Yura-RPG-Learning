@@ -9,8 +9,30 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameFramework/Character.h"
 
+#include "YuraGameplayTags.h"
+
 UYuraAttributeSet::UYuraAttributeSet()
 {
+	const FYuraGameplayTags& YuraGameplayTags = FYuraGameplayTags::Get();
+
+	// Primary Attribute
+	TagsToAttributes.Add(YuraGameplayTags.Attribute_Primary_Strength,				GetStrengthAttribute);
+	TagsToAttributes.Add(YuraGameplayTags.Attribute_Primary_Intelligence,			GetIntelligenceAttribute);
+	TagsToAttributes.Add(YuraGameplayTags.Attribute_Primary_Resilience,				GetResilienceAttribute);
+	TagsToAttributes.Add(YuraGameplayTags.Attribute_Primary_Vigor,					GetVigorAttribute);
+
+	// Secondary Attribute
+	TagsToAttributes.Add(YuraGameplayTags.Attribute_Secondary_Armor,				GetArmorAttribute);
+	TagsToAttributes.Add(YuraGameplayTags.Attribute_Secondary_ArmorPenetration,		GetArmorPenetrationAttribute);
+	TagsToAttributes.Add(YuraGameplayTags.Attribute_Secondary_BlockChance,			GetBlockChanceAttribute);
+	TagsToAttributes.Add(YuraGameplayTags.Attribute_Secondary_CriticalHitChance,	GetCriticalHitChanceAttribute);
+	TagsToAttributes.Add(YuraGameplayTags.Attribute_Secondary_CriticalHitDamage,	GetCriticalHitDamageAttribute);
+	TagsToAttributes.Add(YuraGameplayTags.Attribute_Secondary_CriticalHitResistance, GetCriticalHitResistanceAttribute);
+	TagsToAttributes.Add(YuraGameplayTags.Attribute_Secondary_HealthRegeneration,	GetHealthRegenerationAttribute);
+	TagsToAttributes.Add(YuraGameplayTags.Attribute_Secondary_ManaRegeneration,		GetManaRegenerationAttribute);
+	TagsToAttributes.Add(YuraGameplayTags.Attribute_Secondary_MaxHealth,			GetMaxHealthAttribute);
+	TagsToAttributes.Add(YuraGameplayTags.Attribute_Secondary_MaxMana,				GetMaxManaAttribute);
+
 }
 
 void UYuraAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

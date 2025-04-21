@@ -5,6 +5,7 @@
 
 #include "UI/Widget/YuraUserWidget.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
+#include "UI/WidgetController/AttributeMenuWidgetController.h"
 
 UOverlayWidgetController* AYuraHUD::GetOverlayWidgetController(const FWidgetControllerParam& InWCParam)
 {
@@ -17,6 +18,19 @@ UOverlayWidgetController* AYuraHUD::GetOverlayWidgetController(const FWidgetCont
 		OverlayWidgetController->BindCallbacksToDependiencies();
 	}
 	return OverlayWidgetController;
+}
+
+UAttributeMenuWidgetController* AYuraHUD::GetAttributeMenuWidgetController(const FWidgetControllerParam& InWCParam)
+{
+	if (AttributeMenuController == nullptr)
+	{
+		AttributeMenuController = NewObject<UAttributeMenuWidgetController>(this, AttributeMenuControllerClass);
+		AttributeMenuController->SetWidgetControllrtParams(InWCParam);
+
+		// 开始监听属性变化
+		AttributeMenuController->BindCallbacksToDependiencies();
+	}
+	return AttributeMenuController;
 }
 
 void AYuraHUD::InitOverlay(APlayerController* InPC, APlayerState* InPS, UAbilitySystemComponent* InASC, UAttributeSet* InAS)
