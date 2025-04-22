@@ -46,4 +46,18 @@ void FYuraGameplayTags::InitializeGameplayTags()
 	YuraGameplayTags.Attribute_Secondary_ManaRegeneration =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attribute.Secondary.ManaRegeneration"), FString("Mana points automatically restored per second."));
 
+	// Ability Input Tags
+	YuraGameplayTags.InputTag_LMB =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.LMB"), FString("InputTag Left Mouse Button."));
+	YuraGameplayTags.InputTag_RMB =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.RMB"), FString("InputTag Right Mouse Button."));
+	YuraGameplayTags.InputTag_1 =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.1"), FString("InputTag 1 Key."));
+	YuraGameplayTags.InputTag_2 =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.2"), FString("InputTag 2 Key."));
+	YuraGameplayTags.InputTag_3 =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.3"), FString("InputTag 3 Key."));
+	YuraGameplayTags.InputTag_4 =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.4"), FString("InputTag 4 Key."));
+
 }

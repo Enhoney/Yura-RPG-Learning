@@ -6,6 +6,8 @@
 #include "AbilitySystemComponent.h"
 #include "GameplayEffectTypes.h"
 
+#include "YuraAbilitySystemComponent.h"
+
 AYuraCharacterBase::AYuraCharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -41,6 +43,17 @@ void AYuraCharacterBase::InitializeDefaultAttributes() const
 	// 初始化生命值和魔法值，这个必须在MaxHealth和HealthMana初始化之后
 	ApplyGameplayEffectToSelf(DefaultVitalAttributes);
 	
+}
+
+void AYuraCharacterBase::AddCharacterAbilities()
+{
+	if (!HasAuthority())
+	{
+		return;
+	}
+	// 调用ASC上的函数
+	UYuraAbilitySystemComponent* YuraASC = CastChecked<UYuraAbilitySystemComponent>(AbilitySystemComponent);
+	YuraASC->GrantCharacterAbilities(AbilitiesGrantIngOnStart);
 }
 
 void AYuraCharacterBase::ApplyGameplayEffectToSelf(const TSubclassOf<UGameplayEffect>& GEForAttributes, float Level) const

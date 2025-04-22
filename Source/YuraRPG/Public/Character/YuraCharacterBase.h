@@ -11,6 +11,7 @@
 class UAbilitySystemComponent;
 class UAttributeSet;
 class UGameplayEffect;
+class UGameplayAbility;
 
 UCLASS(Abstract)
 class YURARPG_API AYuraCharacterBase : public ACharacter, public IAbilitySystemInterface, public ICombatInterface
@@ -31,6 +32,8 @@ protected:
 	virtual void BeginPlay() override;
 
 	void InitializeDefaultAttributes() const;
+
+	virtual void AddCharacterAbilities();
 
 
 private:
@@ -58,5 +61,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attribute")
 	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
+
+private:
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> AbilitiesGrantIngOnStart;
 
 };

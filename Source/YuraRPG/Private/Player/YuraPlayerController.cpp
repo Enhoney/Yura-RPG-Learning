@@ -6,14 +6,22 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "EnhancedInputComponent.h"
-
+#include "GameplayTagContainer.h"
+#include "Input/YuraInputComponent.h"
 #include "EnemyInterface.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "YuraAbilitySystemComponent.h"
+#include "Components/SplineComponent.h"
+#include "YuraGameplayTags.h"
 
 AYuraPlayerController::AYuraPlayerController()
 {
 
 	// 开启tick
 	PrimaryActorTick.bCanEverTick = true;
+
+	SplineComponent = CreateDefaultSubobject<USplineComponent>(TEXT("Spline"));
+
 }
 
 void AYuraPlayerController::PlayerTick(float DeltaTime)
@@ -54,9 +62,11 @@ void AYuraPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+	UYuraInputComponent* YuraInputComponent = CastChecked<UYuraInputComponent>(InputComponent);
 
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AYuraPlayerController::Move);
+	YuraInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AYuraPlayerController::Move);
+
+	YuraInputComponent->BindAbilityActions(AbilityInputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
 }
 
 void AYuraPlayerController::Move(const FInputActionValue& InputActionValue)
@@ -131,4 +141,78 @@ void AYuraPlayerController::CursorTrace()
 		}
 	}
 
+}
+
+void AYuraPlayerController::AbilityInputTagPressed(FGameplayTag AbilityActionTag)
+{
+	// 只针对鼠标左键输入响应
+	if (AbilityActionTag.MatchesTagExact(FYuraGameplayTags::Get().InputTag_LMB))
+	{
+		bTargeting = (ThisActor == nullptr) ? false : true;
+		bAutoRunning = false;	// 默认值
+	}
+	
+}
+
+void AYuraPlayerController::AbilityInputTagReleased(FGameplayTag AbilityActionTag)
+{
+	if (GetAbilitySystemComponent() == nullptr) 
+	{
+		return;
+	}
+	GetAbilitySystemComponent()->AbilityInputTagReleased(AbilityActionTag);
+}
+
+void AYuraPlayerController::AbilityInputTagHeld(FGameplayTag AbilityActionTag)
+{
+	if (GetAbilitySystemComponent() == nullptr)
+	{
+		return;
+	}
+	// 如果不是鼠标左键，就激活能力
+	if (!AbilityActionTag.MatchesTagExact(FYuraGameplayTags::Get().InputTag_LMB))
+	{
+		GetAbilitySystemComponent()->AbilityInputTagHeld(AbilityActionTag);
+		return;
+	}
+	// 如果锁定了目标--鼠标下方是敌人，并且按住了鼠标左键
+	if (bTargeting)
+	{
+		// 这对吗，这对应的是什么能力--通常就是攻击能力
+		GetAbilitySystemComponent()->AbilityInputTagHeld(AbilityActionTag);
+		return;
+	}
+	else
+	{
+		// 这个时候就是点击移动了，不用激活GA
+		// 增加按下时间
+		FollowingTime += GetWorld()->DeltaTimeSeconds;
+	}
+	// 获取点击位置，因为是可见通道只要点击的位置下有可见物体，就一定会返回true
+	FHitResult CursorHit;
+	if (GetHitResultUnderCursor(ECC_Visibility, false, CursorHit))
+	{
+		// 缓存点击位置
+		CachedDestinationLocation = CursorHit.ImpactPoint;
+	}
+	
+	// 开始移动
+	if (APawn* ControlledPawn = GetPawn<APawn>())
+	{
+		// 计算移动朝向
+		FVector WorldDirection = (CachedDestinationLocation - ControlledPawn->GetActorLocation()).GetSafeNormal();
+
+		ControlledPawn->AddMovementInput(WorldDirection, 1.0f);
+	}
+	
+}
+
+UYuraAbilitySystemComponent* AYuraPlayerController::GetAbilitySystemComponent()
+{
+	if (AbilitySystemComponent == nullptr)
+	{
+		AbilitySystemComponent = 
+			Cast<UYuraAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()));
+	}
+	return AbilitySystemComponent;
 }
