@@ -28,6 +28,10 @@ public:
 	// 自己定义的方法，方便获取属性
 	UAttributeSet* GetAttributeSet() const;
 
+	/** ConbatInterface start*/
+	virtual FVector GetFireSocketLocation() override;
+	/** ConbatInterface end*/
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -46,6 +50,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
+
+	// 武器尖端SocketName
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	FName WeaponTipSocketName;
 
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;

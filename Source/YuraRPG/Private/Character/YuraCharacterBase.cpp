@@ -28,6 +28,12 @@ UAttributeSet* AYuraCharacterBase::GetAttributeSet() const
 	return AttributeSet;
 }
 
+FVector AYuraCharacterBase::GetFireSocketLocation()
+{
+	check(Weapon);
+	return Weapon->GetSocketLocation(WeaponTipSocketName);
+}
+
 void AYuraCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();

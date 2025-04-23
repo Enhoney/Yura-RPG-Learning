@@ -14,6 +14,10 @@
 #include "Components/SplineComponent.h"
 #include "YuraGameplayTags.h"
 
+// 导航系统
+#include "NavigationSystem.h"
+#include "NavigationPath.h"
+
 AYuraPlayerController::AYuraPlayerController()
 {
 
@@ -29,6 +33,8 @@ void AYuraPlayerController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 
 	CursorTrace();
+
+	YuraAutoRunning();
 }
 
 void AYuraPlayerController::BeginPlay()
@@ -71,6 +77,10 @@ void AYuraPlayerController::SetupInputComponent()
 
 void AYuraPlayerController::Move(const FInputActionValue& InputActionValue)
 {
+	// 退出自动移动状态
+	bAutoRunning = false;
+	FollowingTime = 0.f;
+
 	// 将输入转换成2D形式
 	const FVector2D InputAxisVector = InputActionValue.Get<FVector2D>();
 
@@ -90,7 +100,6 @@ void AYuraPlayerController::Move(const FInputActionValue& InputActionValue)
 
 void AYuraPlayerController::CursorTrace()
 {
-	FHitResult CursorHit;
 
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
 
@@ -113,31 +122,15 @@ void AYuraPlayerController::CursorTrace()
 	 * 5、两个都不是空指针，但是两个对象不一样了--关闭上一个的高亮，开启这个的高亮
 	 */
 
-	if (LastActor == nullptr)
+	if (LastActor != ThisActor)
 	{
-		if (ThisActor != nullptr)
+		if (LastActor)
 		{
-			// Case 2
-			ThisActor->HighlightActor();
-		}
-		// Case 1
-	}
-	else
-	{
-		if (ThisActor == nullptr)
-		{
-			// Case 3
 			LastActor->UnhighlightActor();
 		}
-		else
+		if (ThisActor)
 		{
-			if (ThisActor != LastActor)
-			{
-				// Case 5
-				LastActor->UnhighlightActor();
-				ThisActor->HighlightActor();
-			}
-			// Case 4
+			ThisActor->HighlightActor();
 		}
 	}
 
@@ -160,7 +153,51 @@ void AYuraPlayerController::AbilityInputTagReleased(FGameplayTag AbilityActionTa
 	{
 		return;
 	}
-	GetAbilitySystemComponent()->AbilityInputTagReleased(AbilityActionTag);
+	// 如果不是鼠标左键，就激活能力
+	if (!AbilityActionTag.MatchesTagExact(FYuraGameplayTags::Get().InputTag_LMB))
+	{
+		GetAbilitySystemComponent()->AbilityInputTagReleased(AbilityActionTag);
+		return;
+	}
+	if (bTargeting)
+	{
+		GetAbilitySystemComponent()->AbilityInputTagReleased(AbilityActionTag);
+		return;
+	}
+	else
+	{
+		APawn* ControlledPawn = GetPawn<APawn>();
+		// 这就表示短按，这个时候我们要去创建一条路径，这需要导航系统了
+		if (FollowingTime <= ShortPressThreshould && ControlledPawn)
+		{
+			
+			const FVector CurrentLocation = ControlledPawn->GetActorLocation();
+			// 生成一条导航路径
+			if (UNavigationPath* NavMovePath = UNavigationSystemV1::FindPathToLocationSynchronously(
+				this, CurrentLocation, CachedDestinationLocation))
+			{
+				// 清除组件中原有的曲线路径点
+				SplineComponent->ClearSplinePoints();
+				
+				for (const FVector& PathPoint : NavMovePath->PathPoints)
+				{
+					// 添加到Spline组件中去
+					SplineComponent->AddSplineWorldPoint(PathPoint);
+				}
+
+				// 为了处理某些到不了的位置，直接将导航路径最后一个点作为目标位置
+				CachedDestinationLocation = NavMovePath->PathPoints[NavMovePath->PathPoints.Num() - 1];
+				bAutoRunning = true;
+			}
+			
+		}
+		// 重置FollowingTime
+		FollowingTime = 0.f;
+		bTargeting = false;
+
+
+	}
+
 }
 
 void AYuraPlayerController::AbilityInputTagHeld(FGameplayTag AbilityActionTag)
@@ -189,8 +226,7 @@ void AYuraPlayerController::AbilityInputTagHeld(FGameplayTag AbilityActionTag)
 		FollowingTime += GetWorld()->DeltaTimeSeconds;
 	}
 	// 获取点击位置，因为是可见通道只要点击的位置下有可见物体，就一定会返回true
-	FHitResult CursorHit;
-	if (GetHitResultUnderCursor(ECC_Visibility, false, CursorHit))
+	if (CursorHit.bBlockingHit)
 	{
 		// 缓存点击位置
 		CachedDestinationLocation = CursorHit.ImpactPoint;
@@ -215,4 +251,29 @@ UYuraAbilitySystemComponent* AYuraPlayerController::GetAbilitySystemComponent()
 			Cast<UYuraAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()));
 	}
 	return AbilitySystemComponent;
+}
+
+void AYuraPlayerController::YuraAutoRunning()
+{
+	if (bAutoRunning)
+	{
+		if (APawn* ControlledPawn = GetPawn<APawn>())
+		{
+
+			// 找到最接近的一个路径点位置--世界坐标这个是会根据之前添加的点，绘制一条曲线出来，然后从那个曲线上面取点，不仅限于添加的那几个路径点
+			const FVector ClosetPoint = SplineComponent->FindLocationClosestToWorldLocation(ControlledPawn->GetActorLocation(), ESplineCoordinateSpace::World);
+			// 计算移动朝向
+			const FVector Direction = SplineComponent->FindDirectionClosestToWorldLocation(ControlledPawn->GetActorLocation(), ESplineCoordinateSpace::World);
+			// 移动
+			ControlledPawn->AddMovementInput(Direction, 1.f);
+
+			// 检查距离阈值
+			const float DistanceToDestination = (ControlledPawn->GetActorLocation() - CachedDestinationLocation).Length();
+			if (DistanceToDestination <= AutoRunAcceptenceRadius)
+			{
+				// 如果离点击的位置已经少于50cm，就认为已经到达了
+				bAutoRunning = false;
+			}
+		}
+	}
 }

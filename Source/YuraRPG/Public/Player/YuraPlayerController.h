@@ -48,7 +48,13 @@ private:
 	// 获取AbilitySystemComponent
 	UYuraAbilitySystemComponent* GetAbilitySystemComponent();
 
+	// 分帧移动--自动
+	void YuraAutoRunning();
+
 private:
+	// 鼠标命中结果
+	FHitResult CursorHit;
+
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputMappingContext> YuraContext;
 
@@ -81,7 +87,7 @@ private:
 
 	// 到达目标点距离阈值
 	UPROPERTY(EditDefaultsOnly)
-	float AutoRunAcceptenceRadius = 50.f;
+	float AutoRunAcceptenceRadius = 100.f;
 
 	// 这个组件可以存储一个路径曲线
 	UPROPERTY(VisibleAnywhere)

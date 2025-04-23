@@ -28,7 +28,8 @@ public:
 
 
 protected:
-	void EffectApplied(UAbilitySystemComponent* ASC, const FGameplayEffectSpec& GESpec, FActiveGameplayEffectHandle ActiveGEHandle);
+	UFUNCTION(Client, Reliable)
+	void ClientEffectApplied(UAbilitySystemComponent* ASC, const FGameplayEffectSpec& GESpec, FActiveGameplayEffectHandle ActiveGEHandle);
 
 public:
 	FEffectAssetTagsDelegate OnEffectAssetTags;
