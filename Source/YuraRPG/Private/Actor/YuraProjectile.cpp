@@ -5,6 +5,11 @@
 
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Components/AudioComponent.h"
+
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 AYuraProjectile::AYuraProjectile()
 {
@@ -34,10 +39,46 @@ void AYuraProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 	Sphere->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnSphereBeginOverlap);
+
+	AudioComponent = UGameplayStatics::SpawnSoundAttached(FlyingtSound, GetRootComponent());
+}
+
+void AYuraProjectile::Destroyed()
+{
+	// 这个时候，还没有销毁呢
+	// 如果这个时候在客户端，并且还没有碰撞到，就手动播放效果
+	if (!HasAuthority() && !bHit)
+	{
+		AudioComponent->Stop();
+		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactNiagaraEffect, GetActorLocation());
+	}
+
+	Super::Destroyed();
 }
 
 void AYuraProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	// 停止播放飞行的声音
+	AudioComponent->Stop();
 
+	// 在指定位置播放音效
+
+	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactNiagaraEffect, GetActorLocation());
+	
+
+	// 如果是在服务器上，就销毁这个发射物体
+	// 这里可能存在这样一种情况--客户端还没有播放音效和特效，服务端已经执行到销毁，声音和Niagara只在客户端上有
+	// 这会导致客户端没有任何反馈，发射物就直接消失了
+	// 所以需要做一些操作来保证
+	if (HasAuthority())
+	{
+		Destroy();
+	}
+	else
+	{
+		bHit = true;
+	}
 }
 

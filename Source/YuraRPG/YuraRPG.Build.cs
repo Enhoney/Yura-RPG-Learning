@@ -38,7 +38,7 @@ public class YuraRPG : ModuleRules
 
         PrivateDependencyModuleNames.AddRange(new string[] 
 		{ 
-			
+			"Niagara"
 		});
 
 		// Uncomment if you are using Slate UI

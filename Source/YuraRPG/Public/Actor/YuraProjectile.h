@@ -8,6 +8,9 @@
 
 class USphereComponent;
 class UProjectileMovementComponent;
+class UNiagaraSystem;
+class USoundBase;
+class UAudioComponent;
 
 UCLASS()
 class YURARPG_API AYuraProjectile : public AActor
@@ -23,6 +26,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void Destroyed() override;
+
 	// 重叠回调
 	UFUNCTION()
 	void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -36,4 +41,20 @@ private:
 	// 发射物移动组件
 	UPROPERTY(VisibleAnywhere, Category = "Projectile")
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovementComponent;
+
+	// 命中的效果
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	TObjectPtr<UNiagaraSystem> ImpactNiagaraEffect;
+
+	// 命中的音效
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	TObjectPtr<USoundBase> ImpactSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	TObjectPtr<USoundBase> FlyingtSound;
+
+	UPROPERTY()
+	TObjectPtr<UAudioComponent> AudioComponent;
+
+	bool bHit = false;
 };
