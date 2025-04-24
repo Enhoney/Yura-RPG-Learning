@@ -28,4 +28,7 @@ public:
 
 	// 获取SocketLocation
 	virtual FVector GetFireSocketLocation();
+
+	// 设置Wrap位置朝向
+	virtual void SetWarpTargetFacing(const FVector& TargetLocation);
 };

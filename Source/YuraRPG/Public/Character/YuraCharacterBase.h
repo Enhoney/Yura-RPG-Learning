@@ -30,6 +30,8 @@ public:
 
 	/** ConbatInterface start*/
 	virtual FVector GetFireSocketLocation() override;
+
+	virtual void SetWarpTargetFacing(const FVector& TargetLocation) override;
 	/** ConbatInterface end*/
 
 protected:
@@ -47,6 +49,12 @@ private:
 	void ApplyGameplayEffectToSelf(const TSubclassOf<UGameplayEffect>& GEForAttributes, float Level = 1.0f) const;
 
 protected:
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TObjectPtr<class UMotionWarpingComponent> MotionWarping;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	FName WarpingTargetName = FName();
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;

@@ -7,6 +7,10 @@
 #include "GameplayEffectTypes.h"
 
 #include "YuraAbilitySystemComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+
+#include "MotionWarpingComponent.h"
 
 AYuraCharacterBase::AYuraCharacterBase()
 {
@@ -15,6 +19,12 @@ AYuraCharacterBase::AYuraCharacterBase()
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	Weapon->SetupAttachment(GetMesh(), FName("WeaponHandSocket"));
 	Weapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// 忽略相机的碰撞，以免视角忽然拉近
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
+	MotionWarping = CreateDefaultSubobject<UMotionWarpingComponent>("MotionWarping");
 
 }
 
@@ -32,6 +42,11 @@ FVector AYuraCharacterBase::GetFireSocketLocation()
 {
 	check(Weapon);
 	return Weapon->GetSocketLocation(WeaponTipSocketName);
+}
+
+void AYuraCharacterBase::SetWarpTargetFacing(const FVector& TargetLocation)
+{
+	MotionWarping->AddOrUpdateWarpTargetFromLocation(WarpingTargetName, TargetLocation);
 }
 
 void AYuraCharacterBase::BeginPlay()

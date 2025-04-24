@@ -37,6 +37,11 @@ private:
 
 	void Move(const FInputActionValue& InputActionValue);
 
+	// Shift的按下和抬起
+	// 可以不传递参数，如果不需要这个参数的话
+	void ShiftPressed();
+	void ShiftReleased();
+
 	// 执行调用敌人高亮逻辑
 	void CursorTrace();
 
@@ -60,6 +65,12 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> MoveAction;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputAction> ShiftAction;
+
+	// 记录按键是否按下
+	bool bShiftDown = false;
 
 	// 记录上一帧和这一帧命中的对象
 	IEnemyInterface* LastActor =  nullptr;

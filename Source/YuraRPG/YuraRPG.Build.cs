@@ -18,7 +18,8 @@ public class YuraRPG : ModuleRules
             "GameplayAbilities",
             "GameplayTags",
             "GameplayTasks",
-            "NavigationSystem"
+            "NavigationSystem",
+            "MotionWarping"
         });
 
 		PublicIncludePaths.AddRange(new string[]

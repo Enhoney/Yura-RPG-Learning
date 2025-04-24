@@ -71,6 +71,9 @@ void AYuraPlayerController::SetupInputComponent()
 	UYuraInputComponent* YuraInputComponent = CastChecked<UYuraInputComponent>(InputComponent);
 
 	YuraInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AYuraPlayerController::Move);
+	// Shift 
+	YuraInputComponent->BindAction(ShiftAction, ETriggerEvent::Started, this, &AYuraPlayerController::ShiftPressed);
+	YuraInputComponent->BindAction(ShiftAction, ETriggerEvent::Completed, this, &AYuraPlayerController::ShiftReleased);
 
 	YuraInputComponent->BindAbilityActions(AbilityInputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
 }
@@ -96,6 +99,16 @@ void AYuraPlayerController::Move(const FInputActionValue& InputActionValue)
 		ControlledPawn->AddMovementInput(ForawrdDirection, InputAxisVector.X);
 		ControlledPawn->AddMovementInput(RightDirection, InputAxisVector.Y);
 	}
+}
+
+void AYuraPlayerController::ShiftPressed()
+{
+	bShiftDown = true;
+}
+
+void AYuraPlayerController::ShiftReleased()
+{
+	bShiftDown = false;
 }
 
 void AYuraPlayerController::CursorTrace()
@@ -159,18 +172,15 @@ void AYuraPlayerController::AbilityInputTagReleased(FGameplayTag AbilityActionTa
 		GetAbilitySystemComponent()->AbilityInputTagReleased(AbilityActionTag);
 		return;
 	}
-	if (bTargeting)
-	{
-		GetAbilitySystemComponent()->AbilityInputTagReleased(AbilityActionTag);
-		return;
-	}
-	else
+
+	GetAbilitySystemComponent()->AbilityInputTagReleased(AbilityActionTag);
+	if (!bTargeting && !bShiftDown)
 	{
 		APawn* ControlledPawn = GetPawn<APawn>();
 		// 这就表示短按，这个时候我们要去创建一条路径，这需要导航系统了
 		if (FollowingTime <= ShortPressThreshould && ControlledPawn)
 		{
-			
+
 			const FVector CurrentLocation = ControlledPawn->GetActorLocation();
 			// 生成一条导航路径
 			if (UNavigationPath* NavMovePath = UNavigationSystemV1::FindPathToLocationSynchronously(
@@ -178,7 +188,7 @@ void AYuraPlayerController::AbilityInputTagReleased(FGameplayTag AbilityActionTa
 			{
 				// 清除组件中原有的曲线路径点
 				SplineComponent->ClearSplinePoints();
-				
+
 				for (const FVector& PathPoint : NavMovePath->PathPoints)
 				{
 					// 添加到Spline组件中去
@@ -189,15 +199,12 @@ void AYuraPlayerController::AbilityInputTagReleased(FGameplayTag AbilityActionTa
 				CachedDestinationLocation = NavMovePath->PathPoints[NavMovePath->PathPoints.Num() - 1];
 				bAutoRunning = true;
 			}
-			
+
 		}
 		// 重置FollowingTime
 		FollowingTime = 0.f;
 		bTargeting = false;
-
-
 	}
-
 }
 
 void AYuraPlayerController::AbilityInputTagHeld(FGameplayTag AbilityActionTag)
@@ -213,7 +220,8 @@ void AYuraPlayerController::AbilityInputTagHeld(FGameplayTag AbilityActionTag)
 		return;
 	}
 	// 如果锁定了目标--鼠标下方是敌人，并且按住了鼠标左键
-	if (bTargeting)
+	// 或者这个时候按下了鼠标左键
+	if (bTargeting || bShiftDown)
 	{
 		// 这对吗，这对应的是什么能力--通常就是攻击能力
 		GetAbilitySystemComponent()->AbilityInputTagHeld(AbilityActionTag);

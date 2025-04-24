@@ -14,3 +14,7 @@ FVector ICombatInterface::GetFireSocketLocation()
 {
 	return FVector();
 }
+
+void ICombatInterface::SetWarpTargetFacing(const FVector& TargetLocation)
+{
+}
