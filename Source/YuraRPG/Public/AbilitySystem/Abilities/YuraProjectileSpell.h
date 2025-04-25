@@ -7,6 +7,7 @@
 #include "YuraProjectileSpell.generated.h"
 
 class AYuraProjectile;
+class UGameplayEffect;
 
 /**
  * 
@@ -35,5 +36,9 @@ protected:
 	// 发射物的类
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<AYuraProjectile> ProjectileClass;
+
+	// 伤害的GE
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<UGameplayEffect> DamageEffectClass;
 	
 };

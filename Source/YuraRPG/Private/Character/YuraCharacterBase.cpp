@@ -12,6 +12,8 @@
 
 #include "MotionWarpingComponent.h"
 
+#include "YuraRPG.h"
+
 AYuraCharacterBase::AYuraCharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -22,7 +24,14 @@ AYuraCharacterBase::AYuraCharacterBase()
 
 	// 忽略相机的碰撞，以免视角忽然拉近
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
+	// 关闭胶囊体的重叠响应
+	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
+	// 启用Mesh的重叠响应
+	GetMesh()->SetGenerateOverlapEvents(true);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	
+	GetMesh()->SetCollisionResponseToChannel(ECC_Projectile, ECR_Overlap);
 
 	MotionWarping = CreateDefaultSubobject<UMotionWarpingComponent>("MotionWarping");
 

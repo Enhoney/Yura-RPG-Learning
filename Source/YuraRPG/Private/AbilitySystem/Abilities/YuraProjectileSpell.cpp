@@ -3,7 +3,8 @@
 
 #include "AbilitySystem/Abilities/YuraProjectileSpell.h"
 #include "Actor/YuraProjectile.h"
-
+#include "GameplayEffectTypes.h"
+#include "AbilitySystemComponent.h"
 #include "Interaction/CombatInterface.h"
 
 void UYuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Handle, 
@@ -46,7 +47,11 @@ void UYuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 			GetAvatarActorFromActorInfo(),
 			Cast<APawn>(GetAvatarActorFromActorInfo()),
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-		//TODO: 我们要在这里给他一个GameplayEffectSpec
+		// 我们要在这里给他一个GameplayEffectSpec
+		const UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
+		const FGameplayEffectContextHandle DamageEffectContextHandle = ASC->MakeEffectContext();
+		const FGameplayEffectSpecHandle DamageSpecHandle = ASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), DamageEffectContextHandle);
+		Projectile->DamageEffectSpecHandle = DamageSpecHandle;
 
 		Projectile->FinishSpawning(SpawnTransform);
 	}

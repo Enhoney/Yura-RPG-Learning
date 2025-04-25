@@ -6,7 +6,10 @@
 #include "Character/YuraCharacterBase.h"
 #include "EnemyInterface.h"
 #include "Interaction/CombatInterface.h"
+#include "UI/WidgetController/OverlayWidgetController.h"
 #include "YuraEnemy.generated.h"
+
+class UWidgetComponent;
 
 /**
  * 
@@ -29,6 +32,10 @@ public:
 	virtual int32 GetCharacterLevel() override;
 	/** Combat Interface end*/
 
+	// 手动调用获取初始值
+	UFUNCTION(BlueprintCallable)
+	void CallInitHealthValue();
+
 protected:
 	void BeginPlay() override;
 
@@ -39,8 +46,18 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool bHighlight = false;
 
+	// 角色类作为WidgetController，执行广播
+	UPROPERTY(BlueprintAssignable)
+	FOnAttributeChangedSignature OnHealthChanged;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnAttributeChangedSignature OnMaxHealthChanged;
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Default Class")
 	int32 Level = 1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health Bar")
+	TObjectPtr<UWidgetComponent> HealthBar;
 	
 };

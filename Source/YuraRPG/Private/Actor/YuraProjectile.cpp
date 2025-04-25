@@ -11,6 +11,12 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "YuraRPG.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
+#include "GameplayEffectTypes.h"
+
 AYuraProjectile::AYuraProjectile()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -21,6 +27,9 @@ AYuraProjectile::AYuraProjectile()
 	SetRootComponent(Sphere);
 	// 仅查询
 	Sphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+
+	// 设置ObjectType
+	Sphere->SetCollisionObjectType(ECC_Projectile);
 	// 仅对于指定通道重叠
 	Sphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	Sphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
@@ -59,14 +68,6 @@ void AYuraProjectile::Destroyed()
 
 void AYuraProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// 停止播放飞行的声音
-	AudioComponent->Stop();
-
-	// 在指定位置播放音效
-
-	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
-	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactNiagaraEffect, GetActorLocation());
-	
 
 	// 如果是在服务器上，就销毁这个发射物体
 	// 这里可能存在这样一种情况--客户端还没有播放音效和特效，服务端已经执行到销毁，声音和Niagara只在客户端上有
@@ -74,10 +75,21 @@ void AYuraProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedCompon
 	// 所以需要做一些操作来保证
 	if (HasAuthority())
 	{
+		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor);
+		if (TargetASC)
+		{
+			TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
+		}
 		Destroy();
 	}
 	else
 	{
+		// 停止播放飞行的声音
+		AudioComponent->Stop();
+
+		// 在指定位置播放音效
+		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactNiagaraEffect, GetActorLocation());
 		bHit = true;
 	}
 }
