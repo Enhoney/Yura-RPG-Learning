@@ -37,7 +37,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	void InitializeDefaultAttributes() const;
+	virtual void InitializeDefaultAttributes() const;
 
 	virtual void AddCharacterAbilities();
 

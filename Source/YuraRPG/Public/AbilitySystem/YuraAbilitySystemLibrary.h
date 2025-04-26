@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Data/CharacterClassInfo.h"
 #include "YuraAbilitySystemLibrary.generated.h"
 
 class UOverlayWidgetController;
@@ -25,5 +26,9 @@ public:
 	// 获取OverlayWidgetController
 	UFUNCTION(BlueprintPure, Category = "YuraAbilitySystemLibrary|WidgetController")
 	static UAttributeMenuWidgetController* GetAttributeMenuWidgetController(const UObject* InWorldContextObject);
+
+	// 初始化Enemy的初始属性
+	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Initialize Character Default Attributes")
+	static void InitDefaultAttributes(const UObject* InWorldContextObject, ECharacterClass EnemyClass, float CharacterLevel, UAbilitySystemComponent* TargetASC);
 	
 };

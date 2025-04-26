@@ -9,6 +9,8 @@
 #include "YuraAttributeSet.h"
 #include "Components/WidgetComponent.h"
 #include "UI/Widget/YuraUserWidget.h"
+#include "YuraAbilitySystemLibrary.h"
+
 
 AYuraEnemy::AYuraEnemy()
 {
@@ -85,6 +87,11 @@ void AYuraEnemy::BeginPlay()
 	
 }
 
+void AYuraEnemy::InitializeDefaultAttributes() const
+{
+	UYuraAbilitySystemLibrary::InitDefaultAttributes(this, CharacterClass, Level, AbilitySystemComponent);
+}
+
 void AYuraEnemy::InitAbilityActorInfo()
 {
 	// 初始化
@@ -93,5 +100,6 @@ void AYuraEnemy::InitAbilityActorInfo()
 	// 自定义函数，绑定代理
 	Cast<UYuraAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 
+	// 初始化属性
 	InitializeDefaultAttributes();
 }
