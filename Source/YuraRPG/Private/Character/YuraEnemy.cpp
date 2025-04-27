@@ -10,6 +10,8 @@
 #include "Components/WidgetComponent.h"
 #include "UI/Widget/YuraUserWidget.h"
 #include "YuraAbilitySystemLibrary.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "YuraGameplayTags.h"
 
 
 AYuraEnemy::AYuraEnemy()
@@ -47,6 +49,14 @@ int32 AYuraEnemy::GetCharacterLevel()
 	return Level;
 }
 
+void AYuraEnemy::Die()
+{
+	// 设置寿命
+	SetLifeSpan(LifeSpawnOnDeath);
+	// 
+	Super::Die();
+}
+
 void AYuraEnemy::CallInitHealthValue()
 {
 	// Init
@@ -57,10 +67,22 @@ void AYuraEnemy::CallInitHealthValue()
 	}
 }
 
+void AYuraEnemy::OnHitReactTagChange(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	bHitReacting = (NewCount > 0);
+
+	GetCharacterMovement()->MaxWalkSpeed = (bHitReacting ? 0.f : BaseWalkSpeed);
+}
+
 void AYuraEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 	InitAbilityActorInfo();
+
+	// 授予通用能力
+	UYuraAbilitySystemLibrary::GrantStartUpAbilities(this, AbilitySystemComponent);
 
 	// 设置WidgetController
 	if (UYuraUserWidget* YuraUI = Cast<UYuraUserWidget>(HealthBar->GetUserWidgetObject()))
@@ -84,7 +106,10 @@ void AYuraEnemy::BeginPlay()
 
 	CallInitHealthValue();
 
-	
+	// 绑定Tag授予回调--HitReact
+	AbilitySystemComponent->RegisterGameplayTagEvent(FYuraGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(
+		this, &AYuraEnemy::OnHitReactTagChange
+	);
 }
 
 void AYuraEnemy::InitializeDefaultAttributes() const

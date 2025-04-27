@@ -100,7 +100,11 @@ public:
 	ATTRIBUTE_ACCESSORS(UYuraAttributeSet, CriticalHitResistance);
 	ATTRIBUTE_ACCESSORS(UYuraAttributeSet, HealthRegeneration);
 	ATTRIBUTE_ACCESSORS(UYuraAttributeSet, ManaRegeneration);
-	
+
+	/**
+	 * Meta Attributes
+	 */
+	ATTRIBUTE_ACCESSORS(UYuraAttributeSet, IncomingDamage);
 
 protected:
 	/**
@@ -236,6 +240,13 @@ protected:
 	// 每秒自动恢复魔法值
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_ManaRegeneration, Category = "Secondary Attribute")
 	FGameplayAttributeData ManaRegeneration;
+
+	/**
+	 * Meta Attributes
+	 */
+	// 传入的伤害
+	UPROPERTY(BlueprintReadOnly, Category = "Meta Attribute")
+	FGameplayAttributeData IncomingDamage;
 
 private:
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& OutProps) const;

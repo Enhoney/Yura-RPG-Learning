@@ -10,6 +10,7 @@
 #include "GameFramework/Character.h"
 
 #include "YuraGameplayTags.h"
+#include "Interaction/CombatInterface.h"
 
 UYuraAttributeSet::UYuraAttributeSet()
 {
@@ -151,6 +152,39 @@ void UYuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	if (Data.EvaluatedData.Attribute == GetMaxManaAttribute())
 	{
 		SetMaxMana(FMath::Max(0.f, GetMaxMana()));
+	}
+
+	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
+	{
+		const float LocalIncomingDamage = GetIncomingDamage();
+		SetIncomingDamage(0.f);
+		if (LocalIncomingDamage > 0.f)
+		{
+			const float NewHealth = GetHealth() - LocalIncomingDamage;
+
+			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
+
+			// 是否为致命伤害
+			const bool bFatal = (NewHealth <= 0);
+
+			// 激活受击能力
+			if (!bFatal)
+			{
+				FGameplayTagContainer TagContainer;
+				// 直接就使用Effect.HitReact这个Tag即可，激活能力不会给ASC授予上面的标签吧
+				TagContainer.AddTag(FYuraGameplayTags::Get().Effects_HitReact);
+				EffectProps.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+			}
+			else
+			{
+				// 死亡
+				if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(EffectProps.TargetAvatorActor))
+				{
+					CombatInterface->Die();
+				}
+			}
+		}
+		
 	}
 
 }

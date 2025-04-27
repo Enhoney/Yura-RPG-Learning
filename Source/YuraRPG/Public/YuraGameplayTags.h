@@ -54,6 +54,14 @@ public:
 	FGameplayTag InputTag_3;
 	FGameplayTag InputTag_4;
 
+	// Damage Tag
+	// 用于伤害计算SetCallByCaller的Tag
+	FGameplayTag Damage;
+
+	// 各种Buff和Debuff
+	// 受击僵直
+	FGameplayTag Effects_HitReact;
+
 private:
 	static FYuraGameplayTags YuraGameplayTags;
 };

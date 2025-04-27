@@ -59,7 +59,7 @@ void AYuraCharacter::PossessedBy(AController* NewController)
 	if (GetLocalRole() == ENetRole::ROLE_Authority)
 	{
 		InitAbilityActorInfo();
-
+		// 注册能力
 		AddCharacterAbilities();
 	}
 }

@@ -7,7 +7,7 @@
 #include "CombatInterface.generated.h"
 
 // This class does not need to be modified.
-UINTERFACE(MinimalAPI)
+UINTERFACE(MinimalAPI, BlueprintType)
 class UCombatInterface : public UInterface
 {
 	GENERATED_BODY()
@@ -31,4 +31,10 @@ public:
 
 	// 设置Wrap位置朝向
 	virtual void SetWarpTargetFacing(const FVector& TargetLocation);
+
+	// 获取受击动画
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	UAnimMontage* GetHitReactAnimMontage();
+
+	virtual void Die() = 0;
 };

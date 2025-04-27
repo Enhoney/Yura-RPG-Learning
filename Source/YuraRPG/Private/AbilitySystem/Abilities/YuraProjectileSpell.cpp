@@ -6,6 +6,8 @@
 #include "GameplayEffectTypes.h"
 #include "AbilitySystemComponent.h"
 #include "Interaction/CombatInterface.h"
+#include "YuraGameplayTags.h"
+#include "AbilitySystemBlueprintLibrary.h"
 
 void UYuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Handle, 
 	const FGameplayAbilityActorInfo* ActorInfo, 
@@ -51,6 +53,12 @@ void UYuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 		const UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
 		const FGameplayEffectContextHandle DamageEffectContextHandle = ASC->MakeEffectContext();
 		const FGameplayEffectSpecHandle DamageSpecHandle = ASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), DamageEffectContextHandle);
+
+		// 设置基础伤害
+		FGameplayTag DamageTag = FYuraGameplayTags::Get().Damage;
+		// 从表格中拿到数值
+		const float ScalableDamage = BaseDamage.GetValueAtLevel(GetAbilityLevel());
+		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, DamageTag, ScalableDamage);
 		Projectile->DamageEffectSpecHandle = DamageSpecHandle;
 
 		Projectile->FinishSpawning(SpawnTransform);

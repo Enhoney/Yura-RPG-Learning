@@ -58,6 +58,30 @@ void AYuraCharacterBase::SetWarpTargetFacing(const FVector& TargetLocation)
 	MotionWarping->AddOrUpdateWarpTargetFromLocation(WarpingTargetName, TargetLocation);
 }
 
+void AYuraCharacterBase::Die()
+{
+	// 这个函数一定是在服务器执行的
+	// 武器分离，并保留到世界中
+	// 第二个参数--是否在分离相关组件时调用Modify（），按照DeepSeek的说法，就是是否重置移动状态
+	Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
+
+	MulticastHandleDeath();
+}
+
+void AYuraCharacterBase::MulticastHandleDeath_Implementation()
+{
+	Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	Weapon->SetEnableGravity(true);
+	Weapon->SetSimulatePhysics(true);
+
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	GetMesh()->SetEnableGravity(true);
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
 void AYuraCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();

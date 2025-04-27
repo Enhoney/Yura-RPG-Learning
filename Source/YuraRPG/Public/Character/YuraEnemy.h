@@ -31,11 +31,16 @@ public:
 
 	/** Combat Interface start*/
 	virtual int32 GetCharacterLevel() override;
+
+	virtual void Die() override;
 	/** Combat Interface end*/
 
 	// 手动调用获取初始值
 	UFUNCTION(BlueprintCallable)
 	void CallInitHealthValue();
+
+	// Hit React--当HitReact tag被添加时，执行回调，用于激活相应GA，播放受击动画
+	void OnHitReactTagChange(const FGameplayTag CallbackTag, int32 NewCount);
 
 protected:
 	void BeginPlay() override;
@@ -56,6 +61,14 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangedSignature OnMaxHealthChanged;
 
+	// 是否处于受击状态
+	UPROPERTY(BlueprintReadOnly, Category = "Combat")
+	bool bHitReacting = false;
+
+	// 记录移动速度
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category = "Combat")
+	float BaseWalkSpeed = 0.f;
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Default Class")
 	int32 Level = 1;
@@ -66,5 +79,11 @@ protected:
 	// 类别
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Default Class")
 	ECharacterClass CharacterClass = ECharacterClass::Warrior;
-	
+
+	// 受击动画蒙太奇
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
+	TObjectPtr<UAnimMontage> HitReactAnimMontage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
+	float LifeSpawnOnDeath = 5.f;
 };

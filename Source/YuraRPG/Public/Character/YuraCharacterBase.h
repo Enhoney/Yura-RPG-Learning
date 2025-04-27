@@ -32,7 +32,13 @@ public:
 	virtual FVector GetFireSocketLocation() override;
 
 	virtual void SetWarpTargetFacing(const FVector& TargetLocation) override;
+
+	virtual void Die() override;
 	/** ConbatInterface end*/
+
+	// 处理死亡动画，玩家死亡逻辑和敌人的是不一样的，所以需要分开来做
+	UFUNCTION(NetMulticast, Reliable)
+	virtual void MulticastHandleDeath();
 
 protected:
 	virtual void BeginPlay() override;

@@ -80,3 +80,23 @@ void UYuraAbilitySystemLibrary::InitDefaultAttributes(const UObject* InWorldCont
 	const FGameplayEffectSpecHandle VitalAttributeSpecHandle = TargetASC->MakeOutgoingSpec(CharacterInfo->DefaultVitalAttribute, CharacterLevel, VitalAttributeContextHandle);
 	TargetASC->ApplyGameplayEffectSpecToSelf(*VitalAttributeSpecHandle.Data.Get());
 }
+
+void UYuraAbilitySystemLibrary::GrantStartUpAbilities(const UObject* InWorldContextObject, UAbilitySystemComponent* TargetASC)
+{
+	AYuraGameModeBase* YuraGameMode = Cast<AYuraGameModeBase>(UGameplayStatics::GetGameMode(InWorldContextObject));
+
+	// 因为在客户端是拿不到GameMode的
+	if (YuraGameMode == nullptr)
+	{
+		return;
+	}
+
+	// 获取CharacterInfo
+	UCharacterClassInfo* CharacterInfo = YuraGameMode->DefaultEnemyInfo;
+
+	for (TSubclassOf<UGameplayAbility> CommonAbilityClass : CharacterInfo->CommonAbilities)
+	{
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(CommonAbilityClass, 1);
+		TargetASC->GiveAbility(AbilitySpec);
+	}
+}
