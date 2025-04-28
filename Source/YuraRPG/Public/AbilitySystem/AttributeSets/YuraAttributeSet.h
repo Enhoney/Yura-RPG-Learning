@@ -169,7 +169,7 @@ public:
 	TMap<FGameplayTag, TStaticFuncPtr<FGameplayAttribute()>> TagsToAttributes;
 
 
-protected:
+public:
 	/**
 	 * Primary Attribute
 	 */
@@ -250,5 +250,7 @@ protected:
 
 private:
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& OutProps) const;
+
+	void ShowDamageText(const float DamageNum, const FEffectProperties& Props) const;
 	
 };

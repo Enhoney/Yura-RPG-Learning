@@ -11,6 +11,8 @@ class UYuraAbilitySystemComponent;
 class IEnemyInterface;
 class UYuraInputConfig;
 class USplineComponent;
+class UDamageFloatingComponent;
+
 struct FGameplayTag;
 struct FInputActionValue;
 
@@ -27,6 +29,10 @@ public:
 	AYuraPlayerController();
 
 	virtual void PlayerTick(float DeltaTime) override;
+
+	// 在敌人头上显示伤害--Client RPC，只在当前客户端显示
+	UFUNCTION(Client, Reliable)
+	void ShowDamageText(float DamageFloating, ACharacter* TargetCharacter);
 
 protected:
 	virtual void BeginPlay() override;
@@ -104,4 +110,7 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USplineComponent> SplineComponent;
 
+	// 用于创建伤害数字组件
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TSubclassOf<UDamageFloatingComponent> DamageFloatingCompClass;
 };

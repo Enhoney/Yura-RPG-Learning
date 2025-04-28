@@ -80,6 +80,32 @@ void AYuraCharacterBase::MulticastHandleDeath_Implementation()
 	GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	Disslove();
+}
+
+void AYuraCharacterBase::Disslove()
+{
+	if (IsValid(DissolveEffectMatForMesh))
+	{
+		// 创建动态材质
+		UMaterialInstanceDynamic* MatInsDynamicForMesh = UMaterialInstanceDynamic::Create(DissolveEffectMatForMesh, this);
+		// 因为我们这个模型只有一个材质，所以只设置0的即可，如果有多个材质，就得多创建和设置几个了
+		GetMesh()->SetMaterial(0, MatInsDynamicForMesh);
+		// 开始溶解
+		StartMeshDissolveTimeLine(MatInsDynamicForMesh);
+	}
+
+	// 武器也得溶解
+	if (IsValid(DissolveEffectMatForWeapon))
+	{
+		// 创建动态材质
+		UMaterialInstanceDynamic* MatInsDynamicForWeapon = UMaterialInstanceDynamic::Create(DissolveEffectMatForWeapon, this);
+		// 因为我们这个模型只有一个材质，所以只设置0的即可，如果有多个材质，就得多创建和设置几个了
+		Weapon->SetMaterial(0, MatInsDynamicForWeapon);
+		// 开始溶解
+		StartWeaponDissolveTimeLine(MatInsDynamicForWeapon);
+	}
 }
 
 void AYuraCharacterBase::BeginPlay()

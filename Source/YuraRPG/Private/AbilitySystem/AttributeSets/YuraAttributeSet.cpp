@@ -11,6 +11,8 @@
 
 #include "YuraGameplayTags.h"
 #include "Interaction/CombatInterface.h"
+#include "Player/YuraPlayerController.h"
+#include "Kismet/GameplayStatics.h"
 
 UYuraAttributeSet::UYuraAttributeSet()
 {
@@ -99,6 +101,17 @@ void UYuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 
 }
 
+void UYuraAttributeSet::ShowDamageText(const float DamageNum, const FEffectProperties& Props) const
+{
+	if (Props.TargetCharacter != Props.SourceCharacter)
+	{
+		if (AYuraPlayerController* PlayerController = Cast<AYuraPlayerController>(Props.SourceController))
+		{
+			PlayerController->ShowDamageText(DamageNum, Props.TargetCharacter);
+		}
+	}
+}
+
 void UYuraAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
 	Super::PreAttributeChange(Attribute, NewValue);
@@ -183,6 +196,10 @@ void UYuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 					CombatInterface->Die();
 				}
 			}
+
+			// 伤害飘字
+			ShowDamageText(LocalIncomingDamage, EffectProps);
+			
 		}
 		
 	}

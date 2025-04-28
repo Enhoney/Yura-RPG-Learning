@@ -18,6 +18,9 @@
 #include "NavigationSystem.h"
 #include "NavigationPath.h"
 
+#include "GameFramework/Character.h"
+#include "UI/Widget/DamageFloatingComponent.h"
+
 AYuraPlayerController::AYuraPlayerController()
 {
 
@@ -35,6 +38,28 @@ void AYuraPlayerController::PlayerTick(float DeltaTime)
 	CursorTrace();
 
 	YuraAutoRunning();
+}
+
+void AYuraPlayerController::ShowDamageText_Implementation(float DamageFloating, ACharacter* TargetCharacter)
+{
+	if (IsValid(TargetCharacter) && DamageFloatingCompClass)
+	{
+		// 只在主机代理上做
+		if (IsLocalController())
+		{
+			// 创建组件
+			UDamageFloatingComponent* DamageFloatingComp = NewObject<UDamageFloatingComponent>(TargetCharacter, DamageFloatingCompClass);
+			// 注册组件，动态创建组件需要这么做才行
+			DamageFloatingComp->RegisterComponent();
+			// 附着一下只是为了开始播放UI动画，之后还是要分离的
+			DamageFloatingComp->AttachToComponent(TargetCharacter->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+			DamageFloatingComp->SetDamageFloatingText(DamageFloating);
+			// 分离，让这个数字不跟随敌人移动而移动
+			DamageFloatingComp->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		}
+	}
+	
+	
 }
 
 void AYuraPlayerController::BeginPlay()

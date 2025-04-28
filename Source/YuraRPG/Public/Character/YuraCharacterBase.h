@@ -13,6 +13,8 @@ class UAttributeSet;
 class UGameplayEffect;
 class UGameplayAbility;
 
+class UMaterialInstance;
+
 UCLASS(Abstract)
 class YURARPG_API AYuraCharacterBase : public ACharacter, public IAbilitySystemInterface, public ICombatInterface
 {
@@ -40,6 +42,9 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MulticastHandleDeath();
 
+	/** 溶解--创建动态材质，并调用开始溶解的函数*/ 
+	void Disslove();
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -47,6 +52,12 @@ protected:
 
 	virtual void AddCharacterAbilities();
 
+	/** 开始溶解，使用TimeLine，在蓝图比较好实现*/
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartMeshDissolveTimeLine(UMaterialInstanceDynamic* DissolveMatDynamic);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartWeaponDissolveTimeLine(UMaterialInstanceDynamic* DissolveMatDynamic);
 
 private:
 
@@ -83,6 +94,13 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attribute")
 	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
+
+	// 溶解材质实例
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+	TObjectPtr<UMaterialInstance> DissolveEffectMatForMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+	TObjectPtr<UMaterialInstance> DissolveEffectMatForWeapon;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Abilities")
