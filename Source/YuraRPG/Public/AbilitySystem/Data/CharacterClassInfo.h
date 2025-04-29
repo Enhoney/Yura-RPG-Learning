@@ -49,5 +49,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Common Character Info")
 	TSubclassOf<UGameplayEffect> DefaultVitalAttribute;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage Calculation Cofficients")
+	TObjectPtr<UCurveTable> DamageCalcCoefTable;
 	
 };

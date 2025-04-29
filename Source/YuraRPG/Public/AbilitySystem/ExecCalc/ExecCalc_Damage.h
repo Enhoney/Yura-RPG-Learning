@@ -20,5 +20,8 @@ public:
 	// 这是一个BlueprintNative函数，所以在C++中提供实现的时候，必须加后缀
 	void Execute_Implementation (const FGameplayEffectCustomExecutionParameters& ExecutionParams, 
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const override;
+
+private:
+	void CalculCriticalHitDamage(float& BaseDamage, const float SourceHitCriticalChance, const float TargetHitCriticalRes, const float SourceHitCriticalDamage) const;
 	
 };

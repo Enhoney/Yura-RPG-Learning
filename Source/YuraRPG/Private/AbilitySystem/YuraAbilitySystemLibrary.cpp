@@ -100,3 +100,16 @@ void UYuraAbilitySystemLibrary::GrantStartUpAbilities(const UObject* InWorldCont
 		TargetASC->GiveAbility(AbilitySpec);
 	}
 }
+
+UCharacterClassInfo* UYuraAbilitySystemLibrary::GetCharacterClassInfo(const UObject* InWorldContextObject)
+{
+	AYuraGameModeBase* YuraGameMode = Cast<AYuraGameModeBase>(UGameplayStatics::GetGameMode(InWorldContextObject));
+	if (YuraGameMode == nullptr)
+	{
+		return nullptr;
+	}
+
+	// 获取CharacterInfo
+	UCharacterClassInfo* CharacterInfo = YuraGameMode->DefaultEnemyInfo;
+	return CharacterInfo;
+}

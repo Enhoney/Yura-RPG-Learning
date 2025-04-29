@@ -34,5 +34,8 @@ public:
 	// 授予敌人通用的能力
 	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Grant StartUp Abilities")
 	static void GrantStartUpAbilities(const UObject* InWorldContextObject, UAbilitySystemComponent* TargetASC);
+
+	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Get CharacterClass Info Data")
+	static UCharacterClassInfo* GetCharacterClassInfo(const UObject* InWorldContextObject);
 	
 };

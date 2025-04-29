@@ -7,6 +7,11 @@
 
 #include "YuraGameplayTags.h"
 
+#include "Data/CharacterClassInfo.h"
+#include "YuraAbilitySystemLibrary.h"
+
+#include "Interaction/CombatInterface.h"
+
 struct FYuraDamageStatics
 {
 	// 这个宏是GEEC中提供的
@@ -19,9 +24,13 @@ struct FYuraDamageStatics
 	/** Target Attribute*/
 	DECLARE_ATTRIBUTE_CAPTUREDEF(Armor);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(BlockChance);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalHitResistance);
+	
 
 	/** Source Attribute*/
 	DECLARE_ATTRIBUTE_CAPTUREDEF(ArmorPenetration);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalHitChance);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalHitDamage);
 
 	// 捕获Damage属性
 	FYuraDamageStatics()
@@ -39,9 +48,12 @@ struct FYuraDamageStatics
 		/** Target Attribute*/
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UYuraAttributeSet, Armor, Target, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UYuraAttributeSet, BlockChance, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UYuraAttributeSet, CriticalHitResistance, Target, false);
 
 		/** Source Attribute*/
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UYuraAttributeSet, ArmorPenetration, Source, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UYuraAttributeSet, CriticalHitChance, Source, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UYuraAttributeSet, CriticalHitDamage, Source, false);
 
 	}
 };
@@ -60,13 +72,24 @@ UExecCalc_Damage::UExecCalc_Damage()
 	/** Target Attribute*/
 	RelevantAttributesToCapture.Add(YuraDamageStatics().ArmorDef);
 	RelevantAttributesToCapture.Add(YuraDamageStatics().BlockChanceDef);
+	RelevantAttributesToCapture.Add(YuraDamageStatics().CriticalHitResistanceDef);
 
 	/** Source Attribute*/
 	RelevantAttributesToCapture.Add(YuraDamageStatics().ArmorPenetrationDef);
+	RelevantAttributesToCapture.Add(YuraDamageStatics().CriticalHitChanceDef);
+	RelevantAttributesToCapture.Add(YuraDamageStatics().CriticalHitDamageDef);
 }
 
 void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {
+	
+	// 获取ASC
+	const UAbilitySystemComponent* SourceASC = ExecutionParams.GetSourceAbilitySystemComponent();
+	const UAbilitySystemComponent* TargetASC = ExecutionParams.GetTargetAbilitySystemComponent();
+	// 拿到对应的AvatorActor，一般就是Pawn
+	AActor* SourceAvatorActor = SourceASC ? SourceASC->GetAvatarActor() : nullptr;
+	AActor* TargetAvatortActor = TargetASC ? TargetASC->GetAvatarActor() : nullptr;
+
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
 
 	const FGameplayTagContainer* SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
@@ -96,13 +119,53 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	// 计算是否格挡
 	const bool bBlock = FMath::RandRange(1, 100) < TargetBlockChance * 100;
 
+	// 获取穿透系数
+	UCharacterClassInfo* CharacterClassInfo = UYuraAbilitySystemLibrary::GetCharacterClassInfo(SourceAvatorActor);
+	// 找到对应的曲线
+	FRealCurve* CoefficientCurve = CharacterClassInfo->DamageCalcCoefTable->FindCurve(FName("Coeffiicient.ArmorPene"), FString());
+	// 拿到来源角色等级
+	ICombatInterface* SourceCombat = Cast<ICombatInterface>(SourceAvatorActor);
+	float SourceCharacterLevel = 1.f;
+	if (SourceCombat)
+	{
+		SourceCharacterLevel = SourceCombat->GetCharacterLevel();
+	}
+	// 通过角色等级拿到曲线上的值
+	float DamageArmorPeneCoef =  CoefficientCurve->Eval(SourceCharacterLevel);
 
-	// 伤害修改值
-	const float OverArmor = (SourceArmorPenetration > TargetArmor) ? 0.f : (SourceArmorPenetration - TargetArmor);
-	const float TargetDamage = bBlock ? (BaseDamage + OverArmor) * 0.5 : (BaseDamage + OverArmor);
+	// 伤害修改值，穿透计算的时候，加上系数
+	const float OverArmor = DamageArmorPeneCoef * SourceArmorPenetration - TargetArmor;
+	// 要修改的目标伤害
+	float TargetDamage = bBlock ? (BaseDamage + OverArmor) * 0.5 : (BaseDamage + OverArmor);
+
+	/** 暴击计算*/
+	// 来源的暴击率
+	float SourceCriticalHitChance = 0.00f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(YuraDamageStatics().CriticalHitChanceDef, EvalutionParameters, SourceCriticalHitChance);
+	SourceCriticalHitChance = FMath::Max<float>(0.00f, SourceCriticalHitChance);
+	// 来源的暴击伤害
+	float SourceCriticalHitDamage = 0.00f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(YuraDamageStatics().CriticalHitDamageDef, EvalutionParameters, SourceCriticalHitDamage);
+	SourceCriticalHitDamage = FMath::Max<float>(0.00f, SourceCriticalHitDamage);
+	// 目标的暴击抗性
+	float TargetCriticalHitResistance = 0.00f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(YuraDamageStatics().CriticalHitResistanceDef, EvalutionParameters, TargetCriticalHitResistance);
+	TargetCriticalHitResistance = FMath::Max<float>(0.00f, TargetCriticalHitResistance);
+	// 执行计算
+	CalculCriticalHitDamage(TargetDamage, SourceCriticalHitChance, TargetCriticalHitResistance, SourceCriticalHitDamage);
 
 	// 基础伤害 + 护甲穿透 - 目标护甲值
 	FGameplayModifierEvaluatedData ModifierEvaluatedData_Armor(UYuraAttributeSet::GetIncomingDamageAttribute(), 
-		EGameplayModOp::Additive, TargetDamage);
+		EGameplayModOp::Additive, TargetDamage > 0 ? TargetDamage : 0);
 	OutExecutionOutput.AddOutputModifier(ModifierEvaluatedData_Armor);
+}
+
+void UExecCalc_Damage::CalculCriticalHitDamage(float& BaseDamage, const float SourceHitCriticalChance, const float TargetHitCriticalRes, const float SourceHitCriticalDamage) const
+{
+	const bool bHitCriticl = FMath::RandRange(1, 100) < ((SourceHitCriticalChance - TargetHitCriticalRes) * 100);
+
+	if (bHitCriticl)
+	{
+		BaseDamage *= SourceHitCriticalDamage;
+	}
 }
