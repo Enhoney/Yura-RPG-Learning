@@ -40,7 +40,7 @@ void AYuraPlayerController::PlayerTick(float DeltaTime)
 	YuraAutoRunning();
 }
 
-void AYuraPlayerController::ShowDamageText_Implementation(float DamageFloating, ACharacter* TargetCharacter)
+void AYuraPlayerController::ShowDamageText_Implementation(float DamageFloating, ACharacter* TargetCharacter, bool bDamageBlock, bool bCriticalHit)
 {
 	if (IsValid(TargetCharacter) && DamageFloatingCompClass)
 	{
@@ -53,7 +53,7 @@ void AYuraPlayerController::ShowDamageText_Implementation(float DamageFloating, 
 			DamageFloatingComp->RegisterComponent();
 			// 附着一下只是为了开始播放UI动画，之后还是要分离的
 			DamageFloatingComp->AttachToComponent(TargetCharacter->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-			DamageFloatingComp->SetDamageFloatingText(DamageFloating);
+			DamageFloatingComp->SetDamageFloatingText(DamageFloating, bDamageBlock, bCriticalHit);
 			// 分离，让这个数字不跟随敌人移动而移动
 			DamageFloatingComp->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 		}

@@ -14,6 +14,8 @@
 #include "Player/YuraPlayerController.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "YuraAbilitySystemLibrary.h"
+
 UYuraAttributeSet::UYuraAttributeSet()
 {
 	const FYuraGameplayTags& YuraGameplayTags = FYuraGameplayTags::Get();
@@ -101,13 +103,13 @@ void UYuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 
 }
 
-void UYuraAttributeSet::ShowDamageText(const float DamageNum, const FEffectProperties& Props) const
+void UYuraAttributeSet::ShowDamageText(const float DamageNum, const FEffectProperties& Props, bool bDamageBlock, bool bCriticalHit) const
 {
 	if (Props.TargetCharacter != Props.SourceCharacter)
 	{
 		if (AYuraPlayerController* PlayerController = Cast<AYuraPlayerController>(Props.SourceController))
 		{
-			PlayerController->ShowDamageText(DamageNum, Props.TargetCharacter);
+			PlayerController->ShowDamageText(DamageNum, Props.TargetCharacter, bDamageBlock, bCriticalHit);
 		}
 	}
 }
@@ -197,8 +199,12 @@ void UYuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 				}
 			}
 
+			// 判断是否暴击，是否格挡
+			const bool bDamageBlock = UYuraAbilitySystemLibrary::IsDamageBlock(EffectProps.GEContectHandle);
+			const bool bCriticalHit = UYuraAbilitySystemLibrary::IsCriticalHit(EffectProps.GEContectHandle);
+
 			// 伤害飘字
-			ShowDamageText(LocalIncomingDamage, EffectProps);
+			ShowDamageText(LocalIncomingDamage, EffectProps, bDamageBlock, bCriticalHit);
 			
 		}
 		

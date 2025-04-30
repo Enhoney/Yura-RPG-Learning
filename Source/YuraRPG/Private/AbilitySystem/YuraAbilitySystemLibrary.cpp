@@ -10,6 +10,8 @@
 #include "GameplayEffectTypes.h"
 #include "AbilitySystemComponent.h"
 
+#include "YuraAbilityTypes.h"
+
 UOverlayWidgetController* UYuraAbilitySystemLibrary::GetOverlayWidgetController(const UObject* InWorldContextObject)
 {
 	if (APlayerController* PC = UGameplayStatics::GetPlayerController(InWorldContextObject, 0))
@@ -112,4 +114,57 @@ UCharacterClassInfo* UYuraAbilitySystemLibrary::GetCharacterClassInfo(const UObj
 	// 获取CharacterInfo
 	UCharacterClassInfo* CharacterInfo = YuraGameMode->DefaultEnemyInfo;
 	return CharacterInfo;
+}
+
+bool UYuraAbilitySystemLibrary::IsDamageBlock(const FGameplayEffectContextHandle& EffectContext)
+{
+	const FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	const FYuraGameplayEffectContext* YuraContext = static_cast<const FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		return YuraContext->IsDamageBlock();
+	}
+
+	return false;
+}
+
+bool UYuraAbilitySystemLibrary::IsCriticalHit(const FGameplayEffectContextHandle& EffectContext)
+{
+	const FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	const FYuraGameplayEffectContext* YuraContext = static_cast<const FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		return YuraContext->IsCriticalHit();
+	}
+
+	return false;
+}
+
+void UYuraAbilitySystemLibrary::SetDamageBlock(UPARAM(ref) FGameplayEffectContextHandle& EffectContext, bool bInDamageBlock)
+{
+	FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	FYuraGameplayEffectContext* YuraContext = static_cast<FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		YuraContext->SetIsDamageBlock(bInDamageBlock);
+	}
+
+}
+
+void UYuraAbilitySystemLibrary::SetCriticalHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContext, bool bInCriticalHit)
+{
+	FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	FYuraGameplayEffectContext* YuraContext = static_cast<FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		YuraContext->SetIsCriticalHit(bInCriticalHit);
+	}
 }

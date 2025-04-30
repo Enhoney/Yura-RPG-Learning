@@ -16,6 +16,6 @@ class YURARPG_API UDamageFloatingComponent : public UWidgetComponent
 
 public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void SetDamageFloatingText(float Damage);
+	void SetDamageFloatingText(float Damage, bool bDamageBlock, bool bCriticalHit);
 	
 };

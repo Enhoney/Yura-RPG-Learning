@@ -251,6 +251,6 @@ public:
 private:
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& OutProps) const;
 
-	void ShowDamageText(const float DamageNum, const FEffectProperties& Props) const;
+	void ShowDamageText(const float DamageNum, const FEffectProperties& Props, bool bDamageBlock, bool bCriticalHit) const;
 	
 };

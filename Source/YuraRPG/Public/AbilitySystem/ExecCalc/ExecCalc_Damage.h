@@ -22,6 +22,6 @@ public:
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const override;
 
 private:
-	void CalculCriticalHitDamage(float& BaseDamage, const float SourceHitCriticalChance, const float TargetHitCriticalRes, const float SourceHitCriticalDamage) const;
+	bool CalculCriticalHitDamage(float& BaseDamage, const float SourceHitCriticalChance, const float TargetHitCriticalRes, const float SourceHitCriticalDamage) const;
 	
 };

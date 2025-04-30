@@ -32,7 +32,7 @@ public:
 
 	// 在敌人头上显示伤害--Client RPC，只在当前客户端显示
 	UFUNCTION(Client, Reliable)
-	void ShowDamageText(float DamageFloating, ACharacter* TargetCharacter);
+	void ShowDamageText(float DamageFloating, ACharacter* TargetCharacter, bool bDamageBlock, bool bCriticalHit);
 
 protected:
 	virtual void BeginPlay() override;

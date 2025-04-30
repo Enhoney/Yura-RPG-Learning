@@ -12,6 +12,8 @@
 
 #include "Interaction/CombatInterface.h"
 
+#include "YuraAbilityTypes.h"
+
 struct FYuraDamageStatics
 {
 	// 这个宏是GEEC中提供的
@@ -152,7 +154,14 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(YuraDamageStatics().CriticalHitResistanceDef, EvalutionParameters, TargetCriticalHitResistance);
 	TargetCriticalHitResistance = FMath::Max<float>(0.00f, TargetCriticalHitResistance);
 	// 执行计算
-	CalculCriticalHitDamage(TargetDamage, SourceCriticalHitChance, TargetCriticalHitResistance, SourceCriticalHitDamage);
+	bool bCriticalHit = CalculCriticalHitDamage(TargetDamage, SourceCriticalHitChance, TargetCriticalHitResistance, SourceCriticalHitDamage);
+
+	// 设置自定义Context参数
+	// 首先需要拿到Context，并转换为我们自定义的类型
+	// 这里返回的是引用，所以可以直接使用
+	FGameplayEffectContextHandle ContextHandle = Spec.GetEffectContext();
+	UYuraAbilitySystemLibrary::SetDamageBlock(ContextHandle, bBlock);
+	UYuraAbilitySystemLibrary::SetCriticalHit(ContextHandle, bCriticalHit);
 
 	// 基础伤害 + 护甲穿透 - 目标护甲值
 	FGameplayModifierEvaluatedData ModifierEvaluatedData_Armor(UYuraAttributeSet::GetIncomingDamageAttribute(), 
@@ -160,7 +169,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	OutExecutionOutput.AddOutputModifier(ModifierEvaluatedData_Armor);
 }
 
-void UExecCalc_Damage::CalculCriticalHitDamage(float& BaseDamage, const float SourceHitCriticalChance, const float TargetHitCriticalRes, const float SourceHitCriticalDamage) const
+bool UExecCalc_Damage::CalculCriticalHitDamage(float& BaseDamage, const float SourceHitCriticalChance, const float TargetHitCriticalRes, const float SourceHitCriticalDamage) const
 {
 	const bool bHitCriticl = FMath::RandRange(1, 100) < ((SourceHitCriticalChance - TargetHitCriticalRes) * 100);
 
@@ -168,4 +177,6 @@ void UExecCalc_Damage::CalculCriticalHitDamage(float& BaseDamage, const float So
 	{
 		BaseDamage *= SourceHitCriticalDamage;
 	}
+
+	return bHitCriticl;
 }
