@@ -82,8 +82,11 @@ void AYuraEnemy::BeginPlay()
 	InitAbilityActorInfo();
 
 	// 授予通用能力
-	UYuraAbilitySystemLibrary::GrantStartUpAbilities(this, AbilitySystemComponent);
-
+	if (HasAuthority())
+	{
+		UYuraAbilitySystemLibrary::GrantStartUpAbilities(this, AbilitySystemComponent);
+	}
+	
 	// 设置WidgetController
 	if (UYuraUserWidget* YuraUI = Cast<UYuraUserWidget>(HealthBar->GetUserWidgetObject()))
 	{

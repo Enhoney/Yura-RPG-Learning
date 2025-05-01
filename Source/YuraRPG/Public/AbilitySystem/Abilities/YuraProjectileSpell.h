@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystem/Abilities/YuraGameplayAbility.h"
+#include "AbilitySystem/Abilities/YuraDamageGameplayAbility.h"
 #include "YuraProjectileSpell.generated.h"
 
 class AYuraProjectile;
@@ -13,12 +13,12 @@ class UGameplayEffect;
  * 
  */
 UCLASS()
-class YURARPG_API UYuraProjectileSpell : public UYuraGameplayAbility
+class YURARPG_API UYuraProjectileSpell : public UYuraDamageGameplayAbility
 {
 	GENERATED_BODY()
 
 protected:
-	//定义了 能力激活之后我们要做的是事
+	//定义了 能力激活之后我们要做的事
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
@@ -37,8 +37,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<AYuraProjectile> ProjectileClass;
 
-	// 伤害的GE
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSubclassOf<UGameplayEffect> DamageEffectClass;
+	
 	
 };

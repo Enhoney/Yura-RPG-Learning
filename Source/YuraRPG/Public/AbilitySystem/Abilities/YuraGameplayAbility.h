@@ -20,9 +20,5 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	FGameplayTag StartUpInputTag;
-
-	// 技能基础伤害
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
-	FScalableFloat BaseDamage;
 	
 };

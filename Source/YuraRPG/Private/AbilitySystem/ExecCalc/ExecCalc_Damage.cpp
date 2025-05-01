@@ -27,12 +27,20 @@ struct FYuraDamageStatics
 	DECLARE_ATTRIBUTE_CAPTUREDEF(Armor);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(BlockChance);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalHitResistance);
+	// 四抗
+	DECLARE_ATTRIBUTE_CAPTUREDEF(FireResistance);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(PhysicResistance);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(LightingResistance);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(ArcaneResistance);
 	
 
 	/** Source Attribute*/
 	DECLARE_ATTRIBUTE_CAPTUREDEF(ArmorPenetration);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalHitChance);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalHitDamage);
+
+	// 属性和Tag的映射
+	TMap<FGameplayTag, FGameplayEffectAttributeCaptureDefinition> TagsToCapturedAttributeDef;
 
 	// 捕获Damage属性
 	FYuraDamageStatics()
@@ -51,11 +59,31 @@ struct FYuraDamageStatics
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UYuraAttributeSet, Armor, Target, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UYuraAttributeSet, BlockChance, Target, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UYuraAttributeSet, CriticalHitResistance, Target, false);
+		// 四抗
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UYuraAttributeSet, FireResistance, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UYuraAttributeSet, PhysicResistance, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UYuraAttributeSet, LightingResistance, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UYuraAttributeSet, ArcaneResistance, Target, false);
 
 		/** Source Attribute*/
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UYuraAttributeSet, ArmorPenetration, Source, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UYuraAttributeSet, CriticalHitChance, Source, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UYuraAttributeSet, CriticalHitDamage, Source, false);
+
+		// 添加映射
+		TagsToCapturedAttributeDef.Add(FYuraGameplayTags::Get().Attribute_Secondary_Armor,					ArmorDef);
+		TagsToCapturedAttributeDef.Add(FYuraGameplayTags::Get().Attribute_Secondary_BlockChance,			BlockChanceDef);
+		TagsToCapturedAttributeDef.Add(FYuraGameplayTags::Get().Attribute_Secondary_CriticalHitResistance,	CriticalHitResistanceDef);
+		TagsToCapturedAttributeDef.Add(FYuraGameplayTags::Get().Attribute_Resilience_Fire,					FireResistanceDef);
+		TagsToCapturedAttributeDef.Add(FYuraGameplayTags::Get().Attribute_Resilience_Physic,				PhysicResistanceDef);
+		TagsToCapturedAttributeDef.Add(FYuraGameplayTags::Get().Attribute_Resilience_Lighting,				LightingResistanceDef);
+		TagsToCapturedAttributeDef.Add(FYuraGameplayTags::Get().Attribute_Resilience_Arcane,				ArcaneResistanceDef);
+
+		TagsToCapturedAttributeDef.Add(FYuraGameplayTags::Get().Attribute_Secondary_ArmorPenetration,		ArmorPenetrationDef);
+		TagsToCapturedAttributeDef.Add(FYuraGameplayTags::Get().Attribute_Secondary_CriticalHitChance,		CriticalHitChanceDef);
+		TagsToCapturedAttributeDef.Add(FYuraGameplayTags::Get().Attribute_Secondary_CriticalHitDamage,		CriticalHitDamageDef);
+
+
 
 	}
 };
@@ -75,6 +103,11 @@ UExecCalc_Damage::UExecCalc_Damage()
 	RelevantAttributesToCapture.Add(YuraDamageStatics().ArmorDef);
 	RelevantAttributesToCapture.Add(YuraDamageStatics().BlockChanceDef);
 	RelevantAttributesToCapture.Add(YuraDamageStatics().CriticalHitResistanceDef);
+	//四抗
+	RelevantAttributesToCapture.Add(YuraDamageStatics().FireResistanceDef);
+	RelevantAttributesToCapture.Add(YuraDamageStatics().PhysicResistanceDef);
+	RelevantAttributesToCapture.Add(YuraDamageStatics().LightingResistanceDef);
+	RelevantAttributesToCapture.Add(YuraDamageStatics().ArcaneResistanceDef);
 
 	/** Source Attribute*/
 	RelevantAttributesToCapture.Add(YuraDamageStatics().ArmorPenetrationDef);
@@ -102,7 +135,26 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	EvalutionParameters.TargetTags = TargetTags;
 
 	// 通过SetByCaller拿到技能基础伤害
-	float BaseDamage = Spec.GetSetByCallerMagnitude(FYuraGameplayTags::Get().Damage);
+	float BaseDamage = 0.f;
+
+	for (const auto& DamageTypeToResistance : FYuraGameplayTags::Get().DamageTypeToResistanceTags)
+	{
+		const FGameplayTag DamageType = DamageTypeToResistance.Key;
+		const FGameplayTag AttributeTag = DamageTypeToResistance.Value;
+
+		checkf(FYuraDamageStatics().TagsToCapturedAttributeDef.Contains(AttributeTag), TEXT("Attribute Mapping for Tag [%s] has not captured!!"), *AttributeTag.ToString());
+
+		// 拿到对应的属性
+		float RealResistence = 0.f;
+		const FGameplayEffectAttributeCaptureDefinition CaptureDef = FYuraDamageStatics().TagsToCapturedAttributeDef[AttributeTag];
+		ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(CaptureDef, EvalutionParameters, RealResistence);
+		RealResistence = FMath::Clamp(RealResistence, 0.00f, 1.00f);
+
+		// 拿到对应属性的技能基础伤害
+		const float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageTypeToResistance.Key);
+		// 因为现在只有一种伤害类型，所以先这样做，保证之前的逻辑没问题
+		BaseDamage += DamageTypeValue * (1 - RealResistence);
+	}
 
 	// 获取目标护甲
 	float TargetArmor = 0.f;

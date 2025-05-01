@@ -45,6 +45,13 @@ public:
 	FGameplayTag Attribute_Secondary_HealthRegeneration;
 	FGameplayTag Attribute_Secondary_ManaRegeneration;
 
+	// Ressilience For DamageTypes
+	// 对各种伤害的抗性
+	FGameplayTag Attribute_Resilience_Fire;
+	FGameplayTag Attribute_Resilience_Physic;
+	FGameplayTag Attribute_Resilience_Lighting;
+	FGameplayTag Attribute_Resilience_Arcane;
+
 	// Ability Input Tags
 	// 这些tag和实际的按键不一定是完全对应的
 	FGameplayTag InputTag_LMB;	// 鼠标左键
@@ -54,9 +61,15 @@ public:
 	FGameplayTag InputTag_3;
 	FGameplayTag InputTag_4;
 
-	// Damage Tag
 	// 用于伤害计算SetCallByCaller的Tag
-	FGameplayTag Damage;
+	// 伤害类型
+	FGameplayTag DamageType_Fire;	// 火球
+	FGameplayTag DamageType_Physic;	// 战士近战伤害
+	FGameplayTag DamageType_Lighting;	// 闪电伤害
+	FGameplayTag DamageType_Arcane;		// 奥义伤害
+
+	// 存储所有伤害类型抗性类型的Map
+	TMap<FGameplayTag /**DamageTpype*/, FGameplayTag /** ResistanceType*/> DamageTypeToResistanceTags;
 
 	// 各种Buff和Debuff
 	// 受击僵直

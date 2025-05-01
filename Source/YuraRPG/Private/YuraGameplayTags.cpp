@@ -46,6 +46,17 @@ void FYuraGameplayTags::InitializeGameplayTags()
 	YuraGameplayTags.Attribute_Secondary_ManaRegeneration =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attribute.Secondary.ManaRegeneration"), FString("Mana points automatically restored per second."));
 
+	// 伤害抗性
+	YuraGameplayTags.Attribute_Resilience_Fire =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attribute.Resilience.Fire"), FString("Flame resistance."));
+	YuraGameplayTags.Attribute_Resilience_Physic =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attribute.Resilience.Physic"), FString("Physic resistance."));
+	YuraGameplayTags.Attribute_Resilience_Lighting =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attribute.Resilience.Lighting"), FString("Lighting resistance."));
+	YuraGameplayTags.Attribute_Resilience_Arcane =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attribute.Resilience.Arcane"), FString("Arcane resistance."));
+	
+
 	// Ability Input Tags
 	YuraGameplayTags.InputTag_LMB =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.LMB"), FString("InputTag Left Mouse Button."));
@@ -60,9 +71,25 @@ void FYuraGameplayTags::InitializeGameplayTags()
 	YuraGameplayTags.InputTag_4 =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.4"), FString("InputTag 4 Key."));
 
-	// Damage Tag
-	YuraGameplayTags.Damage =
-		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage"), FString("Damage."));
+	// DamageType
+	YuraGameplayTags.DamageType_Fire =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("DamageType.Fire"), FString("Flame Damage (Player's normal attack)."));
+
+	YuraGameplayTags.DamageType_Physic =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("DamageType.Physic"), FString("Warrior melee damage."));
+
+	YuraGameplayTags.DamageType_Lighting =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("DamageType.Lighting"), FString("Lightning damage."));
+
+	YuraGameplayTags.DamageType_Arcane =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("DamageType.Arcane"), FString("Arcane damage."));
+
+	// 添加到数组中，方便一次性全部拿到
+	YuraGameplayTags.DamageTypeToResistanceTags.Add(YuraGameplayTags.DamageType_Fire, YuraGameplayTags.Attribute_Resilience_Fire);
+	YuraGameplayTags.DamageTypeToResistanceTags.Add(YuraGameplayTags.DamageType_Physic, YuraGameplayTags.Attribute_Resilience_Physic);
+	YuraGameplayTags.DamageTypeToResistanceTags.Add(YuraGameplayTags.DamageType_Lighting, YuraGameplayTags.Attribute_Resilience_Lighting);
+	YuraGameplayTags.DamageTypeToResistanceTags.Add(YuraGameplayTags.DamageType_Arcane, YuraGameplayTags.Attribute_Resilience_Arcane);
+	
 
 	// Effects Tag -- Buff和Debuff
 	// 受击僵直

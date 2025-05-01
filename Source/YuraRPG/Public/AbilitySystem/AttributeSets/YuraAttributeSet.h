@@ -100,6 +100,11 @@ public:
 	ATTRIBUTE_ACCESSORS(UYuraAttributeSet, CriticalHitResistance);
 	ATTRIBUTE_ACCESSORS(UYuraAttributeSet, HealthRegeneration);
 	ATTRIBUTE_ACCESSORS(UYuraAttributeSet, ManaRegeneration);
+	// 伤害抗性
+	ATTRIBUTE_ACCESSORS(UYuraAttributeSet, FireResistance);
+	ATTRIBUTE_ACCESSORS(UYuraAttributeSet, PhysicResistance);
+	ATTRIBUTE_ACCESSORS(UYuraAttributeSet, LightingResistance);
+	ATTRIBUTE_ACCESSORS(UYuraAttributeSet, ArcaneResistance);
 
 	/**
 	 * Meta Attributes
@@ -164,6 +169,20 @@ protected:
 
 	UFUNCTION()
 	void OnRep_ManaRegeneration(const FGameplayAttributeData& OldManaRegeneration) const;
+
+	// 伤害抗性
+
+	UFUNCTION()
+	void OnRep_FireResistance(const FGameplayAttributeData& OldFireResistance) const;
+
+	UFUNCTION()
+	void OnRep_PhysicResistance(const FGameplayAttributeData& OldPhysicResistance) const;
+
+	UFUNCTION()
+	void OnRep_LightingResistance(const FGameplayAttributeData& OldLightingResistance) const;
+
+	UFUNCTION()
+	void OnRep_ArcaneResistance(const FGameplayAttributeData& OldArcaneResistance) const;
 
 public:
 	TMap<FGameplayTag, TStaticFuncPtr<FGameplayAttribute()>> TagsToAttributes;
@@ -240,6 +259,19 @@ public:
 	// 每秒自动恢复魔法值
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_ManaRegeneration, Category = "Secondary Attribute")
 	FGameplayAttributeData ManaRegeneration;
+
+	/** 各种伤害抗性*/
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_FireResistance, Category = "Secondary Attribute")
+	FGameplayAttributeData FireResistance;
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_PhysicResistance, Category = "Secondary Attribute")
+	FGameplayAttributeData PhysicResistance;
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_LightingResistance, Category = "Secondary Attribute")
+	FGameplayAttributeData LightingResistance;
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_ArcaneResistance, Category = "Secondary Attribute")
+	FGameplayAttributeData ArcaneResistance;
 
 	/**
 	 * Meta Attributes

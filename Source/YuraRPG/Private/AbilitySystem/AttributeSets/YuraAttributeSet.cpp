@@ -37,6 +37,11 @@ UYuraAttributeSet::UYuraAttributeSet()
 	TagsToAttributes.Add(YuraGameplayTags.Attribute_Secondary_ManaRegeneration,		GetManaRegenerationAttribute);
 	TagsToAttributes.Add(YuraGameplayTags.Attribute_Secondary_MaxHealth,			GetMaxHealthAttribute);
 	TagsToAttributes.Add(YuraGameplayTags.Attribute_Secondary_MaxMana,				GetMaxManaAttribute);
+	// 伤害抗性
+	TagsToAttributes.Add(YuraGameplayTags.Attribute_Resilience_Fire,				GetFireResistanceAttribute);
+	TagsToAttributes.Add(YuraGameplayTags.Attribute_Resilience_Physic,				GetPhysicResistanceAttribute);
+	TagsToAttributes.Add(YuraGameplayTags.Attribute_Resilience_Lighting,			GetLightingResistanceAttribute);
+	TagsToAttributes.Add(YuraGameplayTags.Attribute_Resilience_Arcane,				GetArcaneResistanceAttribute);
 
 }
 
@@ -65,6 +70,11 @@ void UYuraAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION_NOTIFY(UYuraAttributeSet, CriticalHitResistance,	COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UYuraAttributeSet, HealthRegeneration,		COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UYuraAttributeSet, ManaRegeneration,			COND_None, REPNOTIFY_Always);
+
+	DOREPLIFETIME_CONDITION_NOTIFY(UYuraAttributeSet, FireResistance,			COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UYuraAttributeSet, PhysicResistance,			COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UYuraAttributeSet, LightingResistance,		COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UYuraAttributeSet, ArcaneResistance,			COND_None, REPNOTIFY_Always);
 }
 
 void UYuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& OutProps) const
@@ -297,6 +307,26 @@ void UYuraAttributeSet::OnRep_HealthRegeneration(const FGameplayAttributeData& O
 void UYuraAttributeSet::OnRep_ManaRegeneration(const FGameplayAttributeData& OldManaRegeneration) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UYuraAttributeSet, ManaRegeneration, OldManaRegeneration);
+}
+
+void UYuraAttributeSet::OnRep_FireResistance(const FGameplayAttributeData& OldFireResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UYuraAttributeSet, FireResistance, OldFireResistance);
+}
+
+void UYuraAttributeSet::OnRep_PhysicResistance(const FGameplayAttributeData& OldPhysicResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UYuraAttributeSet, PhysicResistance, OldPhysicResistance);
+}
+
+void UYuraAttributeSet::OnRep_LightingResistance(const FGameplayAttributeData& OldLightingResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UYuraAttributeSet, LightingResistance, OldLightingResistance);
+}
+
+void UYuraAttributeSet::OnRep_ArcaneResistance(const FGameplayAttributeData& OldArcaneResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UYuraAttributeSet, ArcaneResistance, OldArcaneResistance);
 }
 
 

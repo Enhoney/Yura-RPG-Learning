@@ -35,8 +35,6 @@ void UYuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 		const FVector SpawnLocation = CombatInterface->GetFireSocketLocation();
 		// 设置旋转
 		FRotator SpawnRotation = (ProjectileTargetLocation - SpawnLocation).Rotation();
-		// 将俯仰角归零，只能水平移动
-		SpawnRotation.Pitch = 0;
 		// TODO：如果希望做一个抛物线，可以将这个俯仰角加25左右，然后开启重力
 		FTransform SpawnTransform;
 		SpawnTransform.SetLocation(SpawnLocation);
@@ -55,10 +53,13 @@ void UYuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 		const FGameplayEffectSpecHandle DamageSpecHandle = ASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), DamageEffectContextHandle);
 
 		// 设置基础伤害
-		FGameplayTag DamageTag = FYuraGameplayTags::Get().Damage;
 		// 从表格中拿到数值
-		const float ScalableDamage = BaseDamage.GetValueAtLevel(GetAbilityLevel());
-		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, DamageTag, ScalableDamage);
+		for (const auto& Pair : DamageTypes)
+		{
+			const float ScalableDamage = Pair.Value.GetValueAtLevel(GetAbilityLevel());
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, Pair.Key, ScalableDamage);
+		}
+
 		Projectile->DamageEffectSpecHandle = DamageSpecHandle;
 
 		Projectile->FinishSpawning(SpawnTransform);
