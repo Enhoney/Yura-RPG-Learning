@@ -13,6 +13,10 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "YuraGameplayTags.h"
 
+#include "AI/YuraAIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
+#include "BehaviorTree/BehaviorTree.h"
 
 AYuraEnemy::AYuraEnemy()
 {
@@ -26,6 +30,13 @@ AYuraEnemy::AYuraEnemy()
 
 	HealthBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBar"));
 	HealthBar->SetupAttachment(RootComponent);
+
+	// 转向设置
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
+	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 360.f, 0.f);
 }
 
 void AYuraEnemy::HighlightActor()
@@ -72,6 +83,30 @@ void AYuraEnemy::OnHitReactTagChange(const FGameplayTag CallbackTag, int32 NewCo
 	bHitReacting = (NewCount > 0);
 
 	GetCharacterMovement()->MaxWalkSpeed = (bHitReacting ? 0.f : BaseWalkSpeed);
+
+	EnemyAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsHitReacting"), bHitReacting);
+}
+
+void AYuraEnemy::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	// 双保险，虽然这个函数只会在服务器上调用
+	if (!HasAuthority()) return;
+
+	EnemyAIController = Cast<AYuraAIController>(NewController);
+
+	// 将行为树和黑板进行绑定--使用在行为树资产中设置的那个黑板资产进行绑定
+	EnemyAIController->GetBlackboardComponent()->InitializeBlackboard(*EnemyBehaviorTree->BlackboardAsset);
+	// 运行行为树
+	EnemyAIController->RunBehaviorTree(EnemyBehaviorTree);
+	// 初始化受击状态
+	EnemyAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsHitReacting"), false);
+
+	// 是否为远程攻击角色
+	EnemyAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsRangedAttacker"), (CharacterClass != ECharacterClass::Warrior));
+
+	
 }
 
 void AYuraEnemy::BeginPlay()

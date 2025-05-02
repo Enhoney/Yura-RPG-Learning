@@ -48,7 +48,11 @@ protected:
 protected:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Effect Actor")
-	bool bDresroyOnEffectRemoval = false;
+	bool bDestroyOnEffectApplicated = false;
+
+	// 是否可以施加效果给敌人--在子类中决定
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Effect Actor")
+	bool bApplyToEnemy = false;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Effect Actor")
 	TSubclassOf<UGameplayEffect> InstantGameplayEffectClass;

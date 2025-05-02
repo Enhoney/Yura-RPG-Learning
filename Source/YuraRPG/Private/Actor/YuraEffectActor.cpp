@@ -23,6 +23,11 @@ void AYuraEffectActor::BeginPlay()
 
 bool AYuraEffectActor::ApplyGameplayEffectToActor(AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass)
 {
+	if (!bApplyToEnemy && TargetActor->ActorHasTag(FName("YuraCharacter.Enemy")))
+	{
+		return false;
+	}
+
 	// 查找ASC，我们有两种方法，一种是直接调用接口的GetAbilitySystemComponent函数
 	// 还有一种更通用的，由蓝图静态函数库提供的方法，这种更好更通用，如果我们没有实现这个接口，但是也为它添加了ASC，
 	// 在这种情况下，依然可以查找到（通过FindComponentByClass）
@@ -52,12 +57,24 @@ bool AYuraEffectActor::ApplyGameplayEffectToActor(AActor* TargetActor, TSubclass
 		ActiveEffectHandles.Add(ActiveGEHandle, TargrtASC);
 	}
 
+	// 如果是即时效果或者持续效果，并且设置为一次性的，施加完就销毁这个Actor
+	if (bDestroyOnEffectApplicated && GEDurationType != EGameplayEffectDurationType::Infinite)
+	{
+		Destroy();
+	}
+
 	return true;
 
 }
 
 void AYuraEffectActor::OnBeginOverlap(AActor* TargetActor)
 {
+	// 如果不能施加给敌人，并且重叠的是敌人，就啥也不敢
+	if (!bApplyToEnemy && TargetActor->ActorHasTag(FName("YuraCharacter.Enemy")))
+	{
+		return;
+	}
+
 	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnBeginOverlap)
 	{
 		ApplyGameplayEffectToActor(TargetActor, InstantGameplayEffectClass);
@@ -76,6 +93,11 @@ void AYuraEffectActor::OnBeginOverlap(AActor* TargetActor)
 
 void AYuraEffectActor::OnEndOverlap(AActor* TargetActor)
 {
+	if (!bApplyToEnemy && TargetActor->ActorHasTag(FName("YuraCharacter.Enemy")))
+	{
+		return;
+	}
+
 	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnEndOverlap)
 	{
 		ApplyGameplayEffectToActor(TargetActor, InstantGameplayEffectClass);

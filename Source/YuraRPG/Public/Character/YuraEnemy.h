@@ -12,6 +12,9 @@
 
 class UWidgetComponent;
 
+class UBehaviorTree;
+class AYuraAIController;
+
 /**
  * 
  */
@@ -41,6 +44,9 @@ public:
 
 	// Hit React--当HitReact tag被添加时，执行回调，用于激活相应GA，播放受击动画
 	void OnHitReactTagChange(const FGameplayTag CallbackTag, int32 NewCount);
+
+	// 被Controlelr掌控的时候--敌人类在这里获取AIController
+	virtual void PossessedBy(AController* NewController) override;
 
 protected:
 	void BeginPlay() override;
@@ -86,4 +92,12 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
 	float LifeSpawnOnDeath = 5.f;
+
+	// 使用的行为树
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI Controller")
+	TObjectPtr<UBehaviorTree> EnemyBehaviorTree;
+
+	// 记录使用的AIController，不暴露给蓝图
+	UPROPERTY()
+	TObjectPtr<AYuraAIController> EnemyAIController;
 };
