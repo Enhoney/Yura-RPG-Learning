@@ -145,9 +145,12 @@ void AYuraEnemy::BeginPlay()
 	CallInitHealthValue();
 
 	// 绑定Tag授予回调--HitReact
-	AbilitySystemComponent->RegisterGameplayTagEvent(FYuraGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(
-		this, &AYuraEnemy::OnHitReactTagChange
-	);
+	if (HasAuthority())
+	{
+		AbilitySystemComponent->RegisterGameplayTagEvent(FYuraGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(
+			this, &AYuraEnemy::OnHitReactTagChange
+		);
+	}
 }
 
 void AYuraEnemy::InitializeDefaultAttributes() const

@@ -151,7 +151,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 		RealResistence = FMath::Clamp(RealResistence, 0.00f, 1.00f);
 
 		// 拿到对应属性的技能基础伤害
-		const float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageTypeToResistance.Key);
+		const float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageTypeToResistance.Key, false);
 		// 因为现在只有一种伤害类型，所以先这样做，保证之前的逻辑没问题
 		BaseDamage += DamageTypeValue * (1 - RealResistence);
 	}

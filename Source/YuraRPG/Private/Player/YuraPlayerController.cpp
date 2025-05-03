@@ -221,8 +221,12 @@ void AYuraPlayerController::AbilityInputTagReleased(FGameplayTag AbilityActionTa
 				}
 
 				// 为了处理某些到不了的位置，直接将导航路径最后一个点作为目标位置
-				CachedDestinationLocation = NavMovePath->PathPoints[NavMovePath->PathPoints.Num() - 1];
-				bAutoRunning = true;
+				if (NavMovePath->PathPoints.Num() > 0) 
+				{
+					CachedDestinationLocation = NavMovePath->PathPoints[NavMovePath->PathPoints.Num() - 1];
+					bAutoRunning = true;
+				}
+			
 			}
 
 		}
