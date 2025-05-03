@@ -75,6 +75,9 @@ public:
 	// 受击僵直
 	FGameplayTag Effects_HitReact;
 
+	// 用于激活技能的tag
+	FGameplayTag Ability_Attack;
+
 private:
 	static FYuraGameplayTags YuraGameplayTags;
 };

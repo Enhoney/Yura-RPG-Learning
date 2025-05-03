@@ -31,9 +31,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Initialize Character Default Attributes")
 	static void InitDefaultAttributes(const UObject* InWorldContextObject, ECharacterClass EnemyClass, float CharacterLevel, UAbilitySystemComponent* TargetASC);
 
-	// 授予敌人通用的能力
+	// 授予敌人通用的能力，以及独有的能力
 	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Grant StartUp Abilities")
-	static void GrantStartUpAbilities(const UObject* InWorldContextObject, UAbilitySystemComponent* TargetASC);
+	static void GrantStartUpAbilities(const UObject* InWorldContextObject, UAbilitySystemComponent* TargetASC, ECharacterClass EnemyClass, int32 EnemyLevel);
 
 	// 从GameMode中拿到数据资产
 	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Get CharacterClass Info Data")

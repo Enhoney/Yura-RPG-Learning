@@ -77,7 +77,7 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Default Class")
-	int32 Level = 1;
+	int32 CharacterLevel = 1;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health Bar")
 	TObjectPtr<UWidgetComponent> HealthBar;

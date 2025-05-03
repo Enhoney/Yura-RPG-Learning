@@ -66,11 +66,4 @@ void UYuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 	}
 }
 
-void UYuraProjectileSpell::SetWarpingTargetFacingFromLocation(const FVector& ProjectileTargetLocation)
-{
-	ICombatInterface* CombatInterface = Cast<ICombatInterface>(GetAvatarActorFromActorInfo());
-	if (CombatInterface)
-	{
-		CombatInterface->SetWarpTargetFacing(ProjectileTargetLocation);
-	}
-}
+

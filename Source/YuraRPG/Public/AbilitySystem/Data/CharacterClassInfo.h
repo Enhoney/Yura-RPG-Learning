@@ -22,8 +22,11 @@ struct FCharacterClassDefaultInfo
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, Category = "Default CharacterClassInfo")
+	UPROPERTY(EditDefaultsOnly, Category = "Default CharacterClassInfo|Default Primary Attribute")
 	TSubclassOf<UGameplayEffect> DefaultPrimaryAttribute;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Default CharacterClassInfo|Enemy Unique Ability")
+	TArray<TSubclassOf<UGameplayAbility>> UniqueAbilities;
 };
 
 /**

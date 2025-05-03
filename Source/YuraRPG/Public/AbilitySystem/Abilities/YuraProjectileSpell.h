@@ -28,15 +28,9 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 	void SpawnProjectile(const FVector& ProjectileTargetLocation);
 
-	// 设置WarpingTargetFacing
-	UFUNCTION(BlueprintCallable, Category = "Ability")
-	void SetWarpingTargetFacingFromLocation(const FVector& ProjectileTargetLocation);
-
 protected:
 	// 发射物的类
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<AYuraProjectile> ProjectileClass;
 
-	
-	
 };

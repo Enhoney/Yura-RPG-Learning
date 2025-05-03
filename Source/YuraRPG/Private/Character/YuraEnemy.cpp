@@ -57,7 +57,7 @@ void AYuraEnemy::UnhighlightActor()
 
 int32 AYuraEnemy::GetCharacterLevel()
 {
-	return Level;
+	return CharacterLevel;
 }
 
 void AYuraEnemy::Die()
@@ -116,10 +116,10 @@ void AYuraEnemy::BeginPlay()
 	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 	InitAbilityActorInfo();
 
-	// 授予通用能力
+	// 授予通用能力和独有能力
 	if (HasAuthority())
 	{
-		UYuraAbilitySystemLibrary::GrantStartUpAbilities(this, AbilitySystemComponent);
+		UYuraAbilitySystemLibrary::GrantStartUpAbilities(this, AbilitySystemComponent, CharacterClass, CharacterLevel);
 	}
 	
 	// 设置WidgetController
@@ -155,7 +155,7 @@ void AYuraEnemy::BeginPlay()
 
 void AYuraEnemy::InitializeDefaultAttributes() const
 {
-	UYuraAbilitySystemLibrary::InitDefaultAttributes(this, CharacterClass, Level, AbilitySystemComponent);
+	UYuraAbilitySystemLibrary::InitDefaultAttributes(this, CharacterClass, CharacterLevel, AbilitySystemComponent);
 }
 
 void AYuraEnemy::InitAbilityActorInfo()

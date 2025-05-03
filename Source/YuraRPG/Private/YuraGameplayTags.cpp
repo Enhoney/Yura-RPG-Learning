@@ -96,5 +96,7 @@ void FYuraGameplayTags::InitializeGameplayTags()
 	YuraGameplayTags.Effects_HitReact =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Effects.HitReact"), FString("Tag granted when Hit Reacting."));
 	
-
+	// Ability Tag
+	YuraGameplayTags.Ability_Attack =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Attack"), FString("Tag To Activate Attack Ability."));
 }

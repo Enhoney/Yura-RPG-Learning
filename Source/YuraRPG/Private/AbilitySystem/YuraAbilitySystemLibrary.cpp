@@ -83,7 +83,7 @@ void UYuraAbilitySystemLibrary::InitDefaultAttributes(const UObject* InWorldCont
 	TargetASC->ApplyGameplayEffectSpecToSelf(*VitalAttributeSpecHandle.Data.Get());
 }
 
-void UYuraAbilitySystemLibrary::GrantStartUpAbilities(const UObject* InWorldContextObject, UAbilitySystemComponent* TargetASC)
+void UYuraAbilitySystemLibrary::GrantStartUpAbilities(const UObject* InWorldContextObject, UAbilitySystemComponent* TargetASC, ECharacterClass EnemyClass, int32 EnemyLevel)
 {
 	AYuraGameModeBase* YuraGameMode = Cast<AYuraGameModeBase>(UGameplayStatics::GetGameMode(InWorldContextObject));
 
@@ -99,6 +99,14 @@ void UYuraAbilitySystemLibrary::GrantStartUpAbilities(const UObject* InWorldCont
 	for (TSubclassOf<UGameplayAbility> CommonAbilityClass : CharacterInfo->CommonAbilities)
 	{
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(CommonAbilityClass, 1);
+		TargetASC->GiveAbility(AbilitySpec);
+	}
+
+	// 授予独有能力
+	const FCharacterClassDefaultInfo DefaultCharacterInfo = CharacterInfo->GetDerfaultCharacterInfo(EnemyClass);
+	for (TSubclassOf<UGameplayAbility> UniqueAbilityClass : DefaultCharacterInfo.UniqueAbilities)
+	{
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(UniqueAbilityClass, EnemyLevel);
 		TargetASC->GiveAbility(AbilitySpec);
 	}
 }

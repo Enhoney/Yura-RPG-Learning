@@ -17,6 +17,11 @@ class YURARPG_API UYuraDamageGameplayAbility : public UYuraGameplayAbility
 	GENERATED_BODY()
 
 protected:
+	// 设置WarpingTargetFacing
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+	void SetWarpingTargetFacingFromLocation(const FVector& TargetLocation);
+
+protected:
 
 	// 技能伤害类型和对应的基础伤害
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
