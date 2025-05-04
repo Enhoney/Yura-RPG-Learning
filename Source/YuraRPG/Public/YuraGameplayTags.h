@@ -78,6 +78,12 @@ public:
 	// 用于激活技能的tag
 	FGameplayTag Ability_Attack;
 
+	// 和Socket关联的Tag--攻击时用于生成Trace的位置，在Montage中使用
+	FGameplayTag Montage_Attack_Weapon;
+	FGameplayTag Montage_Attack_RightHand;
+	FGameplayTag Montage_Attack_LeftHand;
+
+
 private:
 	static FYuraGameplayTags YuraGameplayTags;
 };

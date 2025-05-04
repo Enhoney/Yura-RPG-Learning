@@ -99,4 +99,12 @@ void FYuraGameplayTags::InitializeGameplayTags()
 	// Ability Tag
 	YuraGameplayTags.Ability_Attack =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Attack"), FString("Tag To Activate Attack Ability."));
+
+	// Montage Tag
+	YuraGameplayTags.Montage_Attack_Weapon =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.Weapon"), FString("Get Socket On Weapon."));
+	YuraGameplayTags.Montage_Attack_RightHand =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.RightHand"), FString("Get Socket On RightHand."));
+	YuraGameplayTags.Montage_Attack_LeftHand =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.LeftHand"), FString("Get Socket On LeftHand."));
 }

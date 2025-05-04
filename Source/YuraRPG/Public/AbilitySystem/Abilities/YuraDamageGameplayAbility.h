@@ -21,6 +21,9 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 	void SetWarpingTargetFacingFromLocation(const FVector& TargetLocation);
 
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+	void GetDamageSpecHandle(FGameplayEffectSpecHandle& OutDamageEffectSpecHandle);
+
 protected:
 
 	// 技能伤害类型和对应的基础伤害

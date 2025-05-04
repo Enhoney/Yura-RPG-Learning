@@ -14,6 +14,8 @@
 
 #include "YuraRPG.h"
 
+#include "YuraGameplayTags.h"
+
 AYuraCharacterBase::AYuraCharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -47,10 +49,17 @@ UAttributeSet* AYuraCharacterBase::GetAttributeSet() const
 	return AttributeSet;
 }
 
-FVector AYuraCharacterBase::GetFireSocketLocation()
+FVector AYuraCharacterBase::GetFireSocketLocation_Implementation(const FGameplayTag& MontageTag)
 {
-	check(Weapon);
-	return Weapon->GetSocketLocation(WeaponTipSocketName);
+	const FName* SocketName = MapMontageToFireSocket.Find(MontageTag);
+
+	if (MontageTag.MatchesTagExact(FYuraGameplayTags::Get().Montage_Attack_Weapon))
+	{
+		check(Weapon);
+		return Weapon->GetSocketLocation(*SocketName);
+	}
+
+	return GetMesh()->GetSocketLocation(*SocketName);
 }
 
 void AYuraCharacterBase::SetWarpTargetFacing(const FVector& TargetLocation)
@@ -68,8 +77,28 @@ void AYuraCharacterBase::Die()
 	MulticastHandleDeath();
 }
 
+bool AYuraCharacterBase::IsDead_Implementation() const
+{
+	return bIsDead;
+}
+
+AActor* AYuraCharacterBase::GetAvator_Implementation()
+{
+	if (AbilitySystemComponent)
+	{
+		return this;
+	}
+	return nullptr;
+}
+
+TArray<FTaggedMontage> AYuraCharacterBase::GetAttackMontages_Implementation() const
+{
+	return AttackMontages;
+}
+
 void AYuraCharacterBase::MulticastHandleDeath_Implementation()
 {
+	bIsDead = true;
 	Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	Weapon->SetEnableGravity(true);
 	Weapon->SetSimulatePhysics(true);

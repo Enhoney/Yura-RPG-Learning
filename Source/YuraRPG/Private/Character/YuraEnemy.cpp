@@ -62,10 +62,21 @@ int32 AYuraEnemy::GetCharacterLevel()
 
 void AYuraEnemy::Die()
 {
+	
 	// 设置寿命
 	SetLifeSpan(LifeSpawnOnDeath);
 	// 
 	Super::Die();
+}
+
+AActor* AYuraEnemy::GetCombatTarget_Implementation() const
+{
+	return CombatTarget;
+}
+
+void AYuraEnemy::SetCombatTarget_Implementation(AActor* TargetActor)
+{
+	CombatTarget = TargetActor;
 }
 
 void AYuraEnemy::CallInitHealthValue()

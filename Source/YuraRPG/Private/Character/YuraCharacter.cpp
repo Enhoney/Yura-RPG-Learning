@@ -88,6 +88,7 @@ int32 AYuraCharacter::GetCharacterLevel()
 	return YuraPlayerState->GetCharacterLevel();
 }
 
+
 void AYuraCharacter::InitAbilityActorInfo()
 {
 	AYuraPlayerState* YuraPlayerState = GetPlayerState<AYuraPlayerState>();

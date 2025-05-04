@@ -12,6 +12,9 @@
 
 #include "YuraAbilityTypes.h"
 
+#include "Engine/OverlapResult.h"
+#include "Interaction/CombatInterface.h"
+
 UOverlayWidgetController* UYuraAbilitySystemLibrary::GetOverlayWidgetController(const UObject* InWorldContextObject)
 {
 	if (APlayerController* PC = UGameplayStatics::GetPlayerController(InWorldContextObject, 0))
@@ -175,4 +178,52 @@ void UYuraAbilitySystemLibrary::SetCriticalHit(UPARAM(ref) FGameplayEffectContex
 	{
 		YuraContext->SetIsCriticalHit(bInCriticalHit);
 	}
+}
+
+void UYuraAbilitySystemLibrary::GetLivePlayersWithinRadius(const UObject* InWorldContextObject, TArray<AActor*>& OutOverlapActors,
+	const TArray<AActor*>& ActorsToIgnore, float Radius, const FVector& InSphereCenterLocation)
+{
+	// 用于碰撞查询的参数
+	FCollisionQueryParams CollisionQueryParams;
+	CollisionQueryParams.AddIgnoredActors(ActorsToIgnore);
+
+	// 记录所有重叠的结果
+	TArray<FOverlapResult> OverlapResults;
+	if (UWorld* World =  GEngine->GetWorldFromContextObject(InWorldContextObject, EGetWorldErrorMode::LogAndReturnNull))
+	{
+		World->OverlapMultiByObjectType(OverlapResults, InSphereCenterLocation, FQuat::Identity, 
+			FCollisionObjectQueryParams(FCollisionObjectQueryParams::InitType::AllDynamicObjects), 
+			FCollisionShape::MakeSphere(Radius), CollisionQueryParams);
+
+		for (FOverlapResult& OverResult : OverlapResults)
+		{
+			// 是否实现了接口的第二种判断方法，一共有三种方法
+			if (OverResult.GetActor()->Implements<UCombatInterface>())
+			{
+				// 调用接口函数
+				const bool bIsLive = !ICombatInterface::Execute_IsDead(OverResult.GetActor());
+
+				if (bIsLive)
+				{
+					// 直接传递OverResult.GetActor()也是一样的
+					OutOverlapActors.AddUnique(ICombatInterface::Execute_GetAvator(OverResult.GetActor()));
+				}
+			}
+		}
+		
+	}
+}
+
+bool UYuraAbilitySystemLibrary::IsNotFriend(const AActor* SourceActor, const AActor* TargetActor)
+{
+	const FName PlayerTag = FName("YuraCharacter.Player");
+	const FName EnemyTag = FName("YuraCharacter.Enemy");
+
+	if (SourceActor->ActorHasTag(PlayerTag) && TargetActor->ActorHasTag(PlayerTag) ||
+		SourceActor->ActorHasTag(EnemyTag) && TargetActor->ActorHasTag(EnemyTag))
+	{
+		return false;
+	}
+	
+	return true;
 }

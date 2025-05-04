@@ -36,6 +36,10 @@ public:
 	virtual int32 GetCharacterLevel() override;
 
 	virtual void Die() override;
+
+	virtual AActor* GetCombatTarget_Implementation() const override;
+
+	virtual void SetCombatTarget_Implementation(AActor* TargetActor) override;
 	/** Combat Interface end*/
 
 	// 手动调用获取初始值
@@ -75,6 +79,8 @@ public:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category = "Combat")
 	float BaseWalkSpeed = 0.f;
 
+	
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Default Class")
 	int32 CharacterLevel = 1;
@@ -100,4 +106,9 @@ protected:
 	// 记录使用的AIController，不暴露给蓝图
 	UPROPERTY()
 	TObjectPtr<AYuraAIController> EnemyAIController;
+
+	// 攻击的目标
+	UPROPERTY(BlueprintReadWrite, Category = "Combat")
+	TObjectPtr<AActor> CombatTarget;
+
 };

@@ -31,11 +31,17 @@ public:
 	UAttributeSet* GetAttributeSet() const;
 
 	/** ConbatInterface start*/
-	virtual FVector GetFireSocketLocation() override;
+	virtual FVector GetFireSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
 
 	virtual void SetWarpTargetFacing(const FVector& TargetLocation) override;
 
 	virtual void Die() override;
+
+	virtual bool IsDead_Implementation() const override;
+
+	virtual AActor* GetAvator_Implementation() override;
+
+	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() const override;
 	/** ConbatInterface end*/
 
 	// 处理死亡动画，玩家死亡逻辑和敌人的是不一样的，所以需要分开来做
@@ -76,10 +82,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
 
-	// 武器尖端SocketName
-	UPROPERTY(EditAnywhere, Category = "Combat")
-	FName WeaponTipSocketName;
-
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
@@ -102,8 +104,18 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<UMaterialInstance> DissolveEffectMatForWeapon;
 
+	// AttackMontage And Tag
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+	TArray<FTaggedMontage> AttackMontages;
+
+	// Map Montage and SocketName
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+	TMap<FGameplayTag, FName> MapMontageToFireSocket;
+
 private:
 	UPROPERTY(EditAnywhere, Category = "Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> AbilitiesGrantIngOnStart;
+
+	bool bIsDead = false;
 
 };

@@ -10,10 +10,6 @@ int32 ICombatInterface::GetCharacterLevel()
 	return 0;
 }
 
-FVector ICombatInterface::GetFireSocketLocation()
-{
-	return FVector();
-}
 
 void ICombatInterface::SetWarpTargetFacing(const FVector& TargetLocation)
 {

@@ -32,7 +32,9 @@ void UYuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 	ICombatInterface* CombatInterface = Cast<ICombatInterface>(GetAvatarActorFromActorInfo());
 	if (CombatInterface)
 	{
-		const FVector SpawnLocation = CombatInterface->GetFireSocketLocation();
+		const FVector SpawnLocation = CombatInterface->Execute_GetFireSocketLocation(GetAvatarActorFromActorInfo(), FYuraGameplayTags::Get().Montage_Attack_Weapon);
+		// 下面这种用法就不用Cast了
+		// const FVector SpawnLocation = ICombatInterface::Execute_GetFireSocketLocation(GetAvatarActorFromActorInfo());
 		// 设置旋转
 		FRotator SpawnRotation = (ProjectileTargetLocation - SpawnLocation).Rotation();
 		// TODO：如果希望做一个抛物线，可以将这个俯仰角加25左右，然后开启重力
@@ -47,18 +49,10 @@ void UYuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 			GetAvatarActorFromActorInfo(),
 			Cast<APawn>(GetAvatarActorFromActorInfo()),
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-		// 我们要在这里给他一个GameplayEffectSpec
-		const UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
-		const FGameplayEffectContextHandle DamageEffectContextHandle = ASC->MakeEffectContext();
-		const FGameplayEffectSpecHandle DamageSpecHandle = ASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), DamageEffectContextHandle);
 
-		// 设置基础伤害
-		// 从表格中拿到数值
-		for (const auto& Pair : DamageTypes)
-		{
-			const float ScalableDamage = Pair.Value.GetValueAtLevel(GetAbilityLevel());
-			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, Pair.Key, ScalableDamage);
-		}
+		FGameplayEffectSpecHandle DamageSpecHandle;
+		// 生成handle
+		GetDamageSpecHandle(DamageSpecHandle);
 
 		Projectile->DamageEffectSpecHandle = DamageSpecHandle;
 

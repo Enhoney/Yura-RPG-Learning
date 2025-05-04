@@ -54,4 +54,13 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
 	static void SetCriticalHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContext, bool bInCriticalHit);
+
+
+	// 获取范围内的指定目标
+	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Gameplay Mechinces")
+	static void GetLivePlayersWithinRadius(const UObject* InWorldContextObject, TArray<AActor*>& OutOverlapActors , 
+		const TArray<AActor*>& ActorsToIgnore, float Radius, const FVector& InSphereCenterLocation);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "YuraAbilitySystemLibrary|Combat")
+	static bool IsNotFriend(const AActor* SourceActor, const AActor* TargetActor);
 };

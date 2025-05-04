@@ -117,7 +117,14 @@ void UYuraAttributeSet::ShowDamageText(const float DamageNum, const FEffectPrope
 {
 	if (Props.TargetCharacter != Props.SourceCharacter)
 	{
+		// 玩家攻击敌人
 		if (AYuraPlayerController* PlayerController = Cast<AYuraPlayerController>(Props.SourceController))
+		{
+			PlayerController->ShowDamageText(DamageNum, Props.TargetCharacter, bDamageBlock, bCriticalHit);
+			return;
+		}
+		// 敌人攻击玩家
+		if (AYuraPlayerController* PlayerController = Cast<AYuraPlayerController>(Props.TargetController))
 		{
 			PlayerController->ShowDamageText(DamageNum, Props.TargetCharacter, bDamageBlock, bCriticalHit);
 		}

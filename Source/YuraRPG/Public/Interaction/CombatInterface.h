@@ -4,7 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+
+#include "GameplayTagContainer.h"
 #include "CombatInterface.generated.h"
+
+USTRUCT(BlueprintType)
+struct FTaggedMontage
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TaggedMontage")
+	class UAnimMontage* AttackMontage = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TaggedMontage")
+	FGameplayTag MontageTag;
+};
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType)
@@ -26,8 +41,9 @@ public:
 	// 获取角色等级
 	virtual int32 GetCharacterLevel();
 
-	// 获取SocketLocation
-	virtual FVector GetFireSocketLocation();
+	// 获取WeaponTipSocketLocation
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	FVector GetFireSocketLocation(const FGameplayTag& MontageTag);
 
 	// 设置Wrap位置朝向
 	virtual void SetWarpTargetFacing(const FVector& TargetLocation);
@@ -37,4 +53,22 @@ public:
 	UAnimMontage* GetHitReactAnimMontage();
 
 	virtual void Die() = 0;
+
+	// 敌人使用，获取和设置攻击目标
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void SetCombatTarget(AActor* TargetActor);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	AActor* GetCombatTarget() const;
+
+	// Character是否死亡
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	bool IsDead() const;
+
+	// 如果它上面有ASC，就返回它自己
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	AActor* GetAvator();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	TArray<FTaggedMontage> GetAttackMontages() const;
 };
