@@ -51,6 +51,10 @@ public:
 	/** 溶解--创建动态材质，并调用开始溶解的函数*/ 
 	void Disslove();
 
+	// 获取武器骨骼网格体
+	UFUNCTION(BlueprintPure)
+	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return Weapon; }
+
 protected:
 	virtual void BeginPlay() override;
 

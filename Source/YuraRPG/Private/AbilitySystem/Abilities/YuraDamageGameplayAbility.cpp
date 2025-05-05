@@ -36,3 +36,14 @@ void UYuraDamageGameplayAbility::GetDamageSpecHandle(FGameplayEffectSpecHandle& 
 	OutDamageEffectSpecHandle = DamageSpecHandle;
 }
 
+FTaggedMontage UYuraDamageGameplayAbility::GetRandTaggedMontage(const TArray<FTaggedMontage>& TaggedMontages) const
+{
+	if (TaggedMontages.Num() > 0)
+	{
+		const int32 RandIndex = FMath::RandRange(0, TaggedMontages.Num() - 1);
+		return TaggedMontages[RandIndex];
+	}
+
+	return FTaggedMontage();
+}
+

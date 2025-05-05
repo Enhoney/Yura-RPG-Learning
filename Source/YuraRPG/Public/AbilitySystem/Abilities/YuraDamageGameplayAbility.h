@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystem/Abilities/YuraGameplayAbility.h"
+#include "Interaction/CombatInterface.h"
 #include "YuraDamageGameplayAbility.generated.h"
 
 struct FGameplayTag;
@@ -23,6 +24,10 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 	void GetDamageSpecHandle(FGameplayEffectSpecHandle& OutDamageEffectSpecHandle);
+
+	// 获取一个随机的攻击动画蒙太奇和对应的Tag
+	UFUNCTION(BlueprintPure, Category = "Ability")
+	FTaggedMontage GetRandTaggedMontage(const TArray<FTaggedMontage>& TaggedMontages) const;
 
 protected:
 

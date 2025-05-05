@@ -17,6 +17,8 @@
 #include "AbilitySystemComponent.h"
 #include "GameplayEffectTypes.h"
 
+#include "YuraAbilitySystemLibrary.h"
+
 AYuraProjectile::AYuraProjectile()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -70,6 +72,12 @@ void AYuraProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedCompon
 {
 	// 避免碰撞到自己，导致异常情况
 	if (DamageEffectSpecHandle.Data.IsValid() && DamageEffectSpecHandle.Data->GetEffectContext().GetEffectCauser() == OtherActor)
+	{
+		return;
+	}
+
+	// 避免误伤
+	if (DamageEffectSpecHandle.Data.IsValid() && !UYuraAbilitySystemLibrary::IsNotFriend(DamageEffectSpecHandle.Data->GetEffectContext().GetEffectCauser(), OtherActor))
 	{
 		return;
 	}
