@@ -62,6 +62,10 @@ int32 AYuraEnemy::GetCharacterLevel()
 
 void AYuraEnemy::Die()
 {
+	if (HasAuthority())
+	{
+		EnemyAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsDead"), true);
+	}
 	
 	// 设置寿命
 	SetLifeSpan(LifeSpawnOnDeath);
@@ -117,7 +121,8 @@ void AYuraEnemy::PossessedBy(AController* NewController)
 	// 是否为远程攻击角色
 	EnemyAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsRangedAttacker"), (CharacterClass != ECharacterClass::Warrior));
 
-	
+	// 设置是否死亡
+	EnemyAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsDead"), false);
 }
 
 void AYuraEnemy::BeginPlay()
