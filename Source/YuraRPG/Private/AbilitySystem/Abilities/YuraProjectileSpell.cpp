@@ -18,7 +18,7 @@ void UYuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 	
 }
 
-void UYuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocation)
+void UYuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag)
 {
 	// 在服务器生成
 	const bool bServer = GetAvatarActorFromActorInfo()->HasAuthority();
@@ -32,7 +32,7 @@ void UYuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 	ICombatInterface* CombatInterface = Cast<ICombatInterface>(GetAvatarActorFromActorInfo());
 	if (CombatInterface)
 	{
-		const FVector SpawnLocation = CombatInterface->Execute_GetFireSocketLocation(GetAvatarActorFromActorInfo(), FYuraGameplayTags::Get().Montage_Attack_Weapon);
+		const FVector SpawnLocation = CombatInterface->Execute_GetFireSocketLocation(GetAvatarActorFromActorInfo(), SocketTag);
 		// 下面这种用法就不用Cast了
 		// const FVector SpawnLocation = ICombatInterface::Execute_GetFireSocketLocation(GetAvatarActorFromActorInfo());
 		// 设置旋转

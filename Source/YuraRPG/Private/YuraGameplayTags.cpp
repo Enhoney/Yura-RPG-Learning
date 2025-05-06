@@ -100,11 +100,22 @@ void FYuraGameplayTags::InitializeGameplayTags()
 	YuraGameplayTags.Ability_Attack =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Attack"), FString("Tag To Activate Attack Ability."));
 
-	// Montage Tag
-	YuraGameplayTags.Montage_Attack_Weapon =
-		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.Weapon"), FString("Get Socket On Weapon."));
-	YuraGameplayTags.Montage_Attack_RightHand =
-		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.RightHand"), FString("Get Socket On RightHand."));
-	YuraGameplayTags.Montage_Attack_LeftHand =
-		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.LeftHand"), FString("Get Socket On LeftHand."));
+	// CombatSocket Tag
+	YuraGameplayTags.CombatSocket_Weapon =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.Weapon"), FString("Get Socket On Weapon."));
+	YuraGameplayTags.CombatSocket_RightHand =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.RightHand"), FString("Get Socket On RightHand."));
+	YuraGameplayTags.CombatSocket_LeftHand =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.LeftHand"), FString("Get Socket On LeftHand."));
+
+	// Montage Tags
+	YuraGameplayTags.Montage_Attack_1 =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.1"), FString("Montage Attack1."));
+	YuraGameplayTags.Montage_Attack_2 =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.2"), FString("Montage Attack2."));
+	YuraGameplayTags.Montage_Attack_3 =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.3"), FString("Montage Attack3."));
+	YuraGameplayTags.Montage_Attack_4 =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.4"), FString("Montage Attack4."));
+
 }

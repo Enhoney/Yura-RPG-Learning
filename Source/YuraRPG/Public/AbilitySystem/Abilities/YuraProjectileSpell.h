@@ -9,6 +9,8 @@
 class AYuraProjectile;
 class UGameplayEffect;
 
+struct FGameplayTag;
+
 /**
  * 
  */
@@ -26,7 +28,7 @@ protected:
 
 	// 蓝图可调用，生成子弹
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-	void SpawnProjectile(const FVector& ProjectileTargetLocation);
+	void SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag);
 
 protected:
 	// 发射物的类

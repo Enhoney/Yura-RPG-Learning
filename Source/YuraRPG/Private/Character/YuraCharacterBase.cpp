@@ -9,7 +9,7 @@
 #include "YuraAbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
-
+#include "Kismet/GameplayStatics.h"
 #include "MotionWarpingComponent.h"
 
 #include "YuraRPG.h"
@@ -49,14 +49,24 @@ UAttributeSet* AYuraCharacterBase::GetAttributeSet() const
 	return AttributeSet;
 }
 
-FVector AYuraCharacterBase::GetFireSocketLocation_Implementation(const FGameplayTag& MontageTag)
+FVector AYuraCharacterBase::GetFireSocketLocation_Implementation(const FGameplayTag& CombatSocketTag)
 {
-	const FName* SocketName = MapMontageToFireSocket.Find(MontageTag);
+	const FName* SocketName = MapMontageToFireSocket.Find(CombatSocketTag);
 
-	if (MontageTag.MatchesTagExact(FYuraGameplayTags::Get().Montage_Attack_Weapon))
+	if (CombatSocketTag.MatchesTagExact(FYuraGameplayTags::Get().CombatSocket_Weapon))
 	{
 		check(Weapon);
-		return Weapon->GetSocketLocation(*SocketName);
+
+		// 如果武器的骨骼设置了
+		if (Weapon->GetSkeletalMeshAsset())
+		{
+			return Weapon->GetSocketLocation(*SocketName);
+		}
+		else
+		{
+			return  GetMesh()->GetSocketLocation(*SocketName);
+		}
+		
 	}
 
 	return GetMesh()->GetSocketLocation(*SocketName);
@@ -96,9 +106,32 @@ TArray<FTaggedMontage> AYuraCharacterBase::GetAttackMontages_Implementation() co
 	return AttackMontages;
 }
 
+UNiagaraSystem* AYuraCharacterBase::GetImpactEffect_Implementation() const
+{
+	return ImpactEffect.Get();
+}
+
+FTaggedMontage AYuraCharacterBase::GetTaggedMontageByMontageTag_Implementation(const FGameplayTag& MontageTag) const
+{
+	for (FTaggedMontage TaggedMontage : AttackMontages)
+	{
+		if (TaggedMontage.MontageTag.MatchesTagExact(MontageTag))
+		{
+			return TaggedMontage;
+		}
+	}
+
+	return FTaggedMontage();
+}
+
 void AYuraCharacterBase::MulticastHandleDeath_Implementation()
 {
 	bIsDead = true;
+	if (DeathSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, DeathSound.Get(), GetActorLocation(), GetActorRotation());
+	}
+
 	Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	Weapon->SetEnableGravity(true);
 	Weapon->SetSimulatePhysics(true);

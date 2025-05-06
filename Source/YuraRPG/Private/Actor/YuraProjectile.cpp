@@ -58,7 +58,7 @@ void AYuraProjectile::Destroyed()
 {
 	// 这个时候，还没有销毁呢
 	// 如果这个时候在客户端，并且还没有碰撞到，就手动播放效果
-	if (!HasAuthority() && !bHit)
+	if (!HasAuthority())
 	{
 		if(AudioComponent) AudioComponent->Stop();
 		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
@@ -95,15 +95,15 @@ void AYuraProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedCompon
 		}
 		Destroy();
 	}
-	else
-	{
-		// 停止播放飞行的声音
-		if(AudioComponent) AudioComponent->Stop();
+	//else
+	//{
+	//	// 停止播放飞行的声音
+	//	if(AudioComponent) AudioComponent->Stop();
 
-		// 在指定位置播放音效
-		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactNiagaraEffect, GetActorLocation());
-		bHit = true;
-	}
+	//	// 在指定位置播放音效
+	//	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
+	//	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactNiagaraEffect, GetActorLocation());
+	//	bHit = true;
+	//}
 }
 

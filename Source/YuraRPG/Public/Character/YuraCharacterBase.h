@@ -14,6 +14,7 @@ class UGameplayEffect;
 class UGameplayAbility;
 
 class UMaterialInstance;
+class UNiagaraSystem;
 
 UCLASS(Abstract)
 class YURARPG_API AYuraCharacterBase : public ACharacter, public IAbilitySystemInterface, public ICombatInterface
@@ -31,7 +32,7 @@ public:
 	UAttributeSet* GetAttributeSet() const;
 
 	/** ConbatInterface start*/
-	virtual FVector GetFireSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
+	virtual FVector GetFireSocketLocation_Implementation(const FGameplayTag& CombatSocketTag) override;
 
 	virtual void SetWarpTargetFacing(const FVector& TargetLocation) override;
 
@@ -42,6 +43,10 @@ public:
 	virtual AActor* GetAvator_Implementation() override;
 
 	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() const override;
+
+	virtual UNiagaraSystem* GetImpactEffect_Implementation() const override;
+
+	virtual FTaggedMontage GetTaggedMontageByMontageTag_Implementation(const FGameplayTag& MontageTag) const override;
 	/** ConbatInterface end*/
 
 	// 处理死亡动画，玩家死亡逻辑和敌人的是不一样的，所以需要分开来做
@@ -115,6 +120,14 @@ protected:
 	// Map Montage and SocketName
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 	TMap<FGameplayTag, FName> MapMontageToFireSocket;
+
+	// 受击特效
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+	TObjectPtr<UNiagaraSystem> ImpactEffect;
+
+	// 死亡语音
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+	TObjectPtr<USoundBase> DeathSound;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Abilities")

@@ -8,6 +8,8 @@
 #include "GameplayTagContainer.h"
 #include "CombatInterface.generated.h"
 
+class UNiagaraSystem;
+
 USTRUCT(BlueprintType)
 struct FTaggedMontage
 {
@@ -19,6 +21,13 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TaggedMontage")
 	FGameplayTag MontageTag;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TaggedMontage")
+	FGameplayTag CombatSocketTag;
+
+	// 命中音效
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TaggedMontage")
+	class USoundBase* ImpactSound = nullptr;
 };
 
 // This class does not need to be modified.
@@ -43,7 +52,7 @@ public:
 
 	// 获取WeaponTipSocketLocation
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	FVector GetFireSocketLocation(const FGameplayTag& MontageTag);
+	FVector GetFireSocketLocation(const FGameplayTag& CombatSocketTag);
 
 	// 设置Wrap位置朝向
 	virtual void SetWarpTargetFacing(const FVector& TargetLocation);
@@ -71,4 +80,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	TArray<FTaggedMontage> GetAttackMontages() const;
+
+	// 获取Character上面的受击效果
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UNiagaraSystem* GetImpactEffect() const;
+	
+	// 通过MontageTag找到配置的命中音效
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	FTaggedMontage GetTaggedMontageByMontageTag(const FGameplayTag& MontageTag) const;
 };

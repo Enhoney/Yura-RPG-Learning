@@ -78,11 +78,16 @@ public:
 	// 用于激活技能的tag
 	FGameplayTag Ability_Attack;
 
-	// 和Socket关联的Tag--攻击时用于生成Trace的位置，在Montage中使用
-	FGameplayTag Montage_Attack_Weapon;
-	FGameplayTag Montage_Attack_RightHand;
-	FGameplayTag Montage_Attack_LeftHand;
+	// 和Socket关联的Tag--攻击时用于生成Trace的位置
+	FGameplayTag CombatSocket_Weapon;
+	FGameplayTag CombatSocket_RightHand;
+	FGameplayTag CombatSocket_LeftHand;
 
+	// 攻击蒙太奇的Tag
+	FGameplayTag Montage_Attack_1;
+	FGameplayTag Montage_Attack_2;
+	FGameplayTag Montage_Attack_3;
+	FGameplayTag Montage_Attack_4;
 
 private:
 	static FYuraGameplayTags YuraGameplayTags;
