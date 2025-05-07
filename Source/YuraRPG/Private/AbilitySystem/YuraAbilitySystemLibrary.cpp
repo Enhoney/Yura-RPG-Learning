@@ -206,7 +206,7 @@ void UYuraAbilitySystemLibrary::GetLivePlayersWithinRadius(const UObject* InWorl
 				if (bIsLive)
 				{
 					// 直接传递OverResult.GetActor()也是一样的
-					OutOverlapActors.AddUnique(ICombatInterface::Execute_GetAvator(OverResult.GetActor()));
+					OutOverlapActors.AddUnique(ICombatInterface::Execute_GetAvatar(OverResult.GetActor()));
 				}
 			}
 		}

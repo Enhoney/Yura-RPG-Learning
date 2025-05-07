@@ -76,7 +76,7 @@ public:
 
 	// 如果它上面有ASC，就返回它自己
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	AActor* GetAvator();
+	AActor* GetAvatar();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	TArray<FTaggedMontage> GetAttackMontages() const;
@@ -88,4 +88,16 @@ public:
 	// 通过MontageTag找到配置的命中音效
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	FTaggedMontage GetTaggedMontageByMontageTag(const FGameplayTag& MontageTag) const;
+
+	// 获取随从数量
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	int32 GetMinionCount() const;
+
+	// 增加随从数量
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void AddMinionCount(int32 Num);
+
+	// 减少随从数量
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void ReduceMinionCount(int32 Num);
 };

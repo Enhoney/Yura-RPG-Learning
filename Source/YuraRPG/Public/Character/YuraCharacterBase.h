@@ -40,13 +40,20 @@ public:
 
 	virtual bool IsDead_Implementation() const override;
 
-	virtual AActor* GetAvator_Implementation() override;
+	virtual AActor* GetAvatar_Implementation() override;
 
 	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() const override;
 
 	virtual UNiagaraSystem* GetImpactEffect_Implementation() const override;
 
 	virtual FTaggedMontage GetTaggedMontageByMontageTag_Implementation(const FGameplayTag& MontageTag) const override;
+
+	virtual int32 GetMinionCount_Implementation() const override;
+
+	virtual void AddMinionCount_Implementation(int32 Num) override;
+
+	virtual void ReduceMinionCount_Implementation(int32 Num) override;
+
 	/** ConbatInterface end*/
 
 	// 处理死亡动画，玩家死亡逻辑和敌人的是不一样的，所以需要分开来做
@@ -134,5 +141,8 @@ private:
 	TArray<TSubclassOf<UGameplayAbility>> AbilitiesGrantIngOnStart;
 
 	bool bIsDead = false;
+
+	/** Monion Count*/
+	int32 MinionCount = 0;
 
 };

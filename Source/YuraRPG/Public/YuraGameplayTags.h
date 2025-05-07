@@ -77,6 +77,7 @@ public:
 
 	// 用于激活技能的tag
 	FGameplayTag Ability_Attack;
+	FGameplayTag Ability_Summon;
 
 	// 和Socket关联的Tag--攻击时用于生成Trace的位置
 	FGameplayTag CombatSocket_Weapon;
@@ -88,6 +89,7 @@ public:
 	FGameplayTag Montage_Attack_2;
 	FGameplayTag Montage_Attack_3;
 	FGameplayTag Montage_Attack_4;
+	FGameplayTag Montage_Summon;
 
 private:
 	static FYuraGameplayTags YuraGameplayTags;

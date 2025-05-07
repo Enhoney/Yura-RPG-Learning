@@ -99,6 +99,8 @@ void FYuraGameplayTags::InitializeGameplayTags()
 	// Ability Tag
 	YuraGameplayTags.Ability_Attack =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Attack"), FString("Tag To Activate Attack Ability."));
+	YuraGameplayTags.Ability_Summon =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Summon"), FString("Tag To Activate Summon Ability."));
 
 	// CombatSocket Tag
 	YuraGameplayTags.CombatSocket_Weapon =
@@ -117,5 +119,7 @@ void FYuraGameplayTags::InitializeGameplayTags()
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.3"), FString("Montage Attack3."));
 	YuraGameplayTags.Montage_Attack_4 =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.4"), FString("Montage Attack4."));
+	YuraGameplayTags.Montage_Summon =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Summon"), FString("Montage Summon."));
 
 }

@@ -18,16 +18,9 @@ class YURARPG_API UYuraDamageGameplayAbility : public UYuraGameplayAbility
 	GENERATED_BODY()
 
 protected:
-	// 设置WarpingTargetFacing
-	UFUNCTION(BlueprintCallable, Category = "Ability")
-	void SetWarpingTargetFacingFromLocation(const FVector& TargetLocation);
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 	void GetDamageSpecHandle(FGameplayEffectSpecHandle& OutDamageEffectSpecHandle);
-
-	// 获取一个随机的攻击动画蒙太奇和对应的Tag
-	UFUNCTION(BlueprintPure, Category = "Ability")
-	FTaggedMontage GetRandTaggedMontage(const TArray<FTaggedMontage>& TaggedMontages) const;
 
 protected:
 

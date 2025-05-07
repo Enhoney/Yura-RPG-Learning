@@ -92,7 +92,7 @@ bool AYuraCharacterBase::IsDead_Implementation() const
 	return bIsDead;
 }
 
-AActor* AYuraCharacterBase::GetAvator_Implementation()
+AActor* AYuraCharacterBase::GetAvatar_Implementation()
 {
 	if (AbilitySystemComponent)
 	{
@@ -122,6 +122,21 @@ FTaggedMontage AYuraCharacterBase::GetTaggedMontageByMontageTag_Implementation(c
 	}
 
 	return FTaggedMontage();
+}
+
+int32 AYuraCharacterBase::GetMinionCount_Implementation() const
+{
+	return MinionCount;
+}
+
+void AYuraCharacterBase::AddMinionCount_Implementation(int32 Num)
+{
+	MinionCount = FMath::Max<int32>(0, MinionCount + Num);
+}
+
+void AYuraCharacterBase::ReduceMinionCount_Implementation(int32 Num)
+{
+	MinionCount = FMath::Max<int32>(0, MinionCount - Num);
 }
 
 void AYuraCharacterBase::MulticastHandleDeath_Implementation()
