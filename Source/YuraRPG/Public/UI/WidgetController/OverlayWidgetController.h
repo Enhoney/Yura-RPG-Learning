@@ -8,8 +8,10 @@
 #include "OverlayWidgetController.generated.h"
 
 struct FOnAttributeChangeData;
-
+struct FYuraAbilityInfo;
 class UYuraUserWidget;
+
+class UAbilityInfo;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
 
@@ -38,6 +40,8 @@ struct FUIWidgeRow : public FTableRowBase
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageWidgetRowSignature, FUIWidgeRow, Message);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityInfoGivenSignature, const FYuraAbilityInfo&, YuraAbilityInfo);
+
 /**
  * 
  */
@@ -53,6 +57,10 @@ public:
 
 	template<typename T>
 	T* GetDataTableRowByTag(const FGameplayTag& InTag, UDataTable* DataTable);
+
+	// 初始化赋予能力的回调
+	UFUNCTION(BlueprintCallable)
+	void OnStartupAbilitiesGiven();
 
 
 public:
@@ -70,9 +78,15 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS|GE Asset Massage")
 	FMessageWidgetRowSignature OnMessageWidgetRowDelegate;
+
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Ability Info")
+	FAbilityInfoGivenSignature OnAbilityInfoGivenDelegate;
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
 	TObjectPtr<UDataTable> MessageTable;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
+	TObjectPtr<UAbilityInfo> AbilityInformations;
 
 };
 

@@ -102,6 +102,14 @@ void FYuraGameplayTags::InitializeGameplayTags()
 	YuraGameplayTags.Ability_Summon =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Summon"), FString("Tag To Activate Summon Ability."));
 
+	// Yura Ability Tag
+	YuraGameplayTags.Ability_Fire_FireBolt =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Fire.FireBolt"), FString("Ability Tag for Yura FireBolt."));
+
+	// Coowdown Tag
+	YuraGameplayTags.Cooldown_Fire_FireBolt =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Fire.FireBolt"), FString("Cooldown Tag for Yura FireBolt."));
+
 	// CombatSocket Tag
 	YuraGameplayTags.CombatSocket_Weapon =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.Weapon"), FString("Get Socket On Weapon."));

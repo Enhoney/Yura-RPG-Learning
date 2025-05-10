@@ -2,6 +2,7 @@
 
 
 #include "AbilitySystem/Data/AttributeInfo.h"
+#include "YuraLogChannel.h"
 
 FYuraAttributeInfo UAttributeInfo::FindAttributeInfoByTag(const FGameplayTag& InAttributeTag, bool bLogNotFound) const
 {
@@ -15,7 +16,7 @@ FYuraAttributeInfo UAttributeInfo::FindAttributeInfoByTag(const FGameplayTag& In
 	}
 	if (bLogNotFound)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Can't find Attribute Tag : [%s] On %s"), *InAttributeTag.ToString(), *GetNameSafe(this));
+		UE_LOG(LogYura, Error, TEXT("Can't find Attribute Tag : [%s] On %s"), *InAttributeTag.ToString(), *GetNameSafe(this));
 	}
 
 	return FYuraAttributeInfo();

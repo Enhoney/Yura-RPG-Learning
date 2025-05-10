@@ -8,6 +8,7 @@
 #include "YuraAbilitySystemComponent.h"
 
 #include "Engine/DataTable.h"
+#include "Data/AbilityInfo.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
 {
@@ -52,24 +53,58 @@ void UOverlayWidgetController::BindCallbacksToDependiencies()
 				OnMaxManaChanged.Broadcast(Data.NewValue);
 			});
 
-	Cast<UYuraAbilitySystemComponent>(AbilitySystemComponent)->OnEffectAssetTags.AddLambda(
-		[this](const FGameplayTagContainer& InGameplayTagContainer)
+	if (UYuraAbilitySystemComponent* ASC = Cast<UYuraAbilitySystemComponent>(AbilitySystemComponent))
+	{
+		
+		if (ASC->bStartupAbilitiesGiven)
 		{
-			for (const FGameplayTag& TmpTag : InGameplayTagContainer)
+			OnStartupAbilitiesGiven();
+		}
+		else
+		{
+			ASC->OnAbilitiesGivenDelegate.AddUObject(this, &UOverlayWidgetController::OnStartupAbilitiesGiven);
+		}
+
+		ASC->OnEffectAssetTags.AddLambda(
+			[this](const FGameplayTagContainer& InGameplayTagContainer)
 			{
-				// 这会去项目配置中找这个Tag，找不到默认会报错
-				FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag(FName("Message"));
-				// 只要包含就会是true
-				bool bIsMessageTag = TmpTag.MatchesTag(MessageTag);
-
-				if (bIsMessageTag)
+				for (const FGameplayTag& TmpTag : InGameplayTagContainer)
 				{
-					FUIWidgeRow* RowData = GetDataTableRowByTag<FUIWidgeRow>(TmpTag, MessageTable.Get());
+					// 这会去项目配置中找这个Tag，找不到默认会报错
+					FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag(FName("Message"));
+					// 只要包含就会是true
+					bool bIsMessageTag = TmpTag.MatchesTag(MessageTag);
 
-					OnMessageWidgetRowDelegate.Broadcast(*RowData);
+					if (bIsMessageTag)
+					{
+						FUIWidgeRow* RowData = GetDataTableRowByTag<FUIWidgeRow>(TmpTag, MessageTable.Get());
+
+						OnMessageWidgetRowDelegate.Broadcast(*RowData);
+					}
+
 				}
-				
-			}
-		});
+			});
+	}
 
+}
+
+void UOverlayWidgetController::OnStartupAbilitiesGiven()
+{
+	if (UYuraAbilitySystemComponent* ASC = Cast<UYuraAbilitySystemComponent>(AbilitySystemComponent))
+	{
+		if (ASC->bStartupAbilitiesGiven)
+		{
+			FForEachAbilitySignature ForEachAbilityDelegate;
+
+			ForEachAbilityDelegate.BindLambda([this](const FGameplayAbilitySpec& AbilitySpec)
+				{
+					FYuraAbilityInfo YuraAbilityInfo = AbilityInformations->FindAbilityInfoByTag(UYuraAbilitySystemComponent::GetAbilityTagFromSpec(AbilitySpec));
+					YuraAbilityInfo.AbilityInputTag = UYuraAbilitySystemComponent::GetAbilityInputTagFromSpec(AbilitySpec);
+
+					OnAbilityInfoGivenDelegate.Broadcast(YuraAbilityInfo);
+				});
+
+			ASC->ForEachAbility(ForEachAbilityDelegate);
+		}
+	}
 }

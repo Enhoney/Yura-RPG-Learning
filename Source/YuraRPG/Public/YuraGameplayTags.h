@@ -79,6 +79,12 @@ public:
 	FGameplayTag Ability_Attack;
 	FGameplayTag Ability_Summon;
 
+	// 玩家的技能Tag
+	FGameplayTag Ability_Fire_FireBolt;
+
+	// 技能冷却时间的tag
+	FGameplayTag Cooldown_Fire_FireBolt;
+
 	// 和Socket关联的Tag--攻击时用于生成Trace的位置
 	FGameplayTag CombatSocket_Weapon;
 	FGameplayTag CombatSocket_RightHand;

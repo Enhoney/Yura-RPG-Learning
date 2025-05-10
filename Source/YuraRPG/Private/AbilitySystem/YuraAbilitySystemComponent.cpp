@@ -4,6 +4,7 @@
 #include "YuraAbilitySystemComponent.h"
 #include "YuraGameplayTags.h"
 #include "Abilities/YuraGameplayAbility.h"
+#include "YuraLogChannel.h"
 
 void UYuraAbilitySystemComponent::AbilityActorInfoSet()
 {
@@ -25,6 +26,9 @@ void UYuraAbilitySystemComponent::GrantCharacterAbilities(const TArray<TSubclass
 			GiveAbility(AbilitySpec);
 		}
 	}
+
+	bStartupAbilitiesGiven = true;
+	OnAbilitiesGivenDelegate.Broadcast();
 }
 
 void UYuraAbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputTag)
@@ -67,6 +71,63 @@ void UYuraAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& In
 		}
 
 	}
+}
+
+void UYuraAbilitySystemComponent::ForEachAbility(const FForEachAbilitySignature& Delegate)
+{
+	FScopedAbilityListLock ActivateAbilityLock(*this);
+
+	for (const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		if (!Delegate.ExecuteIfBound(AbilitySpec))
+		{
+			UE_LOG(LogYura, Error, TEXT("Failed to Execute delegate in [%s]"), *FString(__FUNCTION__));
+		}
+	}
+}
+
+FGameplayTag UYuraAbilitySystemComponent::GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+	if (AbilitySpec.Ability)
+	{
+		FGameplayTagContainer AbilityTagContainer = AbilitySpec.Ability.Get()->AbilityTags;
+		for (FGameplayTag Tag : AbilityTagContainer)
+		{
+			if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Ability"))))
+			{
+				return Tag;
+			}
+		}
+	}
+
+	return FGameplayTag();
+}
+
+FGameplayTag UYuraAbilitySystemComponent::GetAbilityInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+	for (FGameplayTag Tag : AbilitySpec.DynamicAbilityTags)
+	{
+		if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("InputTag"))))
+		{
+			return Tag;
+		}
+	}
+
+	return FGameplayTag();
+}
+
+void UYuraAbilitySystemComponent::OnRep_ActivateAbilities()
+{
+	Super::OnRep_ActivateAbilities();
+
+	// 我们目前只想在一开始的时候执行一次广播
+	// bStartupAbilitiesGiven这个属性没有同步，所以这里客户端一开始时false
+	if (!bStartupAbilitiesGiven)
+	{
+		bStartupAbilitiesGiven = true;
+		OnAbilitiesGivenDelegate.Broadcast();
+	}
+	
 }
 
 void UYuraAbilitySystemComponent::ClientEffectApplied_Implementation(UAbilitySystemComponent* ASC, const FGameplayEffectSpec& GESpec, FActiveGameplayEffectHandle ActiveGEHandle)
