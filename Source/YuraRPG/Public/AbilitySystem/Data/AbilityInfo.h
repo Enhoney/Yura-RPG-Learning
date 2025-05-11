@@ -19,6 +19,9 @@ struct FYuraAbilityInfo
 	FGameplayTag AbilityInputTag = FGameplayTag();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI|AbilityInfo")
+	FGameplayTag AbilityCooldownTag = FGameplayTag();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI|AbilityInfo")
 	TObjectPtr<const UTexture2D> Icon = nullptr;
 
 	// 这种写法相当于是const UMaterialInterface*，表示数据不可修改，指向可以修改
