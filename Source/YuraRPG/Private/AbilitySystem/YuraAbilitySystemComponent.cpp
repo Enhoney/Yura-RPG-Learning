@@ -31,6 +31,17 @@ void UYuraAbilitySystemComponent::GrantCharacterAbilities(const TArray<TSubclass
 	OnAbilitiesGivenDelegate.Broadcast();
 }
 
+void UYuraAbilitySystemComponent::GrantCharacterPassiveAbilities(const TArray<TSubclassOf<UGameplayAbility>>& PassiveAbilitiesToGrant)
+{
+	for (TSubclassOf<UGameplayAbility> AbilityClass : PassiveAbilitiesToGrant)
+	{
+		// 创建Spec--可以简单理解为实例
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+		// 赋予能力并立即激活
+		GiveAbilityAndActivateOnce(AbilitySpec);
+	}
+}
+
 void UYuraAbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputTag)
 {
 	if (!InputTag.IsValid()) return;

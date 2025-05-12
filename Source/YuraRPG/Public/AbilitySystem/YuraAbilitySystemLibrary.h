@@ -35,6 +35,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Grant StartUp Abilities")
 	static void GrantStartUpAbilities(const UObject* InWorldContextObject, UAbilitySystemComponent* TargetASC, ECharacterClass EnemyClass, int32 EnemyLevel);
 
+	// 查找对应的经验点
+	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Get Exp Reward for Class and Level")
+	static int32 FindEnemyExpReward(const UObject* InWorldContextObject, ECharacterClass InCharacterClass, int32 InCharacterLevel);
+
 	// 从GameMode中拿到数据资产
 	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Get CharacterClass Info Data")
 	static UCharacterClassInfo* GetCharacterClassInfo(const UObject* InWorldContextObject);

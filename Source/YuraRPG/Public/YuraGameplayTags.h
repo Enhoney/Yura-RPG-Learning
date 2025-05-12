@@ -52,6 +52,9 @@ public:
 	FGameplayTag Attribute_Resilience_Lighting;
 	FGameplayTag Attribute_Resilience_Arcane;
 
+	// Meta属性Tag
+	FGameplayTag Attribute_Meta_IncomingExp;
+
 	// Ability Input Tags
 	// 这些tag和实际的按键不一定是完全对应的
 	FGameplayTag InputTag_LMB;	// 鼠标左键

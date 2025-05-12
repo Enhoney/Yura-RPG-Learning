@@ -15,6 +15,9 @@ class UAbilityInfo;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnExpPercentChangedSignature, float, NewPercent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLevelChangedSignature, int32, NewLevel);
+
 
 // 数据表行结构
 USTRUCT(BlueprintType)
@@ -62,6 +65,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnStartupAbilitiesGiven();
 
+protected:
+
+	void OnPlayerLevelChanged(int32 NewLevel);
+
+	void OnExpChanged(int32 NewExp);
+
+
 
 public:
 	UPROPERTY(BlueprintAssignable,Category = "GAS|Attributes")
@@ -81,6 +91,12 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Ability Info")
 	FAbilityInfoGivenSignature OnAbilityInfoGivenDelegate;
+
+	UPROPERTY(BlueprintAssignable, Category = "State|Leveling Up")
+	FOnExpPercentChangedSignature OnExpChangedDelegate;
+
+	UPROPERTY(BlueprintAssignable, Category = "State|Leveling Up")
+	FOnLevelChangedSignature OnPlayerLevelChangedDelegate;
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
 	TObjectPtr<UDataTable> MessageTable;

@@ -55,6 +55,10 @@ void FYuraGameplayTags::InitializeGameplayTags()
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attribute.Resilience.Lighting"), FString("Lighting resistance."));
 	YuraGameplayTags.Attribute_Resilience_Arcane =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attribute.Resilience.Arcane"), FString("Arcane resistance."));
+
+	// Meta Attribute tag
+	YuraGameplayTags.Attribute_Meta_IncomingExp =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attribute.Meta.IncomingExp"), FString("Get Exp."));
 	
 
 	// Ability Input Tags

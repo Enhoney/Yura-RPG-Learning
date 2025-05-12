@@ -25,6 +25,7 @@ public:
 
 	void GrantCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& AbilitiesToGrant);
 
+	void GrantCharacterPassiveAbilities(const TArray<TSubclassOf<UGameplayAbility>>& PassiveAbilitiesToGrant);
 
 	void AbilityInputTagHeld(const FGameplayTag& InputTag);
 

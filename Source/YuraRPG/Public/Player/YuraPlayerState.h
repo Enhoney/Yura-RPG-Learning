@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
-
 #include "AbilitySystemInterface.h"
 #include "YuraPlayerState.generated.h"
 
 class UAbilitySystemComponent;
 class UAttributeSet;
+
+class ULevelUpInfo;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FPlayerStateChangedSingnature, int32);
 
@@ -55,6 +56,9 @@ public:
 	FPlayerStateChangedSingnature OnPlayerLevelChangedDelegate;
 
 	FPlayerStateChangedSingnature OnPlayerExpChangedDelegate;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Leveling Up")
+	TObjectPtr<ULevelUpInfo> LevelUpInfo;
 
 protected:
 

@@ -114,6 +114,25 @@ void UYuraAbilitySystemLibrary::GrantStartUpAbilities(const UObject* InWorldCont
 	}
 }
 
+int32 UYuraAbilitySystemLibrary::FindEnemyExpReward(const UObject* InWorldContextObject, ECharacterClass InCharacterClass, int32 InCharacterLevel)
+{
+	AYuraGameModeBase* YuraGameMode = Cast<AYuraGameModeBase>(UGameplayStatics::GetGameMode(InWorldContextObject));
+
+	// 因为在客户端是拿不到GameMode的
+	if (YuraGameMode == nullptr)
+	{
+		return 0;
+	}
+
+	// 获取CharacterInfo
+	UCharacterClassInfo* CharacterInfo = YuraGameMode->DefaultEnemyInfo;
+
+	const FCharacterClassDefaultInfo DefaultCharacterInfo = CharacterInfo->GetDerfaultCharacterInfo(InCharacterClass);
+	const float ExpReward =  DefaultCharacterInfo.ExpReward.GetValueAtLevel(InCharacterLevel);
+
+	return static_cast<int32>(ExpReward);
+}
+
 UCharacterClassInfo* UYuraAbilitySystemLibrary::GetCharacterClassInfo(const UObject* InWorldContextObject)
 {
 	AYuraGameModeBase* YuraGameMode = Cast<AYuraGameModeBase>(UGameplayStatics::GetGameMode(InWorldContextObject));

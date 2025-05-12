@@ -11,10 +11,11 @@
 
 #include "YuraGameplayTags.h"
 #include "Interaction/CombatInterface.h"
+#include "Interaction/PlayerInterface.h"
 #include "Player/YuraPlayerController.h"
 #include "Kismet/GameplayStatics.h"
-
 #include "YuraAbilitySystemLibrary.h"
+#include "YuraLogChannel.h"
 
 UYuraAttributeSet::UYuraAttributeSet()
 {
@@ -131,6 +132,23 @@ void UYuraAttributeSet::ShowDamageText(const float DamageNum, const FEffectPrope
 	}
 }
 
+void UYuraAttributeSet::SendExpEvent(const FEffectProperties& OutProps) const
+{
+	// 注意这里的Soruce和Target
+	if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(OutProps.TargetAvatorActor))
+	{
+		const FGameplayTag& ExpTag = FYuraGameplayTags::Get().Attribute_Meta_IncomingExp;
+		FGameplayEventData Payload;
+		Payload.EventTag = ExpTag;
+
+		Payload.EventMagnitude = UYuraAbilitySystemLibrary::FindEnemyExpReward(OutProps.SourceAvatorActor, 
+			CombatInterface->GetCharacterClass(), CombatInterface->GetCharacterLevel());
+
+		// 造成伤害时，来源就是玩家
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OutProps.SourceAvatorActor, ExpTag, Payload);
+	}
+}
+
 void UYuraAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
 	Super::PreAttributeChange(Attribute, NewValue);
@@ -210,8 +228,10 @@ void UYuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			else
 			{
 				// 死亡
+				SendExpEvent(EffectProps);
 				if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(EffectProps.TargetAvatorActor))
 				{
+					// 发起GameplayEvent，向伤害发起者奖励经验
 					CombatInterface->Die();
 				}
 			}
@@ -225,6 +245,50 @@ void UYuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			
 		}
 		
+	}
+
+	if (Data.EvaluatedData.Attribute == GetIncomingExpAttribute())
+	{
+		// 获取经验
+		const float LocalIncomingExp = GetIncomingExp();
+		SetIncomingExp(0.f);
+
+		if (EffectProps.SourceCharacter->Implements<UPlayerInterface>() && EffectProps.SourceCharacter->Implements<UCombatInterface>())
+		{
+			// 判断是否可以升级
+			const int32 CurExp = IPlayerInterface::Execute_GetCurrentExp(EffectProps.SourceCharacter);
+			const int32 CurLevel = Cast<ICombatInterface>(EffectProps.SourceCharacter)->GetCharacterLevel();
+			const int32 NewLevel = IPlayerInterface::Execute_FindCurrentLevelByExp(EffectProps.SourceCharacter, (CurExp + LocalIncomingExp));
+
+			const int32 NumLevelUps = NewLevel - CurLevel;
+			if (NumLevelUps > 0)
+			{
+				// 获得属性点和技能点
+				int32 AttributePointsReward = 0;
+				int32 SpellPointsReward = 0;
+				// 处理跳级的问题
+				for (int32 Level = CurLevel + 1; Level <= NewLevel; ++Level)
+				{
+					AttributePointsReward += IPlayerInterface::Execute_GetAttributePointReward(EffectProps.SourceCharacter, Level);
+					SpellPointsReward += IPlayerInterface::Execute_GetSpellPointReward(EffectProps.SourceCharacter, Level);
+				}
+				// 升级
+				IPlayerInterface::Execute_AddToPlayerLevel(EffectProps.SourceCharacter, NumLevelUps);
+				// 赋予技能点和属性点
+				IPlayerInterface::Execute_AddAttributePoints(EffectProps.SourceCharacter, AttributePointsReward);
+				IPlayerInterface::Execute_AddSpellPoints(EffectProps.SourceCharacter, SpellPointsReward);
+
+				// 加满血量和蓝量
+				SetHealth(GetMaxHealth());
+				SetMana(GetMaxMana());
+
+				// 升级--这里主要是播放效果
+				IPlayerInterface::Execute_LevelUp(EffectProps.SourceCharacter);
+
+			}
+
+			IPlayerInterface::Execute_AddToExp(EffectProps.SourceCharacter, LocalIncomingExp);
+		}
 	}
 
 }

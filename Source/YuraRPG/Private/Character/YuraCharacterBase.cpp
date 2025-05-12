@@ -139,6 +139,11 @@ void AYuraCharacterBase::ReduceMinionCount_Implementation(int32 Num)
 	MinionCount = FMath::Max<int32>(0, MinionCount - Num);
 }
 
+ECharacterClass AYuraCharacterBase::GetCharacterClass() const
+{
+	return CharacterClass;
+}
+
 void AYuraCharacterBase::MulticastHandleDeath_Implementation()
 {
 	bIsDead = true;
@@ -211,6 +216,8 @@ void AYuraCharacterBase::AddCharacterAbilities()
 	// 调用ASC上的函数
 	UYuraAbilitySystemComponent* YuraASC = CastChecked<UYuraAbilitySystemComponent>(AbilitySystemComponent);
 	YuraASC->GrantCharacterAbilities(AbilitiesGrantIngOnStart);
+	// 赋予并激活初始被动技能
+	YuraASC->GrantCharacterPassiveAbilities(StartupPassiveAbilities);
 }
 
 void AYuraCharacterBase::ApplyGameplayEffectToSelf(const TSubclassOf<UGameplayEffect>& GEForAttributes, float Level) const

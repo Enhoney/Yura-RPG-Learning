@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 
 #include "GameplayTagContainer.h"
+#include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "CombatInterface.generated.h"
 
 class UNiagaraSystem;
@@ -48,7 +49,7 @@ class YURARPG_API ICombatInterface
 public:
 	// 不是必须重写的
 	// 获取角色等级
-	virtual int32 GetCharacterLevel();
+	virtual int32 GetCharacterLevel() const;
 
 	// 获取WeaponTipSocketLocation
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
@@ -100,4 +101,7 @@ public:
 	// 减少随从数量
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void ReduceMinionCount(int32 Num);
+
+	// 获取角色类别
+	virtual ECharacterClass GetCharacterClass() const;
 };

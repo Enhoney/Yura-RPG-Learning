@@ -110,6 +110,7 @@ public:
 	 * Meta Attributes
 	 */
 	ATTRIBUTE_ACCESSORS(UYuraAttributeSet, IncomingDamage);
+	ATTRIBUTE_ACCESSORS(UYuraAttributeSet, IncomingExp);
 
 protected:
 	/**
@@ -280,9 +281,15 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Meta Attribute")
 	FGameplayAttributeData IncomingDamage;
 
+	// 击杀获得的经验值
+	UPROPERTY(BlueprintReadOnly, Category = "Meta Attribute")
+	FGameplayAttributeData IncomingExp;
+
 private:
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& OutProps) const;
 
 	void ShowDamageText(const float DamageNum, const FEffectProperties& Props, bool bDamageBlock, bool bCriticalHit) const;
+
+	void SendExpEvent(const FEffectProperties& OutProps) const;
 	
 };

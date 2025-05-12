@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Interaction/CombatInterface.h"
 #include "AbilitySystemInterface.h"
+#include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "YuraCharacterBase.generated.h"
 
 class UAbilitySystemComponent;
@@ -53,6 +54,8 @@ public:
 	virtual void AddMinionCount_Implementation(int32 Num) override;
 
 	virtual void ReduceMinionCount_Implementation(int32 Num) override;
+
+	virtual ECharacterClass GetCharacterClass() const override;
 
 	/** ConbatInterface end*/
 
@@ -136,9 +139,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<USoundBase> DeathSound;
 
+	// 类别
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Default Class")
+	ECharacterClass CharacterClass = ECharacterClass::Warrior;
+
 private:
 	UPROPERTY(EditAnywhere, Category = "Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> AbilitiesGrantIngOnStart;
+
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> StartupPassiveAbilities;
 
 	bool bIsDead = false;
 

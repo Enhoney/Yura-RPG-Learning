@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Character/YuraCharacterBase.h"
+#include "Interaction/PlayerInterface.h"
 #include "YuraCharacter.generated.h"
 
 class USpringArmComponent;
@@ -13,7 +14,7 @@ class UCameraComponent;
  * 
  */
 UCLASS()
-class YURARPG_API AYuraCharacter : public AYuraCharacterBase
+class YURARPG_API AYuraCharacter : public AYuraCharacterBase, public IPlayerInterface
 {
 	GENERATED_BODY()
 
@@ -27,8 +28,22 @@ public:
 	virtual void OnRep_PlayerState() override;
 
 	/** Combat Interface start*/
-	virtual int32 GetCharacterLevel() override;
+	virtual int32 GetCharacterLevel() const override;
 	/** Combat Interface end*/
+
+	/** IPlayerInterface start*/
+	virtual void AddToExp_Implementation(int32 ExpToAdd) override;
+	virtual void AddToPlayerLevel_Implementation(int32 LevelToAdd) override;
+	virtual void LevelUp_Implementation() override;
+	virtual int32 GetCurrentExp_Implementation() const override;
+	virtual int32 FindCurrentLevelByExp_Implementation(int32 CurExp) const override;
+
+	virtual int32 GetAttributePointReward_Implementation(int32 Level) const override;
+	virtual int32 GetSpellPointReward_Implementation(int32 Level) const override;
+
+	virtual void AddAttributePoints_Implementation(int32 AttributePointToAdd) override;
+	virtual void AddSpellPoints_Implementation(int32 SpellPointToAdd) override;
+	/** IPlayerInterface end*/
 
 private:
 

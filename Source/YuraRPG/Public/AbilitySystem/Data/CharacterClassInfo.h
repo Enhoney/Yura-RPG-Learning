@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "ScalableFloat.h"
 #include "CharacterClassInfo.generated.h"
 
 class UGameplayEffect;
@@ -27,6 +28,9 @@ struct FCharacterClassDefaultInfo
 
 	UPROPERTY(EditDefaultsOnly, Category = "Default CharacterClassInfo|Enemy Unique Ability")
 	TArray<TSubclassOf<UGameplayAbility>> UniqueAbilities;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Default CharacterClassInfo|Enemy Exp Reward")
+	FScalableFloat ExpReward;
 };
 
 /**

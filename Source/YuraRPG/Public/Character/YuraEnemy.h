@@ -7,7 +7,6 @@
 #include "EnemyInterface.h"
 #include "Interaction/CombatInterface.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
-#include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "YuraEnemy.generated.h"
 
 class UWidgetComponent;
@@ -33,7 +32,7 @@ public:
 	/** Enemy Interface end*/
 
 	/** Combat Interface start*/
-	virtual int32 GetCharacterLevel() override;
+	virtual int32 GetCharacterLevel() const override;
 
 	virtual void Die() override;
 
@@ -87,10 +86,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health Bar")
 	TObjectPtr<UWidgetComponent> HealthBar;
-
-	// 类别
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Default Class")
-	ECharacterClass CharacterClass = ECharacterClass::Warrior;
 
 	// 受击动画蒙太奇
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")

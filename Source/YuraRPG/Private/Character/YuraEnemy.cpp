@@ -55,7 +55,7 @@ void AYuraEnemy::UnhighlightActor()
 	Weapon->SetRenderCustomDepth(false);
 }
 
-int32 AYuraEnemy::GetCharacterLevel()
+int32 AYuraEnemy::GetCharacterLevel() const
 {
 	return CharacterLevel;
 }

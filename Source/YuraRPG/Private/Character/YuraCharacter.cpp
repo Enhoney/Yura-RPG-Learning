@@ -9,9 +9,10 @@
 
 #include "YuraAbilitySystemComponent.h"
 #include "YuraPlayerState.h"
-
+#include "Player/Data/LevelUpInfo.h"
 #include "YuraPlayerController.h"
 #include "UI/HUD/YuraHUD.h"
+#include "Interaction/CombatInterface.h"
 
 AYuraCharacter::AYuraCharacter()
 {
@@ -49,6 +50,8 @@ AYuraCharacter::AYuraCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
+
+	CharacterClass = ECharacterClass::Elementalist;
 }
 
 void AYuraCharacter::PossessedBy(AController* NewController)
@@ -80,12 +83,73 @@ void AYuraCharacter::OnRep_PlayerState()
 	
 }
 
-int32 AYuraCharacter::GetCharacterLevel()
+int32 AYuraCharacter::GetCharacterLevel() const
 {
 	const AYuraPlayerState* YuraPlayerState = GetPlayerState<AYuraPlayerState>();
 	check(YuraPlayerState);
 
 	return YuraPlayerState->GetCharacterLevel();
+}
+
+void AYuraCharacter::AddToExp_Implementation(int32 ExpToAdd)
+{
+	AYuraPlayerState* YuraPlayerState = GetPlayerState<AYuraPlayerState>();
+	check(YuraPlayerState);
+
+	YuraPlayerState->AddToExp(ExpToAdd);
+}
+
+void AYuraCharacter::AddToPlayerLevel_Implementation(int32 LevelToAdd)
+{
+	AYuraPlayerState* YuraPlayerState = GetPlayerState<AYuraPlayerState>();
+	check(YuraPlayerState);
+
+	YuraPlayerState->AddToCharacterLevel(LevelToAdd);
+}
+
+void AYuraCharacter::LevelUp_Implementation()
+{
+
+}
+
+int32 AYuraCharacter::GetCurrentExp_Implementation() const
+{
+	AYuraPlayerState* YuraPlayerState = GetPlayerState<AYuraPlayerState>();
+	check(YuraPlayerState);
+
+	return YuraPlayerState->GetPlayerExp();
+}
+
+int32 AYuraCharacter::FindCurrentLevelByExp_Implementation(int32 CurExp) const
+{
+	AYuraPlayerState* YuraPlayerState = GetPlayerState<AYuraPlayerState>();
+	check(YuraPlayerState);
+
+	return YuraPlayerState->LevelUpInfo->FindCurrentLevelByExp(CurExp);
+}
+
+int32 AYuraCharacter::GetAttributePointReward_Implementation(int32 Level) const
+{
+	AYuraPlayerState* YuraPlayerState = GetPlayerState<AYuraPlayerState>();
+	check(YuraPlayerState);
+
+	return YuraPlayerState->LevelUpInfo->LevelUpInformation[Level].AttributePointAward;
+}
+
+int32 AYuraCharacter::GetSpellPointReward_Implementation(int32 Level) const
+{
+	AYuraPlayerState* YuraPlayerState = GetPlayerState<AYuraPlayerState>();
+	check(YuraPlayerState);
+	
+	return YuraPlayerState->LevelUpInfo->LevelUpInformation[Level].SpellPointAward;
+}
+
+void AYuraCharacter::AddAttributePoints_Implementation(int32 AttributePointToAdd)
+{
+}
+
+void AYuraCharacter::AddSpellPoints_Implementation(int32 SpellPointToAdd)
+{
 }
 
 
