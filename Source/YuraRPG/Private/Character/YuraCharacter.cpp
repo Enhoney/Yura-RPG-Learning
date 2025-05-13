@@ -6,7 +6,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
-
+#include "NiagaraComponent.h"
 #include "YuraAbilitySystemComponent.h"
 #include "YuraPlayerState.h"
 #include "Player/Data/LevelUpInfo.h"
@@ -52,6 +52,11 @@ AYuraCharacter::AYuraCharacter()
 	bUseControllerRotationRoll = false;
 
 	CharacterClass = ECharacterClass::Elementalist;
+
+	LevelingUpNiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("LevelingUpNiagaraComp"));
+	LevelingUpNiagaraComp->SetupAttachment(GetRootComponent());
+	LevelingUpNiagaraComp->bAutoActivate = false;
+	// LevelingUpNiagaraComp->SetRelativeRotation(FRotator(45.f, 0.f, 0.f));
 }
 
 void AYuraCharacter::PossessedBy(AController* NewController)
@@ -109,7 +114,7 @@ void AYuraCharacter::AddToPlayerLevel_Implementation(int32 LevelToAdd)
 
 void AYuraCharacter::LevelUp_Implementation()
 {
-
+	MulticastActivateLevelUpNiagara();
 }
 
 int32 AYuraCharacter::GetCurrentExp_Implementation() const
@@ -180,4 +185,16 @@ void AYuraCharacter::InitAbilityActorInfo()
 		}
 		
 	}
+}
+
+void AYuraCharacter::MulticastActivateLevelUpNiagara_Implementation()
+{
+	if (!IsValid(LevelingUpNiagaraComp)) return;
+
+	// 因为这个游戏视角是固定的，所以所有玩家相机角度都是一样的，不存在出现在屏幕上但是模拟代理上看不到的情况
+	const FVector CameraLocation = Camera->GetComponentLocation();
+	const FVector NiagaraCompLocation = LevelingUpNiagaraComp->GetComponentLocation();
+	// 设置朝向
+	LevelingUpNiagaraComp->SetWorldRotation((CameraLocation - NiagaraCompLocation).Rotation());
+	LevelingUpNiagaraComp->Activate(true);
 }

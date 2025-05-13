@@ -9,6 +9,7 @@
 
 class USpringArmComponent;
 class UCameraComponent;
+class UNiagaraComponent;
 
 /**
  * 
@@ -49,6 +50,10 @@ private:
 
 	virtual void InitAbilityActorInfo() override;
 
+	// 播放升级的粒子特效
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastActivateLevelUpNiagara();
+
 private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Camera")
@@ -56,5 +61,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Camera")
 	TObjectPtr<UCameraComponent> Camera;
+
+	// 升级特效组件
+	UPROPERTY(VisibleAnywhere, Category = "Level Up")
+	TObjectPtr<UNiagaraComponent> LevelingUpNiagaraComp;
 	
 };
