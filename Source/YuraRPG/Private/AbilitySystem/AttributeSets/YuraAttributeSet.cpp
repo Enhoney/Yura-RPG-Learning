@@ -279,8 +279,8 @@ void UYuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 				IPlayerInterface::Execute_AddSpellPoints(EffectProps.SourceCharacter, SpellPointsReward);
 
 				// 加满血量和蓝量
-				SetHealth(GetMaxHealth());
-				SetMana(GetMaxMana());
+				bTopOffHealth = true;
+				bTopOffMana = true;
 
 				// 升级--这里主要是播放效果
 				IPlayerInterface::Execute_LevelUp(EffectProps.SourceCharacter);
@@ -291,6 +291,24 @@ void UYuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		}
 	}
 
+}
+
+void UYuraAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
+{
+	Super::PostAttributeChange(Attribute, OldValue, NewValue);
+
+	// 最大血量被修改--在这个项目中，就只有升级的时候才会改动
+	if (Attribute == GetMaxHealthAttribute() && bTopOffHealth)
+	{
+		SetHealth(GetMaxHealth());
+		bTopOffHealth = false;
+	}
+
+	if (Attribute == GetMaxManaAttribute() && bTopOffMana)
+	{
+		SetMana(GetMaxMana());
+		bTopOffMana = false;
+	}
 }
 
 void UYuraAttributeSet::OnRep_Strength(const FGameplayAttributeData& OldStrength) const

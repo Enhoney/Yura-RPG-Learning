@@ -35,6 +35,7 @@ public:
 	// 自己定义的方法，方便获取属性
 	UAttributeSet* GetAttributeSet() const;
 
+	/** Level*/
 	FORCEINLINE int32 GetCharacterLevel() const { return Level; };
 	void SetCharacterLevel(int32 NewLevel);
 	void AddToCharacterLevel(int32 LevelToAdd);
@@ -44,6 +45,18 @@ public:
 	void SetExp(int32 NewExp);
 	void AddToExp(int32 ExpToAdd);
 
+	/** Attribute Point*/
+	FORCEINLINE int32 GetAttributePoint() const { return AttributePoint; };
+	void SetAttributePoint(int32 NewAttributePoint);
+	void AddToAttributePoint(int32 AttributePointToAdd);
+	void ConsumeAttributePoint(int32 AttributePointToUse);
+
+	/** Spell Point*/
+	FORCEINLINE int32 GetSpellPoint() const { return SpellPoint; };
+	void SetSpellPoint(int32 NewSpellPoint);
+	void AddToSpellPoint(int32 SpellPointToAdd);
+	void ConsmueSpellPoint(int32 SpellPointToUse);
+
 private:
 	UFUNCTION()
 	void OnRep_Level(int32 OldLevel);
@@ -51,11 +64,21 @@ private:
 	UFUNCTION()
 	void OnRep_Exp(int32 OldExp);
 
+	UFUNCTION()
+	void OnRep_AttributePoint(int32 OldExp);
+
+	UFUNCTION()
+	void OnRep_SpellPoint(int32 OldExp);
+
 public:
 
 	FPlayerStateChangedSingnature OnPlayerLevelChangedDelegate;
 
 	FPlayerStateChangedSingnature OnPlayerExpChangedDelegate;
+
+	FPlayerStateChangedSingnature OnAttributePointChangedDelegate;
+
+	FPlayerStateChangedSingnature OnSpellPointChangedDelegate;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Leveling Up")
 	TObjectPtr<ULevelUpInfo> LevelUpInfo;
@@ -74,5 +97,11 @@ private:
 
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Exp)
 	int32 Exp = 0;
+
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_AttributePoint)
+	int32 AttributePoint = 5;
+
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_SpellPoint)
+	int32 SpellPoint = 0;
 	
 };

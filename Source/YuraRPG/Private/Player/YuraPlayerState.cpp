@@ -70,6 +70,48 @@ void AYuraPlayerState::AddToExp(int32 ExpToAdd)
 	OnPlayerExpChangedDelegate.Broadcast(Exp);
 }
 
+void AYuraPlayerState::SetAttributePoint(int32 NewAttributePoint)
+{
+	AttributePoint = FMath::Max<int32>(0, NewAttributePoint);
+
+	OnAttributePointChangedDelegate.Broadcast(AttributePoint);
+}
+
+void AYuraPlayerState::AddToAttributePoint(int32 AttributePointToAdd)
+{
+	AttributePoint = FMath::Max<int32>(0, AttributePoint + AttributePointToAdd);
+
+	OnAttributePointChangedDelegate.Broadcast(AttributePoint);
+}
+
+void AYuraPlayerState::ConsumeAttributePoint(int32 AttributePointToUse)
+{
+	AttributePoint = FMath::Max<int32>(0, AttributePoint - AttributePointToUse);
+
+	OnAttributePointChangedDelegate.Broadcast(AttributePoint);
+}
+
+void AYuraPlayerState::SetSpellPoint(int32 NewSpellPoint)
+{
+	SpellPoint = FMath::Max<int32>(0, NewSpellPoint);
+
+	OnSpellPointChangedDelegate.Broadcast(SpellPoint);
+}
+
+void AYuraPlayerState::AddToSpellPoint(int32 SpellPointToAdd)
+{
+	SpellPoint = FMath::Max<int32>(0, SpellPoint + SpellPointToAdd);
+
+	OnSpellPointChangedDelegate.Broadcast(SpellPoint);
+}
+
+void AYuraPlayerState::ConsmueSpellPoint(int32 SpellPointToUse)
+{
+	SpellPoint = FMath::Max<int32>(0, SpellPoint - SpellPointToUse);
+
+	OnSpellPointChangedDelegate.Broadcast(SpellPoint);
+}
+
 void AYuraPlayerState::OnRep_Level(int32 OldLevel)
 {
 	OnPlayerLevelChangedDelegate.Broadcast(Level);
@@ -78,4 +120,14 @@ void AYuraPlayerState::OnRep_Level(int32 OldLevel)
 void AYuraPlayerState::OnRep_Exp(int32 OldExp)
 {
 	OnPlayerExpChangedDelegate.Broadcast(Exp);
+}
+
+void AYuraPlayerState::OnRep_AttributePoint(int32 OldExp)
+{
+	OnAttributePointChangedDelegate.Broadcast(AttributePoint);
+}
+
+void AYuraPlayerState::OnRep_SpellPoint(int32 OldExp)
+{
+	OnSpellPointChangedDelegate.Broadcast(SpellPoint);
 }

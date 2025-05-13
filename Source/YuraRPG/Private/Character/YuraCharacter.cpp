@@ -151,10 +151,30 @@ int32 AYuraCharacter::GetSpellPointReward_Implementation(int32 Level) const
 
 void AYuraCharacter::AddAttributePoints_Implementation(int32 AttributePointToAdd)
 {
+	AYuraPlayerState* YuraPlayerState = GetPlayerState<AYuraPlayerState>();
+	check(YuraPlayerState);
+
+	YuraPlayerState->AddToAttributePoint(AttributePointToAdd);
 }
 
 void AYuraCharacter::AddSpellPoints_Implementation(int32 SpellPointToAdd)
 {
+}
+
+int32 AYuraCharacter::GetAttributePoint_Implementation() const
+{
+	AYuraPlayerState* YuraPlayerState = GetPlayerState<AYuraPlayerState>();
+	check(YuraPlayerState);
+
+	return YuraPlayerState->GetAttributePoint();
+}
+
+void AYuraCharacter::ConsumeAttributePoint_Implementation(int32 AttributePointToUse)
+{
+	AYuraPlayerState* YuraPlayerState = GetPlayerState<AYuraPlayerState>();
+	check(YuraPlayerState);
+
+	YuraPlayerState->ConsumeAttributePoint(AttributePointToUse);
 }
 
 

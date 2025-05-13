@@ -14,6 +14,9 @@ class UAttributeInfo;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAttributeInfoSignature, const FYuraAttributeInfo&, AttributeInfo);
 
+// 用于显示属性点
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAttributePointChangedSignature, int32, NewAttributePoints);
+
 /**
  * 
  */
@@ -28,12 +31,18 @@ public:
 
 	virtual void BindCallbacksToDependiencies() override;
 
+	UFUNCTION(BlueprintCallable)
+	void UpgradeAttribute(const FGameplayTag& AttributeTag);
+
 private:
 	void BrodacastAttributeInfo(const FGameplayTag& TagToFind, const FGameplayAttribute& Attribute);
 
 public:
 	UPROPERTY(BlueprintAssignable,Category = "GAS|Attribute")
 	FAttributeInfoSignature AttributeInfoDelegate;
+
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Attribute")
+	FAttributePointChangedSignature AttributePointChangedDelegate;
 
 protected:
 	// 数据资产

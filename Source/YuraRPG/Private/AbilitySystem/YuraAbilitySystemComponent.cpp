@@ -5,6 +5,8 @@
 #include "YuraGameplayTags.h"
 #include "Abilities/YuraGameplayAbility.h"
 #include "YuraLogChannel.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "Interaction/PlayerInterface.h"
 
 void UYuraAbilitySystemComponent::AbilityActorInfoSet()
 {
@@ -125,6 +127,38 @@ FGameplayTag UYuraAbilitySystemComponent::GetAbilityInputTagFromSpec(const FGame
 	}
 
 	return FGameplayTag();
+}
+
+void UYuraAbilitySystemComponent::UpgradeAttribute(const FGameplayTag& AttributeTag)
+{
+	if (GetAvatarActor()->Implements<UPlayerInterface>())
+	{
+		// 第一层判断--客户端
+		if (IPlayerInterface::Execute_GetAttributePoint(GetAvatarActor()) > 0)
+		{
+			// 执行RPC，在服务器继续走
+			ServerUpgradeAttribute(AttributeTag);
+		}
+	}
+}
+
+void UYuraAbilitySystemComponent::ServerUpgradeAttribute_Implementation(const FGameplayTag& AttributeTag)
+{
+	if (GetAvatarActor()->Implements<UPlayerInterface>())
+	{
+		// 第二层判断--服务器
+		if (IPlayerInterface::Execute_GetAttributePoint(GetAvatarActor()) > 0)
+		{
+			FGameplayEventData AttributeEventData;
+			AttributeEventData.EventTag = AttributeTag;
+			AttributeEventData.EventMagnitude = 1.0;
+
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetAvatarActor(), AttributeTag, AttributeEventData);
+
+			// 消耗属性点
+			IPlayerInterface::Execute_ConsumeAttributePoint(GetAvatarActor(), 1);
+		}
+	}
 }
 
 void UYuraAbilitySystemComponent::OnRep_ActivateAbilities()

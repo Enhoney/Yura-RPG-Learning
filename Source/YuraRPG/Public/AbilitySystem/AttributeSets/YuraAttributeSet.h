@@ -74,6 +74,9 @@ public:
 	// 发送
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 
+	// 当CurrentValue被修改时触发--我们在这里处理升级时血条填不满的问题
+	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
+
 public:
 	/**
 	 * Primary Attribute
@@ -291,5 +294,9 @@ private:
 	void ShowDamageText(const float DamageNum, const FEffectProperties& Props, bool bDamageBlock, bool bCriticalHit) const;
 
 	void SendExpEvent(const FEffectProperties& OutProps) const;
+	
+	// 用于判断是否是由升级导致的最大血量和Man变动
+	bool bTopOffHealth = false;
+	bool bTopOffMana = false;
 	
 };

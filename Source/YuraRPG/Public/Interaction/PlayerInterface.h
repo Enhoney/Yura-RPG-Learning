@@ -49,4 +49,12 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void AddSpellPoints(int32 SpellPointToAdd);
+
+	// 获取当前剩余属性点
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetAttributePoint() const;
+
+	// 消耗属性点
+	UFUNCTION(BlueprintNativeEvent)
+	void ConsumeAttributePoint(int32 AttributePointToUse);
 };
