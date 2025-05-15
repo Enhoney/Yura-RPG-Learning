@@ -26,7 +26,7 @@ class YURARPG_API UAttributeMenuWidgetController : public UYuraWidgetController
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable)
+
 	virtual void BroadcastInitialValues() override;
 
 	virtual void BindCallbacksToDependiencies() override;

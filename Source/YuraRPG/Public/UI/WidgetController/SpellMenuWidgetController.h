@@ -9,9 +9,14 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType, Blueprintable)
 class YURARPG_API USpellMenuWidgetController : public UYuraWidgetController
 {
 	GENERATED_BODY()
+
+public:
+	virtual void BroadcastInitialValues() override;
+
+	virtual void BindCallbacksToDependiencies() override;
 	
 };

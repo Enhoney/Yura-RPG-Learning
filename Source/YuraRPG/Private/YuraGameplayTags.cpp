@@ -60,6 +60,23 @@ void FYuraGameplayTags::InitializeGameplayTags()
 	YuraGameplayTags.Attribute_Meta_IncomingExp =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attribute.Meta.IncomingExp"), FString("Get Exp."));
 	
+	// 技能类型
+	YuraGameplayTags.Ability_Type_Offensive =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Type.Offensive"), FString("Ability Type Offensive."));
+	YuraGameplayTags.Ability_Type_Passive =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Type.Passive"), FString("Ability Type Passive."));
+	YuraGameplayTags.Ability_Type_None =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Type.None"), FString("Ability Type Others."));
+
+	// 技能状态
+	YuraGameplayTags.Ability_Status_Locked =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Status.Locked"), FString("Ability Status Locked."));
+	YuraGameplayTags.Ability_Status_Eligible =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Status.Eligible"), FString("Ability Status Eligible."));
+	YuraGameplayTags.Ability_Status_Unlocked =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Status.Unlocked"), FString("Ability Status Unlocked."));
+	YuraGameplayTags.Ability_Status_Equipped =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Status.Equipped"), FString("Ability Status Equipped."));
 
 	// Ability Input Tags
 	YuraGameplayTags.InputTag_LMB =
@@ -72,8 +89,11 @@ void FYuraGameplayTags::InitializeGameplayTags()
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.2"), FString("InputTag 2 Key."));
 	YuraGameplayTags.InputTag_3 =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.3"), FString("InputTag 3 Key."));
-	YuraGameplayTags.InputTag_4 =
-		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.4"), FString("InputTag 4 Key."));
+	YuraGameplayTags.InputTag_Passive_1 =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Passive.1"), FString("InputTag Passive 1."));
+	// 被动技能的InputTag--不是激活技能用的，而是标识位置用的
+	YuraGameplayTags.InputTag_Passive_2 =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Passive.2"), FString("InputTag Passive 2."));
 
 	// DamageType
 	YuraGameplayTags.DamageType_Fire =

@@ -8,7 +8,6 @@
 #include "YuraAbilitySystemComponent.h"
 
 #include "Engine/DataTable.h"
-#include "Data/AbilityInfo.h"
 
 #include "Player/YuraPlayerState.h"
 #include "Player/Data/LevelUpInfo.h"
@@ -68,11 +67,11 @@ void UOverlayWidgetController::BindCallbacksToDependiencies()
 		
 		if (ASC->bStartupAbilitiesGiven)
 		{
-			OnStartupAbilitiesGiven();
+			BroadcastYuraAbilityInfo();
 		}
 		else
 		{
-			ASC->OnAbilitiesGivenDelegate.AddUObject(this, &UOverlayWidgetController::OnStartupAbilitiesGiven);
+			ASC->OnAbilitiesGivenDelegate.AddUObject(this, &UOverlayWidgetController::BroadcastYuraAbilityInfo);
 		}
 
 		ASC->OnEffectAssetTags.AddLambda(
@@ -96,28 +95,6 @@ void UOverlayWidgetController::BindCallbacksToDependiencies()
 			});
 	}
 
-}
-
-// 更新初始化技能图标
-void UOverlayWidgetController::OnStartupAbilitiesGiven()
-{
-	if (UYuraAbilitySystemComponent* ASC = Cast<UYuraAbilitySystemComponent>(AbilitySystemComponent))
-	{
-		if (ASC->bStartupAbilitiesGiven)
-		{
-			FForEachAbilitySignature ForEachAbilityDelegate;
-
-			ForEachAbilityDelegate.BindLambda([this](const FGameplayAbilitySpec& AbilitySpec)
-				{
-					FYuraAbilityInfo YuraAbilityInfo = AbilityInformations->FindAbilityInfoByTag(UYuraAbilitySystemComponent::GetAbilityTagFromSpec(AbilitySpec));
-					YuraAbilityInfo.AbilityInputTag = UYuraAbilitySystemComponent::GetAbilityInputTagFromSpec(AbilitySpec);
-
-					OnAbilityInfoGivenDelegate.Broadcast(YuraAbilityInfo);
-				});
-
-			ASC->ForEachAbility(ForEachAbilityDelegate);
-		}
-	}
 }
 
 void UOverlayWidgetController::OnPlayerLevelChanged(int32 NewLevel)

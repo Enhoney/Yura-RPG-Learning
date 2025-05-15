@@ -9,6 +9,7 @@
 class UYuraUserWidget;
 class UOverlayWidgetController;
 class UAttributeMenuWidgetController;
+class USpellMenuWidgetController;
 class UAbilitySystemComponent;
 class UAttributeSet;
 struct FWidgetControllerParam;
@@ -28,6 +29,9 @@ public:
 
 	UFUNCTION()
 	UAttributeMenuWidgetController* GetAttributeMenuWidgetController(const FWidgetControllerParam& InWCParam);
+
+	UFUNCTION()
+	USpellMenuWidgetController* GetSpellMenuWidgetController(const FWidgetControllerParam& InWCParam);
 
 	// 初始化Overlay并添加到视口
 	void InitOverlay(APlayerController* InPC, APlayerState* InPS, UAbilitySystemComponent* InASC, UAttributeSet* InAS);
@@ -52,5 +56,12 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UAttributeMenuWidgetController> AttributeMenuController;
+
+	// Spell Menu Widget Controller
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<USpellMenuWidgetController> SpellMenuControllerClass;
+
+	UPROPERTY()
+	TObjectPtr<USpellMenuWidgetController> SpellMenuController;
 	
 };

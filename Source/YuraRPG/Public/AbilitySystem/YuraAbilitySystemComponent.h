@@ -37,6 +37,10 @@ public:
 
 	static FGameplayTag GetAbilityInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
 
+	static FGameplayTag GetAbilityStatusTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
+
+	static FGameplayTag GetAbilityTypeTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
+
 	// 增加主要属性--客户端调用
 	void UpgradeAttribute(const FGameplayTag& AttributeTag);
 	// 增加主要属性--RPC

@@ -6,6 +6,7 @@
 #include "UI/Widget/YuraUserWidget.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
 #include "UI/WidgetController/AttributeMenuWidgetController.h"
+#include "UI/WidgetController/SpellMenuWidgetController.h"
 
 UOverlayWidgetController* AYuraHUD::GetOverlayWidgetController(const FWidgetControllerParam& InWCParam)
 {
@@ -31,6 +32,19 @@ UAttributeMenuWidgetController* AYuraHUD::GetAttributeMenuWidgetController(const
 		AttributeMenuController->BindCallbacksToDependiencies();
 	}
 	return AttributeMenuController;
+}
+
+USpellMenuWidgetController* AYuraHUD::GetSpellMenuWidgetController(const FWidgetControllerParam& InWCParam)
+{
+	if (SpellMenuController == nullptr)
+	{
+		SpellMenuController = NewObject<USpellMenuWidgetController>(this, SpellMenuControllerClass);
+		SpellMenuController->SetWidgetControllrtParams(InWCParam);
+
+		// 开始监听属性变化
+		SpellMenuController->BindCallbacksToDependiencies();
+	}
+	return SpellMenuController;
 }
 
 void AYuraHUD::InitOverlay(APlayerController* InPC, APlayerState* InPS, UAbilitySystemComponent* InASC, UAttributeSet* InAS)

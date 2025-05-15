@@ -15,7 +15,8 @@
 #include "Engine/OverlapResult.h"
 #include "Interaction/CombatInterface.h"
 
-UOverlayWidgetController* UYuraAbilitySystemLibrary::GetOverlayWidgetController(const UObject* InWorldContextObject)
+
+bool UYuraAbilitySystemLibrary::MakeWidgetControllerParam(const UObject* InWorldContextObject, FWidgetControllerParam& OutParams, AYuraHUD*& OutHUD)
 {
 	if (APlayerController* PC = UGameplayStatics::GetPlayerController(InWorldContextObject, 0))
 	{
@@ -25,10 +26,27 @@ UOverlayWidgetController* UYuraAbilitySystemLibrary::GetOverlayWidgetController(
 			UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
 			UAttributeSet* AS = PS->GetAttributeSet();
 
-			const FWidgetControllerParam WidgetControllerParam(PC, PS, ASC, AS);
+			OutParams.PlayerController = PC;
+			OutParams.PlayerState = PS;
+			OutParams.AbilitySystemComponent = ASC;
+			OutParams.AttributeSet = AS;
 
-			return YuraHUD->GetOverlayWidgetController(WidgetControllerParam);
+			OutHUD = YuraHUD;
+			return true;
 		}
+	}
+
+	return false;
+}
+
+UOverlayWidgetController* UYuraAbilitySystemLibrary::GetOverlayWidgetController(const UObject* InWorldContextObject)
+{
+	FWidgetControllerParam WidgetControllerParams;
+	AYuraHUD* YuraHUD = nullptr;
+	if (MakeWidgetControllerParam(InWorldContextObject, WidgetControllerParams, YuraHUD))
+	{
+		return YuraHUD->GetOverlayWidgetController(WidgetControllerParams);
+
 	}
 
 	return nullptr;
@@ -36,19 +54,28 @@ UOverlayWidgetController* UYuraAbilitySystemLibrary::GetOverlayWidgetController(
 
 UAttributeMenuWidgetController* UYuraAbilitySystemLibrary::GetAttributeMenuWidgetController(const UObject* InWorldContextObject)
 {
-	if (APlayerController* PC = UGameplayStatics::GetPlayerController(InWorldContextObject, 0))
+	FWidgetControllerParam WidgetControllerParams;
+	AYuraHUD* YuraHUD = nullptr;
+	if (MakeWidgetControllerParam(InWorldContextObject, WidgetControllerParams, YuraHUD))
 	{
-		if (AYuraHUD* YuraHUD = Cast<AYuraHUD>(PC->GetHUD()))
-		{
-			AYuraPlayerState* PS = PC->GetPlayerState<AYuraPlayerState>();
-			UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
-			UAttributeSet* AS = PS->GetAttributeSet();
-
-			const FWidgetControllerParam WidgetControllerParam(PC, PS, ASC, AS);
-
-			return YuraHUD->GetAttributeMenuWidgetController(WidgetControllerParam);
-		}
+		return YuraHUD->GetAttributeMenuWidgetController(WidgetControllerParams);
+		
 	}
+
+	return nullptr;
+
+}
+
+USpellMenuWidgetController* UYuraAbilitySystemLibrary::GetSpellMenuWidgetController(const UObject* InWorldContextObject)
+{
+	FWidgetControllerParam WidgetControllerParams;
+	AYuraHUD* YuraHUD = nullptr;
+	if (MakeWidgetControllerParam(InWorldContextObject, WidgetControllerParams, YuraHUD))
+	{
+		return YuraHUD->GetSpellMenuWidgetController(WidgetControllerParams);
+
+	}
+
 	return nullptr;
 }
 

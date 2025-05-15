@@ -9,6 +9,10 @@
 
 class UOverlayWidgetController;
 class UAttributeMenuWidgetController;
+class USpellMenuWidgetController;
+class AYuraHUD;
+
+struct FWidgetControllerParam;
 
 /**
  * 
@@ -19,13 +23,21 @@ class YURARPG_API UYuraAbilitySystemLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-	// 获取OverlayWidgetController
+	// 构建WidgetControllerParam
 	UFUNCTION(BlueprintPure, Category = "YuraAbilitySystemLibrary|WidgetController")
+	static bool MakeWidgetControllerParam(const UObject* InWorldContextObject, FWidgetControllerParam& OutParams, AYuraHUD*& OutHUD);
+
+	// 获取OverlayWidgetController
+	UFUNCTION(BlueprintPure, Category = "YuraAbilitySystemLibrary|WidgetController", meta = (DefaultToSelf = "InWorldContextObject"))
 	static UOverlayWidgetController* GetOverlayWidgetController(const UObject* InWorldContextObject);
 
 	// 获取OverlayWidgetController
-	UFUNCTION(BlueprintPure, Category = "YuraAbilitySystemLibrary|WidgetController")
+	UFUNCTION(BlueprintPure, Category = "YuraAbilitySystemLibrary|WidgetController", meta = (DefaultToSelf = "InWorldContextObject"))
 	static UAttributeMenuWidgetController* GetAttributeMenuWidgetController(const UObject* InWorldContextObject);
+
+	// 获取SpellMenuWidgetControlelr
+	UFUNCTION(BlueprintPure, Category = "YuraAbilitySystemLibrary|WidgetController", meta = (DefaultToSelf = "InWorldContextObject"))
+	static USpellMenuWidgetController* GetSpellMenuWidgetController(const UObject* InWorldContextObject);
 
 	// 初始化Enemy的初始属性
 	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Initialize Character Default Attributes")

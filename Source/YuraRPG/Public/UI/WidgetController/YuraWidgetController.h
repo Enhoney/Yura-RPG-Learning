@@ -9,6 +9,8 @@
 class UAttributeSet;
 class UAbilitySystemComponent;
 
+class UAbilityInfo;
+
 USTRUCT(BlueprintType)
 struct FWidgetControllerParam
 {
@@ -36,6 +38,8 @@ public:
 	TObjectPtr<UAttributeSet> AttributeSet =  nullptr;
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityInfoGivenSignature, const FYuraAbilityInfo&, YuraAbilityInfo);
+
 /**
  * 
  */
@@ -49,9 +53,18 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetWidgetControllrtParams(const FWidgetControllerParam& InWCParams);
 
+	UFUNCTION(BlueprintCallable)
 	virtual void BroadcastInitialValues();
 
 	virtual void BindCallbacksToDependiencies();
+
+	// 初始化赋予能力的回调
+	UFUNCTION(BlueprintCallable)
+	void BroadcastYuraAbilityInfo();
+
+public:
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Ability Info")
+	FAbilityInfoGivenSignature OnAbilityInfoGivenDelegate;
 
 protected:
 
@@ -66,5 +79,9 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
 	TObjectPtr<UAttributeSet> AttributeSet;
+
+	// 存储Ability 信息
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
+	TObjectPtr<UAbilityInfo> AbilityInformations;
 	
 };

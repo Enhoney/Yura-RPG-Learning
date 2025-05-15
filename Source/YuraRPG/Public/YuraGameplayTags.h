@@ -63,6 +63,9 @@ public:
 	FGameplayTag InputTag_2;
 	FGameplayTag InputTag_3;
 	FGameplayTag InputTag_4;
+	// 被动技能的InputTag
+	FGameplayTag InputTag_Passive_1;
+	FGameplayTag InputTag_Passive_2;
 
 	// 用于伤害计算SetCallByCaller的Tag
 	// 伤害类型
@@ -78,7 +81,18 @@ public:
 	// 受击僵直
 	FGameplayTag Effects_HitReact;
 
-	// 用于激活技能的tag
+	// 技能类型
+	FGameplayTag Ability_Type_Offensive;
+	FGameplayTag Ability_Type_Passive;
+	FGameplayTag Ability_Type_None;
+
+	// 技能状态
+	FGameplayTag Ability_Status_Locked;
+	FGameplayTag Ability_Status_Eligible;
+	FGameplayTag Ability_Status_Unlocked;
+	FGameplayTag Ability_Status_Equipped;
+
+	// 用于激活技能的tag--敌人
 	FGameplayTag Ability_Attack;
 	FGameplayTag Ability_Summon;
 

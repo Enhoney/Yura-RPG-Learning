@@ -24,6 +24,7 @@ void UYuraAbilitySystemComponent::GrantCharacterAbilities(const TArray<TSubclass
 		{
 			// 动态Tag
 			AbilitySpec.DynamicAbilityTags.AddTag(YuraGA->StartUpInputTag);
+			AbilitySpec.DynamicAbilityTags.AddTag(FYuraGameplayTags::Get().Ability_Status_Eligible);
 			// 赋予能力并不激活
 			GiveAbility(AbilitySpec);
 		}
@@ -121,6 +122,32 @@ FGameplayTag UYuraAbilitySystemComponent::GetAbilityInputTagFromSpec(const FGame
 	for (FGameplayTag Tag : AbilitySpec.DynamicAbilityTags)
 	{
 		if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("InputTag"))))
+		{
+			return Tag;
+		}
+	}
+
+	return FGameplayTag();
+}
+
+FGameplayTag UYuraAbilitySystemComponent::GetAbilityStatusTagFromSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+	for (FGameplayTag Tag : AbilitySpec.DynamicAbilityTags)
+	{
+		if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Ability.Status"))))
+		{
+			return Tag;
+		}
+	}
+
+	return FGameplayTag();
+}
+
+FGameplayTag UYuraAbilitySystemComponent::GetAbilityTypeTagFromSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+	for (FGameplayTag Tag : AbilitySpec.DynamicAbilityTags)
+	{
+		if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Ability.Type"))))
 		{
 			return Tag;
 		}

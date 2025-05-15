@@ -18,6 +18,9 @@ struct FYuraAbilityInfo
 	UPROPERTY(BlueprintReadOnly, Category = "UI|AbilityInfo")
 	FGameplayTag AbilityInputTag = FGameplayTag();
 
+	UPROPERTY(BlueprintReadOnly, Category = "UI|AbilityInfo")
+	FGameplayTag AbilityStatusTag = FGameplayTag();
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI|AbilityInfo")
 	FGameplayTag AbilityCooldownTag = FGameplayTag();
 
