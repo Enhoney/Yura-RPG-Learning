@@ -267,7 +267,7 @@ void UYuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 				int32 AttributePointsReward = 0;
 				int32 SpellPointsReward = 0;
 				// 处理跳级的问题
-				for (int32 Level = CurLevel + 1; Level <= NewLevel; ++Level)
+				for (int32 Level = CurLevel; Level < NewLevel; ++Level)
 				{
 					AttributePointsReward += IPlayerInterface::Execute_GetAttributePointReward(EffectProps.SourceCharacter, Level);
 					SpellPointsReward += IPlayerInterface::Execute_GetSpellPointReward(EffectProps.SourceCharacter, Level);

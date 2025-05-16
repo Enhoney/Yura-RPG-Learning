@@ -98,6 +98,7 @@ public:
 
 	// 玩家的技能Tag
 	FGameplayTag Ability_Fire_FireBolt;
+	FGameplayTag Ability_Lightning_Electrocute;
 
 	// 技能冷却时间的tag
 	FGameplayTag Cooldown_Fire_FireBolt;

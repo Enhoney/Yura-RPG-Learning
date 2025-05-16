@@ -7,6 +7,8 @@
 #include "YuraLogChannel.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Interaction/PlayerInterface.h"
+#include "Data/AbilityInfo.h"
+#include "AbilitySystem/YuraAbilitySystemLibrary.h"
 
 void UYuraAbilitySystemComponent::AbilityActorInfoSet()
 {
@@ -24,7 +26,7 @@ void UYuraAbilitySystemComponent::GrantCharacterAbilities(const TArray<TSubclass
 		{
 			// 动态Tag
 			AbilitySpec.DynamicAbilityTags.AddTag(YuraGA->StartUpInputTag);
-			AbilitySpec.DynamicAbilityTags.AddTag(FYuraGameplayTags::Get().Ability_Status_Eligible);
+			AbilitySpec.DynamicAbilityTags.AddTag(FYuraGameplayTags::Get().Ability_Status_Equipped);
 			// 赋予能力并不激活
 			GiveAbility(AbilitySpec);
 		}
@@ -49,7 +51,7 @@ void UYuraAbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputT
 {
 	if (!InputTag.IsValid()) return;
 
-	// GetActivatableAbilities--获取所有已经注册的GAS pec
+	// GetActivatableAbilities--获取所有已经注册的GAS spec
 	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
 		if(AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag))
@@ -96,6 +98,47 @@ void UYuraAbilitySystemComponent::ForEachAbility(const FForEachAbilitySignature&
 		if (!Delegate.ExecuteIfBound(AbilitySpec))
 		{
 			UE_LOG(LogYura, Error, TEXT("Failed to Execute delegate in [%s]"), *FString(__FUNCTION__));
+		}
+	}
+}
+
+void UYuraAbilitySystemComponent::UpdateAbilityStatuses(int32 Level)
+{
+	// 首先拿到在GameMode中的配置信息
+	UAbilityInfo* AbilityInfo = UYuraAbilitySystemLibrary::GetAbilityInfoOnGameMode(GetAvatarActor());
+
+	check(AbilityInfo);
+
+	for (const FYuraAbilityInfo& Info : AbilityInfo->YuraAbilityInfos)
+	{
+		const int32 LevelRequirement = Info.LevelRequirement;
+		// 如果没有配置AbilityTag，也直接继续
+		if (!Info.AbilityTag.IsValid())
+		{
+			continue;
+		}
+		// 不满足激活条件，就继续遍历
+		if (Level < LevelRequirement)
+		{
+			continue;
+		}
+		else
+		{
+			// 如果满足解锁条件，但是能力还没有赋予
+			if (GetSpecByAbilityTag(Info.AbilityTag) == nullptr)
+			{
+				// 就赋予这个能力
+				FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Info.AbilityClass, 1);
+				// 将状态设为可解锁
+				const FGameplayTag NewStatusTag = FYuraGameplayTags::Get().Ability_Status_Eligible;
+				AbilitySpec.DynamicAbilityTags.AddTag(NewStatusTag);
+				// 赋予能力
+				GiveAbility(AbilitySpec);
+				// 强制他立即复制，而不是等待下一次状态同步
+				MarkAbilitySpecDirty(AbilitySpec);
+				// RPC--告知客户端更新技能树
+				ClientAbilityStatusesChanged(Info.AbilityTag, NewStatusTag);
+			}
 		}
 	}
 }
@@ -156,6 +199,25 @@ FGameplayTag UYuraAbilitySystemComponent::GetAbilityTypeTagFromSpec(const FGamep
 	return FGameplayTag();
 }
 
+FGameplayAbilitySpec* UYuraAbilitySystemComponent::GetSpecByAbilityTag(const FGameplayTag& AbilityTag)
+{
+	// 避免有能力被移除或者添加
+	FScopedAbilityListLock AbilityLock(*this);
+
+	for (FGameplayAbilitySpec& Spec : GetActivatableAbilities())
+	{
+		for (FGameplayTag YuraAbilityTag : Spec.Ability->AbilityTags)
+		{
+			if (YuraAbilityTag.MatchesTagExact(AbilityTag))
+			{
+				return &Spec;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
 void UYuraAbilitySystemComponent::UpgradeAttribute(const FGameplayTag& AttributeTag)
 {
 	if (GetAvatarActor()->Implements<UPlayerInterface>())
@@ -211,3 +273,9 @@ void UYuraAbilitySystemComponent::ClientEffectApplied_Implementation(UAbilitySys
 	OnEffectAssetTags.Broadcast(TagContainer);
 
 }
+
+void UYuraAbilitySystemComponent::ClientAbilityStatusesChanged_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& NewStatusTag)
+{
+	OnAbilityStatusChangedDelegate.Broadcast(AbilityTag, NewStatusTag);
+}
+

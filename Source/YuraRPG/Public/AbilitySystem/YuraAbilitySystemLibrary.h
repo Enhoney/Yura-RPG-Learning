@@ -55,6 +55,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Get CharacterClass Info Data")
 	static UCharacterClassInfo* GetCharacterClassInfo(const UObject* InWorldContextObject);
 
+	// 获取GameMode上面的AbilityInfo
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "YuraAbilitySystemLibrary|AbilityInfo")
+	static UAbilityInfo* GetAbilityInfoOnGameMode(const UObject* InWorldContextObject);
+
 	/** 
 	 * 用于自定义的GameplayEffectContext
 	 */
@@ -79,4 +83,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "YuraAbilitySystemLibrary|Combat")
 	static bool IsNotFriend(const AActor* SourceActor, const AActor* TargetActor);
+
+
 };

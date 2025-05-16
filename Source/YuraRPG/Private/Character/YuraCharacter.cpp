@@ -110,6 +110,10 @@ void AYuraCharacter::AddToPlayerLevel_Implementation(int32 LevelToAdd)
 	check(YuraPlayerState);
 
 	YuraPlayerState->AddToCharacterLevel(LevelToAdd);
+	// 判断是否可以解锁新的技能
+	UYuraAbilitySystemComponent* YuraASC = Cast<UYuraAbilitySystemComponent>(AbilitySystemComponent);
+	check(YuraASC);
+	YuraASC->UpdateAbilityStatuses(YuraPlayerState->GetCharacterLevel());
 }
 
 void AYuraCharacter::LevelUp_Implementation()
@@ -159,6 +163,10 @@ void AYuraCharacter::AddAttributePoints_Implementation(int32 AttributePointToAdd
 
 void AYuraCharacter::AddSpellPoints_Implementation(int32 SpellPointToAdd)
 {
+	AYuraPlayerState* YuraPlayerState = GetPlayerState<AYuraPlayerState>();
+	check(YuraPlayerState);
+
+	YuraPlayerState->AddToSpellPoint(SpellPointToAdd);
 }
 
 int32 AYuraCharacter::GetAttributePoint_Implementation() const

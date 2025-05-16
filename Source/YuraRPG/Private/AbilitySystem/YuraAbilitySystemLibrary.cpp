@@ -173,6 +173,19 @@ UCharacterClassInfo* UYuraAbilitySystemLibrary::GetCharacterClassInfo(const UObj
 	return CharacterInfo;
 }
 
+UAbilityInfo* UYuraAbilitySystemLibrary::GetAbilityInfoOnGameMode(const UObject* InWorldContextObject)
+{
+	AYuraGameModeBase* YuraGameMode = Cast<AYuraGameModeBase>(UGameplayStatics::GetGameMode(InWorldContextObject));
+	if (YuraGameMode == nullptr)
+	{
+		return nullptr;
+	}
+
+	// 获取CharacterInfo
+	UAbilityInfo* AbilityInfo = YuraGameMode->DefaultAbilityInfo;
+	return AbilityInfo;
+}
+
 bool UYuraAbilitySystemLibrary::IsDamageBlock(const FGameplayEffectContextHandle& EffectContext)
 {
 	const FGameplayEffectContext* Context = EffectContext.Get();
@@ -273,3 +286,5 @@ bool UYuraAbilitySystemLibrary::IsNotFriend(const AActor* SourceActor, const AAc
 	
 	return true;
 }
+
+

@@ -29,6 +29,10 @@ void AYuraPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME_CONDITION_NOTIFY(AYuraPlayerState, Level, COND_None, REPNOTIFY_Always);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(AYuraPlayerState, Exp, COND_None, REPNOTIFY_Always);
+
+	DOREPLIFETIME_CONDITION_NOTIFY(AYuraPlayerState, AttributePoint, COND_None, REPNOTIFY_Always);
+
+	DOREPLIFETIME_CONDITION_NOTIFY(AYuraPlayerState, SpellPoint, COND_None, REPNOTIFY_Always);
 }
 
 UAbilitySystemComponent* AYuraPlayerState::GetAbilitySystemComponent() const

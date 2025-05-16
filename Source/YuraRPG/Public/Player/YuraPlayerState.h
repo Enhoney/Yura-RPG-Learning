@@ -102,6 +102,6 @@ private:
 	int32 AttributePoint = 5;
 
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_SpellPoint)
-	int32 SpellPoint = 0;
+	int32 SpellPoint = 3;
 	
 };
