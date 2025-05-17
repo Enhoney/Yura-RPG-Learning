@@ -96,6 +96,7 @@ int32 AYuraCharacter::GetCharacterLevel() const
 	return YuraPlayerState->GetCharacterLevel();
 }
 
+
 void AYuraCharacter::AddToExp_Implementation(int32 ExpToAdd)
 {
 	AYuraPlayerState* YuraPlayerState = GetPlayerState<AYuraPlayerState>();
@@ -183,6 +184,14 @@ void AYuraCharacter::ConsumeAttributePoint_Implementation(int32 AttributePointTo
 	check(YuraPlayerState);
 
 	YuraPlayerState->ConsumeAttributePoint(AttributePointToUse);
+}
+
+void AYuraCharacter::ConsumeSpellPoint_Implementation(int32 SpellPointToUse)
+{
+	AYuraPlayerState* YuraPlayerState = GetPlayerState<AYuraPlayerState>();
+	check(YuraPlayerState);
+
+	YuraPlayerState->ConsumeSpellPoint(SpellPointToUse);
 }
 
 

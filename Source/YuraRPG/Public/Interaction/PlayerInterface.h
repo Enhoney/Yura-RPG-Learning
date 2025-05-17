@@ -57,4 +57,8 @@ public:
 	// 消耗属性点
 	UFUNCTION(BlueprintNativeEvent)
 	void ConsumeAttributePoint(int32 AttributePointToUse);
+
+	// 消耗技能点
+	UFUNCTION(BlueprintNativeEvent)
+	void ConsumeSpellPoint(int32 SpellPointToUse);
 };

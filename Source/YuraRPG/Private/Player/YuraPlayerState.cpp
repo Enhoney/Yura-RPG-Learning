@@ -109,7 +109,7 @@ void AYuraPlayerState::AddToSpellPoint(int32 SpellPointToAdd)
 	OnSpellPointChangedDelegate.Broadcast(SpellPoint);
 }
 
-void AYuraPlayerState::ConsmueSpellPoint(int32 SpellPointToUse)
+void AYuraPlayerState::ConsumeSpellPoint(int32 SpellPointToUse)
 {
 	SpellPoint = FMath::Max<int32>(0, SpellPoint - SpellPointToUse);
 

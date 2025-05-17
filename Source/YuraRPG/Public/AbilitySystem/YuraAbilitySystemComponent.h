@@ -13,7 +13,7 @@ DECLARE_MULTICAST_DELEGATE(FAbilitiesGivenSignature);
 DECLARE_DELEGATE_OneParam(FForEachAbilitySignature, const FGameplayAbilitySpec&);
 
 // 广播能力状态改变
-DECLARE_MULTICAST_DELEGATE_TwoParams(FAbilityStatusChangedSignature, const FGameplayTag& /** AbilityTag*/, const FGameplayTag& /** NewStatusTag*/);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FAbilityStatusChangedSignature, const FGameplayTag& /** AbilityTag*/, const FGameplayTag& /** NewStatusTag*/, int32 /** NewLevel*/);
 
 /**
  * 
@@ -46,6 +46,16 @@ public:
 
 	static FGameplayTag GetAbilityTypeTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
 
+
+	// 根据Abilitytag拿到描述信息
+	bool GetAbilityCurrentDescription(const FGameplayTag& InAbilityTag, FString& OutCurDescription, FString& OutNextLevelDescription);
+
+
+	// 根据Ability Tag查找StatusTag
+	// 可以在外部使用
+	UFUNCTION(BlueprintPure, Category = "YuraAbilitySystemComponent")
+	FGameplayTag GetStatusByAbilityTag(const FGameplayTag& InAbilityTag);
+
 	FGameplayAbilitySpec* GetSpecByAbilityTag(const FGameplayTag& AbilityTag);
 
 	// 增加主要属性--客户端调用
@@ -53,12 +63,17 @@ public:
 	// 增加主要属性--RPC
 	UFUNCTION(Server, Reliable)
 	void ServerUpgradeAttribute(const FGameplayTag& AttributeTag);
+
+	// 消耗技能点
+	UFUNCTION(Server, Reliable)
+	void ServerSpendignSpellPoint(const FGameplayTag& AbilityTag, int32 SpellPointsToSpend);
+
 protected:
 	UFUNCTION(Client, Reliable)
 	void ClientEffectApplied(UAbilitySystemComponent* ASC, const FGameplayEffectSpec& GESpec, FActiveGameplayEffectHandle ActiveGEHandle);
 
 	UFUNCTION(Client, Reliable)
-	void ClientAbilityStatusesChanged(const FGameplayTag& AbilityTag, const FGameplayTag& NewStatusTag);
+	void ClientAbilityStatusesChanged(const FGameplayTag& AbilityTag, const FGameplayTag& NewStatusTag, int32 NewAbilityLevel);
 
 	// 重写的函数，可激活能力变动时广播
 	virtual void OnRep_ActivateAbilities() override;

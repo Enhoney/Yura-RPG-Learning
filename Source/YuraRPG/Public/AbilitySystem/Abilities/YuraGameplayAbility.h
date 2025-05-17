@@ -17,6 +17,13 @@ class YURARPG_API UYuraGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
 
+public:
+	virtual FString GetCurrentLevelDescription(int Level);
+
+	virtual FString GetNextLevelDescription(int Level);
+
+	static FString GetLockedDescription(int Level);
+
 protected:
 	// 设置WarpingTargetFacing
 	UFUNCTION(BlueprintCallable, Category = "Ability")

@@ -44,6 +44,10 @@ struct FYuraAbilityInfo
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI|AbilityInfo")
 	int32 LevelRequirement = 1;
 
+	// 技能的当前等级
+	UPROPERTY(BlueprintReadOnly, Category = "UI|AbilityInfo")
+	int32 AbilityLevel = 1;
+
 	// 对应的技能类
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AbilityInfo")
 	TSubclassOf<UGameplayAbility> AbilityClass;

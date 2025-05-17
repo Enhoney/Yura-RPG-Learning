@@ -137,7 +137,7 @@ void UYuraAbilitySystemComponent::UpdateAbilityStatuses(int32 Level)
 				// 强制他立即复制，而不是等待下一次状态同步
 				MarkAbilitySpecDirty(AbilitySpec);
 				// RPC--告知客户端更新技能树
-				ClientAbilityStatusesChanged(Info.AbilityTag, NewStatusTag);
+				ClientAbilityStatusesChanged(Info.AbilityTag, NewStatusTag, AbilitySpec.Level);
 			}
 		}
 	}
@@ -199,6 +199,53 @@ FGameplayTag UYuraAbilitySystemComponent::GetAbilityTypeTagFromSpec(const FGamep
 	return FGameplayTag();
 }
 
+bool UYuraAbilitySystemComponent::GetAbilityCurrentDescription(const FGameplayTag& InAbilityTag, FString& OutCurDescription, FString& OutNextLevelDescription)
+{
+	// 先看看这个能力是否有被赋予
+	FGameplayAbilitySpec* AbilitySpec = GetSpecByAbilityTag(InAbilityTag);
+
+	if (!AbilitySpec)
+	{
+		UAbilityInfo* AbilityInfo = UYuraAbilitySystemLibrary::GetAbilityInfoOnGameMode(GetAvatarActor());
+		check(AbilityInfo);
+
+		FYuraAbilityInfo YuraAbilityInfo = AbilityInfo->FindAbilityInfoByTag(InAbilityTag);
+
+		OutCurDescription = UYuraGameplayAbility::GetLockedDescription(YuraAbilityInfo.LevelRequirement);
+		OutNextLevelDescription = FString();
+
+		return false;
+	}
+
+	if (UYuraGameplayAbility* YuraAbility = Cast<UYuraGameplayAbility>(AbilitySpec->Ability))
+	{
+		OutCurDescription = YuraAbility->GetCurrentLevelDescription(AbilitySpec->Level);
+		OutNextLevelDescription = YuraAbility->GetNextLevelDescription(AbilitySpec->Level + 1);
+
+		return true;
+	}
+
+	return false;
+}
+
+FGameplayTag UYuraAbilitySystemComponent::GetStatusByAbilityTag(const FGameplayTag& InAbilityTag)
+{
+	// 避免有能力被移除或者添加
+	FScopedAbilityListLock AbilityLock(*this);
+
+	FGameplayTag OutStatusTag = FGameplayTag();
+
+	// 找到能力
+	FGameplayAbilitySpec* AbilitySpec = GetSpecByAbilityTag(InAbilityTag);
+	if (AbilitySpec)
+	{
+		// 如果这个能力已经被赋予，就拿到上面的StatusTag
+		OutStatusTag = UYuraAbilitySystemComponent::GetAbilityStatusTagFromSpec(*AbilitySpec);
+	}
+
+	return OutStatusTag;
+}
+
 FGameplayAbilitySpec* UYuraAbilitySystemComponent::GetSpecByAbilityTag(const FGameplayTag& AbilityTag)
 {
 	// 避免有能力被移除或者添加
@@ -250,6 +297,51 @@ void UYuraAbilitySystemComponent::ServerUpgradeAttribute_Implementation(const FG
 	}
 }
 
+void UYuraAbilitySystemComponent::ServerSpendignSpellPoint_Implementation(const FGameplayTag& AbilityTag, int32 SpellPointsToSpend)
+{
+	// 首先找到这个能力
+	if (FGameplayAbilitySpec* AblitySpec = GetSpecByAbilityTag(AbilityTag))
+	{
+
+		const FYuraGameplayTags YuraGameplayTags = FYuraGameplayTags::Get();
+
+		// 然后查看它的状态
+		FGameplayTag AbilityStatus = GetAbilityStatusTagFromSpec(*AblitySpec);
+
+		// 一般来说，这个肯定是有效的
+		if (AbilityStatus.IsValid())
+		{
+			// 消耗技能点
+			if (GetAvatarActor()->Implements<UPlayerInterface>())
+			{
+				IPlayerInterface::Execute_ConsumeSpellPoint(GetAvatarActor(), SpellPointsToSpend);
+			}
+
+			if (AbilityStatus.MatchesTagExact((YuraGameplayTags.Ability_Status_Eligible)))
+			{
+				// 解锁技能--修改状态为Unlock
+				// 删除原有StatusTag，添加新的Tag
+				AblitySpec->DynamicAbilityTags.RemoveTag(YuraGameplayTags.Ability_Status_Eligible);
+				AblitySpec->DynamicAbilityTags.AddTag(YuraGameplayTags.Ability_Status_Unlocked);
+				// 通知客户端这个能力的状态修改了，可以更新UI了
+				ClientAbilityStatusesChanged(AbilityTag, YuraGameplayTags.Ability_Status_Unlocked, AblitySpec->Level);
+				
+			}
+			else if (AbilityStatus.MatchesTagExact((YuraGameplayTags.Ability_Status_Unlocked)) ||
+				AbilityStatus.MatchesTagExact((YuraGameplayTags.Ability_Status_Equipped)))
+			{
+				// 升级技能，不修改状态
+				AblitySpec->Level += 1;
+				ClientAbilityStatusesChanged(AbilityTag, AbilityStatus, AblitySpec->Level);
+			}
+
+			// 强制更新GA到客户端
+			MarkAbilitySpecDirty(*AblitySpec);
+		}
+	}
+
+}
+
 void UYuraAbilitySystemComponent::OnRep_ActivateAbilities()
 {
 	Super::OnRep_ActivateAbilities();
@@ -274,8 +366,8 @@ void UYuraAbilitySystemComponent::ClientEffectApplied_Implementation(UAbilitySys
 
 }
 
-void UYuraAbilitySystemComponent::ClientAbilityStatusesChanged_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& NewStatusTag)
+void UYuraAbilitySystemComponent::ClientAbilityStatusesChanged_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& NewStatusTag, int32 NewAbilityLevel)
 {
-	OnAbilityStatusChangedDelegate.Broadcast(AbilityTag, NewStatusTag);
+	OnAbilityStatusChangedDelegate.Broadcast(AbilityTag, NewStatusTag, NewAbilityLevel);
 }
 

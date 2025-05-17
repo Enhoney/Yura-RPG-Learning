@@ -47,6 +47,7 @@ public:
 
 	virtual int32 GetAttributePoint_Implementation() const override;
 	virtual void ConsumeAttributePoint_Implementation(int32 AttributePointToUse) override;
+	virtual void ConsumeSpellPoint_Implementation(int32 SpellPointToUse) override;
 	/** IPlayerInterface end*/
 
 private:

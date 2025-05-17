@@ -55,7 +55,7 @@ public:
 	FORCEINLINE int32 GetSpellPoint() const { return SpellPoint; };
 	void SetSpellPoint(int32 NewSpellPoint);
 	void AddToSpellPoint(int32 SpellPointToAdd);
-	void ConsmueSpellPoint(int32 SpellPointToUse);
+	void ConsumeSpellPoint(int32 SpellPointToUse);
 
 private:
 	UFUNCTION()
