@@ -33,6 +33,11 @@ protected:
 	UFUNCTION(BlueprintPure, Category = "Ability")
 	FTaggedMontage GetRandTaggedMontage(const TArray<FTaggedMontage>& TaggedMontages) const;
 
+	// 获取技能本身的Cost 和Cooldown
+	float GetManaCost(float InLevel = 1.0f) const;
+
+	float GetCooldown(float InLevel = 1.0f) const;
+
 public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")

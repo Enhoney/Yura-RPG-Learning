@@ -33,6 +33,9 @@ void USpellMenuWidgetController::BindCallbacksToDependiencies()
 			}
 		});
 
+	// 更新装备状态
+	YuraASC->OnAbilityEquipAndUnloadDelegate.AddUObject(this, &USpellMenuWidgetController::EquipAbilityCallback);
+
 	// 更新技能点
 	AYuraPlayerState* YuraPlayerState = CastChecked<AYuraPlayerState>(PlayerState);
 	// 广播技能点
@@ -48,6 +51,7 @@ void USpellMenuWidgetController::BindCallbacksToDependiencies()
 
 void USpellMenuWidgetController::HandleSpellPointAndEquipButton(const FGameplayTag& InAbilityTag)
 {
+
 	UYuraAbilitySystemComponent* ASC = CastChecked<UYuraAbilitySystemComponent>(AbilitySystemComponent);
 
 	FGameplayTag AbilityStatusTag = ASC->GetStatusByAbilityTag(InAbilityTag);
@@ -55,6 +59,14 @@ void USpellMenuWidgetController::HandleSpellPointAndEquipButton(const FGameplayT
 	// 赋值SelectedAbility
 	SelectedAbility.AbilityTag = InAbilityTag;
 	SelectedAbility.StatusTag = AbilityStatusTag;
+	SelectedAbility.TypeTag = AbilityInformations->FindAbilityInfoByTag(InAbilityTag).AbilityTypeTag;
+
+	// 退出装备状态-如果是在装备状态的话
+	if (bWaitforEquipSelect)
+	{
+		bWaitforEquipSelect = false;
+		StopEquipSelectDelegate.Broadcast(SelectedAbility.TypeTag);
+	}
 
 	// 默认都是不可用
 	bool bCanSpellPoint = false;
@@ -67,7 +79,7 @@ void USpellMenuWidgetController::HandleSpellPointAndEquipButton(const FGameplayT
 		FString CurDescription = FString();
 		FString NextLevelDescription = FString();
 		UYuraAbilitySystemComponent* YuraASC = CastChecked<UYuraAbilitySystemComponent>(AbilitySystemComponent);
-		YuraASC->GetAbilityCurrentDescription(SelectedAbility.AbilityTag, CurDescription, NextLevelDescription);
+		YuraASC->GetAbilityCurrentDescription(SelectedAbility.AbilityTag, AbilityInformations, CurDescription, NextLevelDescription);
 
 		OnSpellMenuButtonDelegate.Broadcast(bCanSpellPoint, bCanEquip, CurDescription, NextLevelDescription);
 		return;
@@ -99,7 +111,7 @@ void USpellMenuWidgetController::HandleSpellPointAndEquipButton(const FGameplayT
 	FString CurDescription = FString();
 	FString NextLevelDescription = FString();
 	UYuraAbilitySystemComponent* YuraASC = CastChecked<UYuraAbilitySystemComponent>(AbilitySystemComponent);
-	YuraASC->GetAbilityCurrentDescription(SelectedAbility.AbilityTag, CurDescription, NextLevelDescription);
+	YuraASC->GetAbilityCurrentDescription(SelectedAbility.AbilityTag, AbilityInformations, CurDescription, NextLevelDescription);
 
 	OnSpellMenuButtonDelegate.Broadcast(bCanSpellPoint, bCanEquip, CurDescription, NextLevelDescription);
 }
@@ -109,6 +121,7 @@ void USpellMenuWidgetController::ClearSelectedAbility()
 {
 	SelectedAbility.AbilityTag = FGameplayTag();
 	SelectedAbility.StatusTag = FGameplayTag();
+	SelectedAbility.TypeTag = FGameplayTag();
 
 	CurrentSpellPoint = 0;
 }
@@ -119,6 +132,83 @@ void USpellMenuWidgetController::OnSpellPointButtonPressed()
 
 	// 执行RPC
 	ASC->ServerSpendignSpellPoint(SelectedAbility.AbilityTag, 1);
+}
+
+void USpellMenuWidgetController::OnEquipButtonPressed()
+{
+	check(AbilityInformations);
+	if (!SelectedAbility.AbilityTag.IsValid())
+	{
+		return;
+	}
+
+	const FGameplayTag AbilityTypeTag = AbilityInformations->FindAbilityInfoByTag(SelectedAbility.AbilityTag).AbilityTypeTag;
+
+	WaitforEquipSelectDelegate.Broadcast(AbilityTypeTag);
+
+	bWaitforEquipSelect = true;
+
+	// 获取InputTag，如果它被装备上了
+	if (SelectedAbility.StatusTag.MatchesTagExact(FYuraGameplayTags::Get().Ability_Status_Equipped))
+	{
+		UYuraAbilitySystemComponent* YuraASC = CastChecked<UYuraAbilitySystemComponent>(AbilitySystemComponent);
+		InutTagOnSelectedAbility = YuraASC->GetInputByAbilityTag(SelectedAbility.AbilityTag);
+	}
+}
+
+
+
+void USpellMenuWidgetController::OnSpellRowGlobePressed(const FGameplayTag& SlotInputTag, const FGameplayTag& SlotAbilityTypeTag)
+{
+	// 如果不是在装备状态--啥也不干
+	if (!bWaitforEquipSelect)
+	{
+		return;
+	}
+
+	// 如果尝试将主动技能装备到被动技能槽，也啥都不干
+	// 这个TypeTag早在按钮点击的时候就拿到了
+	if (!SelectedAbility.TypeTag.MatchesTagExact(SlotAbilityTypeTag))
+	{
+		return;
+	}
+
+	/** 接下来就真正开始装备了，这就需要在服务器上做了*/
+	UYuraAbilitySystemComponent* YuraASC = CastChecked<UYuraAbilitySystemComponent>(AbilitySystemComponent);
+	YuraASC->ServerEquipSpellToInputSlot(SelectedAbility.AbilityTag, SlotInputTag);
+
+	// 退出选择状态
+	bWaitforEquipSelect = false;
+	StopEquipSelectDelegate.Broadcast(SelectedAbility.TypeTag);
+
+}
+
+void USpellMenuWidgetController::EquipAbilityCallback(const FGameplayTag& AbilityTag, const FGameplayTag& NewStatusTag, const FGameplayTag& InputSlot, const FGameplayTag& PreInputSlot)
+{
+	check(AbilityInformations);
+
+	// 得先清除原来的
+	FYuraAbilityInfo PreYuraAbilityInfo = FYuraAbilityInfo();
+	PreYuraAbilityInfo.AbilityTag = FGameplayTag();
+	PreYuraAbilityInfo.AbilityInputTag = PreInputSlot;
+	PreYuraAbilityInfo.AbilityStatusTag = FYuraGameplayTags::Get().Ability_Status_Unlocked;
+	OnAbilityInfoGivenDelegate.Broadcast(PreYuraAbilityInfo);
+
+	// 再来广播当前的
+	FYuraAbilityInfo YuraAbilityInfo = AbilityInformations->FindAbilityInfoByTag(AbilityTag);
+	// 这个有可能是空的
+	YuraAbilityInfo.AbilityInputTag = InputSlot;
+	YuraAbilityInfo.AbilityStatusTag = NewStatusTag;
+
+	OnAbilityInfoGivenDelegate.Broadcast(YuraAbilityInfo);
+
+	// 退出装备状态-如果是在装备状态的话
+	if (bWaitforEquipSelect)
+	{
+		bWaitforEquipSelect = false;
+		StopEquipSelectDelegate.Broadcast(SelectedAbility.TypeTag);
+	}
+
 }
 
 void USpellMenuWidgetController::HandleButtonEnableOnChanged(int32 NewSpellPoint, const FGameplayTag& NewStatusTag)
@@ -165,7 +255,25 @@ void USpellMenuWidgetController::HandleButtonEnableOnChanged(int32 NewSpellPoint
 	FString CurDescription = FString();
 	FString NextLevelDescription = FString();
 	UYuraAbilitySystemComponent* YuraASC = CastChecked<UYuraAbilitySystemComponent>(AbilitySystemComponent);
-	YuraASC->GetAbilityCurrentDescription(SelectedAbility.AbilityTag, CurDescription, NextLevelDescription);
+	YuraASC->GetAbilityCurrentDescription(SelectedAbility.AbilityTag, AbilityInformations, CurDescription, NextLevelDescription);
 
 	OnSpellMenuButtonDelegate.Broadcast(bCanSpellPoint, bCanEquip, CurDescription, NextLevelDescription);
+}
+
+
+
+void USpellMenuWidgetController::GlobeSelfDeselect()
+{
+	// 退出装备状态-如果是在装备状态的话
+	if (bWaitforEquipSelect)
+	{
+		bWaitforEquipSelect = false;
+		StopEquipSelectDelegate.Broadcast(SelectedAbility.TypeTag);
+	}
+
+	// 清除现在选择的信息
+	ClearSelectedAbility();
+
+
+	OnSpellMenuButtonDelegate.Broadcast(false, false, FString(), FString());
 }

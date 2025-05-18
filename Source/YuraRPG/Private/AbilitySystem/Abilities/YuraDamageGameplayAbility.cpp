@@ -28,5 +28,11 @@ void UYuraDamageGameplayAbility::GetDamageSpecHandle(FGameplayEffectSpecHandle& 
 	OutDamageEffectSpecHandle = DamageSpecHandle;
 }
 
+float UYuraDamageGameplayAbility::GetBaseDamageTyped(const FGameplayTag& DamageType, int32 Level) const
+{
+
+	checkf(DamageTypes.Contains(DamageType), TEXT("DamageTypes don't have the TypeTag: %s"), *DamageType.ToString());
+	return DamageTypes[DamageType].GetValueAtLevel(Level);
+}
 
 

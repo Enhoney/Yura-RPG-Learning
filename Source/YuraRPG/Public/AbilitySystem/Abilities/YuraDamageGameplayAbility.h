@@ -22,6 +22,9 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 	void GetDamageSpecHandle(FGameplayEffectSpecHandle& OutDamageEffectSpecHandle);
 
+	// 从表格中，根据伤害类型获取当前等级的伤害
+	float GetBaseDamageTyped(const FGameplayTag& DamageType, int32 Level) const;
+
 protected:
 
 	// 技能伤害类型和对应的基础伤害

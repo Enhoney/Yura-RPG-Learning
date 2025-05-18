@@ -199,17 +199,16 @@ FGameplayTag UYuraAbilitySystemComponent::GetAbilityTypeTagFromSpec(const FGamep
 	return FGameplayTag();
 }
 
-bool UYuraAbilitySystemComponent::GetAbilityCurrentDescription(const FGameplayTag& InAbilityTag, FString& OutCurDescription, FString& OutNextLevelDescription)
+bool UYuraAbilitySystemComponent::GetAbilityCurrentDescription(const FGameplayTag& InAbilityTag, const class UAbilityInfo* InAbilityInfo, FString& OutCurDescription, FString& OutNextLevelDescription)
 {
 	// 先看看这个能力是否有被赋予
 	FGameplayAbilitySpec* AbilitySpec = GetSpecByAbilityTag(InAbilityTag);
 
 	if (!AbilitySpec)
 	{
-		UAbilityInfo* AbilityInfo = UYuraAbilitySystemLibrary::GetAbilityInfoOnGameMode(GetAvatarActor());
-		check(AbilityInfo);
+		check(InAbilityInfo);
 
-		FYuraAbilityInfo YuraAbilityInfo = AbilityInfo->FindAbilityInfoByTag(InAbilityTag);
+		FYuraAbilityInfo YuraAbilityInfo = InAbilityInfo->FindAbilityInfoByTag(InAbilityTag);
 
 		OutCurDescription = UYuraGameplayAbility::GetLockedDescription(YuraAbilityInfo.LevelRequirement);
 		OutNextLevelDescription = FString();
@@ -246,6 +245,24 @@ FGameplayTag UYuraAbilitySystemComponent::GetStatusByAbilityTag(const FGameplayT
 	return OutStatusTag;
 }
 
+FGameplayTag UYuraAbilitySystemComponent::GetInputByAbilityTag(const FGameplayTag& InAbilityTag)
+{
+	// 避免有能力被移除或者添加
+	FScopedAbilityListLock AbilityLock(*this);
+
+	FGameplayTag OutInputTag = FGameplayTag();
+
+	// 找到能力
+	FGameplayAbilitySpec* AbilitySpec = GetSpecByAbilityTag(InAbilityTag);
+	if (AbilitySpec)
+	{
+		// 如果这个能力已经被赋予，就拿到上面的StatusTag
+		OutInputTag = UYuraAbilitySystemComponent::GetAbilityInputTagFromSpec(*AbilitySpec);
+	}
+
+	return OutInputTag;
+}
+
 FGameplayAbilitySpec* UYuraAbilitySystemComponent::GetSpecByAbilityTag(const FGameplayTag& AbilityTag)
 {
 	// 避免有能力被移除或者添加
@@ -256,6 +273,25 @@ FGameplayAbilitySpec* UYuraAbilitySystemComponent::GetSpecByAbilityTag(const FGa
 		for (FGameplayTag YuraAbilityTag : Spec.Ability->AbilityTags)
 		{
 			if (YuraAbilityTag.MatchesTagExact(AbilityTag))
+			{
+				return &Spec;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+FGameplayAbilitySpec* UYuraAbilitySystemComponent::GetSpecByAbilityInputTag(const FGameplayTag& AbilityInputTag)
+{
+	// 避免有能力被移除或者添加
+	FScopedAbilityListLock AbilityLock(*this);
+
+	for (FGameplayAbilitySpec& Spec : GetActivatableAbilities())
+	{
+		for (FGameplayTag YuraAbilityTag : Spec.DynamicAbilityTags)
+		{
+			if (YuraAbilityTag.MatchesTagExact(AbilityInputTag))
 			{
 				return &Spec;
 			}
@@ -342,6 +378,51 @@ void UYuraAbilitySystemComponent::ServerSpendignSpellPoint_Implementation(const 
 
 }
 
+void UYuraAbilitySystemComponent::ServerEquipSpellToInputSlot_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& TargetInputTag)
+{
+	// 避免有能力被移除或者添加
+	FScopedAbilityListLock AbilityLock(*this);
+
+	// 如果这个技能压根就没被赋予--一般来说不会有这种情况，除非UI上面配置错了，并且上游逻辑有问题
+	if (FGameplayAbilitySpec* AbilitySpec = GetSpecByAbilityTag(AbilityTag))
+	{
+		// 获取现在的InputTag
+		const FGameplayTag PreIputTag = GetAbilityInputTagFromSpec(*AbilitySpec);
+		// 获取现在的状态
+		const FGameplayTag PreStatusTag = GetAbilityStatusTagFromSpec(*AbilitySpec);
+
+		const FYuraGameplayTags YuraTags = FYuraGameplayTags::Get();
+		const bool bStatusValid = PreStatusTag.MatchesTagExact(YuraTags.Ability_Status_Unlocked) || 
+			PreStatusTag.MatchesTagExact(YuraTags.Ability_Status_Equipped);
+		if (!bStatusValid)
+		{
+			return;
+		}
+		// 如果当前槽位装备了技能，就卸载原来的技能，并装备到现在这个槽位
+		// 那么就需要找到原来的技能了
+		FGameplayAbilitySpec* PreAbilitySpec = GetSpecByAbilityInputTag(TargetInputTag);
+		// 如果原来在这个槽上装备了技能，就先卸载它，并执行广播，没有就直接装备新技能
+		if (PreAbilitySpec)
+		{
+			UnloadAbilityEquipped(PreAbilitySpec);
+			if (PreIputTag.IsValid())
+			{
+				// 如果要装备的那个技能原来的槽不是空的
+				// 就交换
+				EquipAbility(PreAbilitySpec, PreIputTag);
+			}
+			// 立即执行复制
+			MarkAbilitySpecDirty(*PreAbilitySpec);
+			const FGameplayTag PreEquippedAbilityTag = GetAbilityTagFromSpec(*PreAbilitySpec);
+			ClientEquipAbility(PreEquippedAbilityTag, UYuraAbilitySystemComponent::GetAbilityStatusTagFromSpec(*PreAbilitySpec), TargetInputTag, PreIputTag);
+		}
+		// 装备新技能
+		EquipAbility(AbilitySpec, TargetInputTag);
+		MarkAbilitySpecDirty(*AbilitySpec);
+		ClientEquipAbility(AbilityTag, YuraTags.Ability_Status_Equipped, PreIputTag, TargetInputTag);
+	}
+}
+
 void UYuraAbilitySystemComponent::OnRep_ActivateAbilities()
 {
 	Super::OnRep_ActivateAbilities();
@@ -354,6 +435,57 @@ void UYuraAbilitySystemComponent::OnRep_ActivateAbilities()
 		OnAbilitiesGivenDelegate.Broadcast();
 	}
 	
+}
+
+void UYuraAbilitySystemComponent::UnloadAbilityEquipped(FGameplayAbilitySpec* AbilitySpec)
+{
+	// 避免有能力被移除或者添加
+	FScopedAbilityListLock AbilityLock(*this);
+
+	// 修改状态
+	AbilitySpec->DynamicAbilityTags.RemoveTag(FYuraGameplayTags::Get().Ability_Status_Equipped);
+	AbilitySpec->DynamicAbilityTags.AddTag(FYuraGameplayTags::Get().Ability_Status_Unlocked);
+	// 清除InputTag
+	const FGameplayTag InputSolt = GetAbilityInputTagFromSpec(*AbilitySpec);
+	AbilitySpec->DynamicAbilityTags.RemoveTag(InputSolt);
+}
+
+bool UYuraAbilitySystemComponent::EquipAbility(FGameplayAbilitySpec* AbilitySpec, const FGameplayTag& TargetInputTag)
+{
+	// 避免有能力被移除或者添加
+	FScopedAbilityListLock AbilityLock(*this);
+
+	// 标记这个技能是否装备上了--只有当前后槽位一样的情况下才会装备失败
+	bool bNewEquip = false;
+
+	// 修改状态--如果没有装备上的话
+	if (!AbilitySpec->DynamicAbilityTags.HasTagExact(FYuraGameplayTags::Get().Ability_Status_Equipped))
+	{
+		// 只有解锁状态才能点击装备，所以这个技能一定至少是解锁状态
+		AbilitySpec->DynamicAbilityTags.RemoveTag(FYuraGameplayTags::Get().Ability_Status_Unlocked);
+		AbilitySpec->DynamicAbilityTags.AddTag(FYuraGameplayTags::Get().Ability_Status_Equipped);
+	}
+	
+	// 清除原来的InputTag--如果原来已经装备过了
+	const FGameplayTag PreInputSolt = GetAbilityInputTagFromSpec(*AbilitySpec);
+	// 如果两个输入位置是不一样的
+	if (PreInputSolt.IsValid() && !PreInputSolt.MatchesTagExact(TargetInputTag))
+	{
+		AbilitySpec->DynamicAbilityTags.RemoveTag(PreInputSolt);
+		// 赋予新的输入
+		AbilitySpec->DynamicAbilityTags.AddTag(TargetInputTag);
+
+		bNewEquip = true;
+	}
+	else if (!PreInputSolt.IsValid())
+	{
+		// 赋予新的输入
+		AbilitySpec->DynamicAbilityTags.AddTag(TargetInputTag);
+
+		bNewEquip = true;
+	}
+
+	return bNewEquip;
 }
 
 void UYuraAbilitySystemComponent::ClientEffectApplied_Implementation(UAbilitySystemComponent* ASC, const FGameplayEffectSpec& GESpec, FActiveGameplayEffectHandle ActiveGEHandle)
@@ -369,5 +501,10 @@ void UYuraAbilitySystemComponent::ClientEffectApplied_Implementation(UAbilitySys
 void UYuraAbilitySystemComponent::ClientAbilityStatusesChanged_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& NewStatusTag, int32 NewAbilityLevel)
 {
 	OnAbilityStatusChangedDelegate.Broadcast(AbilityTag, NewStatusTag, NewAbilityLevel);
+}
+
+void UYuraAbilitySystemComponent::ClientEquipAbility_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& NewStatusTag, const FGameplayTag& InputSlot, const FGameplayTag& PreInputSlot)
+{
+	OnAbilityEquipAndUnloadDelegate.Broadcast(AbilityTag, NewStatusTag, InputSlot, PreInputSlot);
 }
 

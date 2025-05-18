@@ -26,6 +26,7 @@ protected:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData) override;
 
+
 	// 蓝图可调用，生成子弹
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 	void SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag);
@@ -34,5 +35,9 @@ protected:
 	// 发射物的类
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<AYuraProjectile> ProjectileClass;
+
+	// 一次释放技能最多发射的数量
+	UPROPERTY(EditDefaultsOnly)
+	int32 MaxNumToSpawn = 1;
 
 };

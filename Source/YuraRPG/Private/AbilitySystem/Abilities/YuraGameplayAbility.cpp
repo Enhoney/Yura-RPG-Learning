@@ -3,6 +3,7 @@
 
 #include "AbilitySystem/Abilities/YuraGameplayAbility.h"
 #include "Interaction/CombatInterface.h"
+#include "AttributeSets/YuraAttributeSet.h"
 
 FString UYuraGameplayAbility::GetCurrentLevelDescription(int Level)
 {
@@ -16,7 +17,7 @@ FString UYuraGameplayAbility::GetNextLevelDescription(int Level)
 
 FString UYuraGameplayAbility::GetLockedDescription(int Level)
 {
-	return FString::Printf(TEXT("<Default>Default Description : %s</>"), L"Mamba out!!!");
+	return FString::Printf(TEXT("<Default>Spell Locked Until Level: </><Level>%d</>"), Level);
 }
 
 void UYuraGameplayAbility::SetWarpingTargetFacingFromLocation(const FVector& TargetLocation)
@@ -37,4 +38,39 @@ FTaggedMontage UYuraGameplayAbility::GetRandTaggedMontage(const TArray<FTaggedMo
 	}
 
 	return FTaggedMontage();
+}
+
+float UYuraGameplayAbility::GetManaCost(float InLevel /*= 1.0f*/) const
+{
+	float OutManaCost = 0.f;
+	if (const UGameplayEffect* CostEffect = GetCostGameplayEffect())
+	{
+		// 遍历GE的Modifiers
+		for (const FGameplayModifierInfo& Mod : CostEffect->Modifiers)
+		{
+			// 如果修改的是Mana
+			if (Mod.Attribute == UYuraAttributeSet::GetManaAttribute())
+			{
+				// 拿到对应等级的ModifierMagnitude，只有Mod在使用ScalableFloat或者硬编码的时候才能拿到正确的值
+				Mod.ModifierMagnitude.GetStaticMagnitudeIfPossible(InLevel, OutManaCost);
+			}
+		}
+	}
+
+	// 因为这里拿到的是负数，所以要返回相反数
+	return -OutManaCost;
+}
+
+float UYuraGameplayAbility::GetCooldown(float InLevel /*= 1.0f*/) const
+{
+	float OutCooldown = 0.f;
+	if (const UGameplayEffect* CooldownEffect = GetCooldownGameplayEffect())
+	{
+		if (CooldownEffect->DurationPolicy == EGameplayEffectDurationType::HasDuration)
+		{
+			CooldownEffect->DurationMagnitude.GetStaticMagnitudeIfPossible(InLevel, OutCooldown);
+		}
+	}
+
+	return OutCooldown;
 }
