@@ -7,7 +7,7 @@
 FString UYuraFireBlotAbility::GetCurrentLevelDescription(int Level)
 {
 	// 获取火焰元素伤害，因为玩家这个就是火球，只会造成火焰元素伤害
-	const int32 BaseDamageCause = GetBaseDamageTyped(FYuraGameplayTags::Get().DamageType_Fire, Level);
+	const int32 BaseDamageCause = GetBaseDamageTyped(DamageTypeTag, Level);
 	const float ManaCost = GetManaCost(Level);
 	const float Cooldown = GetCooldown(Level);
 
@@ -60,7 +60,7 @@ FString UYuraFireBlotAbility::GetCurrentLevelDescription(int Level)
 
 FString UYuraFireBlotAbility::GetNextLevelDescription(int Level)
 {
-	const int32 BaseDamageCause = GetBaseDamageTyped(FYuraGameplayTags::Get().DamageType_Fire, Level);
+	const int32 BaseDamageCause = GetBaseDamageTyped(DamageTypeTag, Level);
 	const float ManaCost = GetManaCost(Level);
 	const float Cooldown = GetCooldown(Level);
 

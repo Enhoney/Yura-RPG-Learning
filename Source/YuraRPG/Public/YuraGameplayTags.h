@@ -77,7 +77,21 @@ public:
 	// 存储所有伤害类型抗性类型的Map
 	TMap<FGameplayTag /**DamageTpype*/, FGameplayTag /** ResistanceType*/> DamageTypeToResistanceTags;
 
-	// 各种Buff和Debuff
+	// Debuff
+	FGameplayTag Debuff_Fire_Burn;	// 灼烧
+	FGameplayTag Debuff_Physic_Custom;	// TODO
+	FGameplayTag Debuff_Lighting_Stun;	// 眩晕
+	FGameplayTag Debuff_Arcane_Custom;	// TODO
+
+	// 存储所有伤害类型与Debuff类型的Map
+	TMap<FGameplayTag /**DamageTpype*/, FGameplayTag /** DebuffType*/> DamageTypeToDebuff;
+
+	// Debuff的参数
+	FGameplayTag DebuffParam_Chance;
+	FGameplayTag DebuffParam_Duration;
+	FGameplayTag DebuffParam_Frequency;
+	FGameplayTag DebuffParam_BaseDamage;
+
 	// 受击僵直
 	FGameplayTag Effects_HitReact;
 

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "GameplayEffectTypes.h"
+#include "YuraAbilityTypes.h"
 #include "YuraProjectile.generated.h"
 
 class USphereComponent;
@@ -24,6 +24,9 @@ public:
 	// 获取移动组件--我们可能需要设置它的速度啥的
 	FORCEINLINE UProjectileMovementComponent* GetMovementComponent() { return ProjectileMovementComponent;}
 
+	// 属性复制--为了DamageEffectParams
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -33,11 +36,13 @@ protected:
 	UFUNCTION()
 	void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	void OnHit();
+
 public:
-	// 存储一个EffectSpecHandle
+	// 存储一个FDamageEffectParams
 	// ExposeOnSpawn--在Spawn的时候，可作为一个参数传递进来
-	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
-	FGameplayEffectSpecHandle DamageEffectSpecHandle;
+	UPROPERTY(BlueprintReadWrite, Replicated, meta = (ExposeOnSpawn = "true"))
+	FDamageEffectParams DamageEffectParams;
 
 private:
 	// 球体碰撞

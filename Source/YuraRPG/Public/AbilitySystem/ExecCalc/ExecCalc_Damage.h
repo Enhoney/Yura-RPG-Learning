@@ -21,6 +21,8 @@ public:
 	void Execute_Implementation (const FGameplayEffectCustomExecutionParameters& ExecutionParams, 
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const override;
 
+	void DeterminingDebuff(const FGameplayEffectSpec& Spec, const FGameplayEffectCustomExecutionParameters& ExecutionParams, FAggregatorEvaluateParameters& EvalutionParameters) const;
+
 private:
 	bool CalculCriticalHitDamage(float& BaseDamage, const float SourceHitCriticalChance, const float TargetHitCriticalRes, const float SourceHitCriticalDamage) const;
 	

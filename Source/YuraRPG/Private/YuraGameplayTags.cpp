@@ -113,6 +113,31 @@ void FYuraGameplayTags::InitializeGameplayTags()
 	YuraGameplayTags.DamageTypeToResistanceTags.Add(YuraGameplayTags.DamageType_Physic, YuraGameplayTags.Attribute_Resilience_Physic);
 	YuraGameplayTags.DamageTypeToResistanceTags.Add(YuraGameplayTags.DamageType_Lighting, YuraGameplayTags.Attribute_Resilience_Lighting);
 	YuraGameplayTags.DamageTypeToResistanceTags.Add(YuraGameplayTags.DamageType_Arcane, YuraGameplayTags.Attribute_Resilience_Arcane);
+
+	// Debuff 
+	YuraGameplayTags.Debuff_Fire_Burn =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Debuff.Fire.Burn"), FString("Fire Type Debuff -- Burn."));
+	YuraGameplayTags.Debuff_Physic_Custom =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Debuff.Physic.Custom"), FString("Physic Type Debuff -- TODO."));
+	YuraGameplayTags.Debuff_Lighting_Stun =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Debuff.Lighting.Stun"), FString("Lighting Type Debuff -- Stun."));
+	YuraGameplayTags.Debuff_Arcane_Custom =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Debuff.Arcane.Custom"), FString("Arcane Type Debuff -- TODO."));
+
+	YuraGameplayTags.DamageTypeToDebuff.Add(YuraGameplayTags.DamageType_Fire, YuraGameplayTags.Debuff_Fire_Burn);
+	YuraGameplayTags.DamageTypeToDebuff.Add(YuraGameplayTags.DamageType_Physic, YuraGameplayTags.Debuff_Physic_Custom);
+	YuraGameplayTags.DamageTypeToDebuff.Add(YuraGameplayTags.DamageType_Lighting, YuraGameplayTags.Debuff_Lighting_Stun);
+	YuraGameplayTags.DamageTypeToDebuff.Add(YuraGameplayTags.DamageType_Arcane, YuraGameplayTags.Debuff_Arcane_Custom);
+
+	// Debuf的GE参数
+	YuraGameplayTags.DebuffParam_Chance =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("DebuffParam.Chance"), FString("DebuffParam - Chance."));
+	YuraGameplayTags.DebuffParam_Duration =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("DebuffParam.Duration"), FString("DebuffParam - Duration."));
+	YuraGameplayTags.DebuffParam_Frequency =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("DebuffParam.Frequency"), FString("DebuffParam - Frequency."));
+	YuraGameplayTags.DebuffParam_BaseDamage =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("DebuffParam.BaseDamage"), FString("DebuffParam - BaseDamage."));
 	
 
 	// Effects Tag -- Buff和Debuff

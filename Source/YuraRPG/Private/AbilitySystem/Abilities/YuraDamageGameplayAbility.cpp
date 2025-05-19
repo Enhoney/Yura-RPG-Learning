@@ -18,12 +18,9 @@ void UYuraDamageGameplayAbility::GetDamageSpecHandle(FGameplayEffectSpecHandle& 
 	FGameplayEffectSpecHandle DamageSpecHandle = ASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), DamageEffectContextHandle);
 
 	// 设置基础伤害
-	// 从表格中拿到数值
-	for (const TPair<FGameplayTag, FScalableFloat>& Pair : DamageTypes)
-	{
-		const float ScalableDamage = Pair.Value.GetValueAtLevel(GetAbilityLevel());
-		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, Pair.Key, ScalableDamage);
-	}
+	const float ScalableDamage = SpellBaseDamage.GetValueAtLevel(GetAbilityLevel());
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, DamageTypeTag, ScalableDamage);
+
 
 	OutDamageEffectSpecHandle = DamageSpecHandle;
 }
@@ -31,8 +28,29 @@ void UYuraDamageGameplayAbility::GetDamageSpecHandle(FGameplayEffectSpecHandle& 
 float UYuraDamageGameplayAbility::GetBaseDamageTyped(const FGameplayTag& DamageType, int32 Level) const
 {
 
-	checkf(DamageTypes.Contains(DamageType), TEXT("DamageTypes don't have the TypeTag: %s"), *DamageType.ToString());
-	return DamageTypes[DamageType].GetValueAtLevel(Level);
+	if (DamageTypeTag.MatchesTagExact(DamageType))
+	{
+		return SpellBaseDamage.GetValueAtLevel(Level);
+	}
+	return 0.f;
+	
 }
 
+FDamageEffectParams UYuraDamageGameplayAbility::MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor)  const
+{
+	FDamageEffectParams OutParams;
+	OutParams.WorldContextObject = GetAvatarActorFromActorInfo();
+	OutParams.DamageGameplayEffectClass = DamageEffectClass;
+	OutParams.SourceASC = GetAbilitySystemComponentFromActorInfo();
+	OutParams.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+	OutParams.AbilityBaseDamage = SpellBaseDamage.GetValueAtLevel(GetAbilityLevel());
+	OutParams.AbilityLevel = GetAbilityLevel();
+	OutParams.DamageType = DamageTypeTag;
+	OutParams.DebuffChance = DebuffChance;
+	OutParams.DebuffDuration = DebuffDuration;
+	OutParams.DebuffFrequency = DebuffFrequency;
+	OutParams.DebuffBaseDamage = DebuffBaseDamage;
+
+	return OutParams;
+}
 

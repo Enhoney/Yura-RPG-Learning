@@ -9,11 +9,12 @@
 #include "Game/YuraGameModeBase.h"
 #include "GameplayEffectTypes.h"
 #include "AbilitySystemComponent.h"
-
+#include "YuraGameplayTags.h"
 #include "YuraAbilityTypes.h"
 
 #include "Engine/OverlapResult.h"
 #include "Interaction/CombatInterface.h"
+#include "AbilitySystemBlueprintLibrary.h"
 
 
 bool UYuraAbilitySystemLibrary::MakeWidgetControllerParam(const UObject* InWorldContextObject, FWidgetControllerParam& OutParams, AYuraHUD*& OutHUD)
@@ -214,6 +215,77 @@ bool UYuraAbilitySystemLibrary::IsCriticalHit(const FGameplayEffectContextHandle
 	return false;
 }
 
+bool UYuraAbilitySystemLibrary::IsSuccessfulDebuff(const FGameplayEffectContextHandle& EffectContext)
+{
+	const FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	const FYuraGameplayEffectContext* YuraContext = static_cast<const FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		return YuraContext->IsSuccessfulDebuff();
+	}
+
+	return false;
+}
+
+
+float UYuraAbilitySystemLibrary::GetDebuffBaseDamage(const FGameplayEffectContextHandle& EffectContext)
+{
+	const FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	const FYuraGameplayEffectContext* YuraContext = static_cast<const FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		return YuraContext->GetDebuffBaseDamage();
+	}
+
+	return 0.f;
+}
+
+float UYuraAbilitySystemLibrary::GetDebuffDuration(const FGameplayEffectContextHandle& EffectContext)
+{
+	const FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	const FYuraGameplayEffectContext* YuraContext = static_cast<const FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		return YuraContext->GetDebuffDuration();
+	}
+
+	return 0.f;
+}
+
+float UYuraAbilitySystemLibrary::GetDebuffFrequency(const FGameplayEffectContextHandle& EffectContext)
+{
+	const FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	const FYuraGameplayEffectContext* YuraContext = static_cast<const FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		return YuraContext->GetDebuffFrequency();
+	}
+
+	return 0.0f;
+}
+
+FGameplayTag UYuraAbilitySystemLibrary::GetDamageTypeTag(const FGameplayEffectContextHandle& EffectContext)
+{
+	const FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	const FYuraGameplayEffectContext* YuraContext = static_cast<const FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		return YuraContext->GetDamageTypeTag();
+	}
+
+	return FGameplayTag();
+}
+
 void UYuraAbilitySystemLibrary::SetDamageBlock(UPARAM(ref) FGameplayEffectContextHandle& EffectContext, bool bInDamageBlock)
 {
 	FGameplayEffectContext* Context = EffectContext.Get();
@@ -236,6 +308,66 @@ void UYuraAbilitySystemLibrary::SetCriticalHit(UPARAM(ref) FGameplayEffectContex
 	if (YuraContext)
 	{
 		YuraContext->SetIsCriticalHit(bInCriticalHit);
+	}
+}
+
+void UYuraAbilitySystemLibrary::SetIsSuccessfulDebuff(UPARAM(ref)FGameplayEffectContextHandle& EffectContext, bool bInIsSuccessfulDebuff)
+{
+	FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	FYuraGameplayEffectContext* YuraContext = static_cast<FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		YuraContext->SetIsSuccessfulDebuff(bInIsSuccessfulDebuff);
+	}
+}
+
+void UYuraAbilitySystemLibrary::SetDebuffBaseDamage(UPARAM(ref)FGameplayEffectContextHandle& EffectContext, float InDebuffBaseDamage)
+{
+	FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	FYuraGameplayEffectContext* YuraContext = static_cast<FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		YuraContext->SetDebuffBaseDamage(InDebuffBaseDamage);
+	}
+}
+
+void UYuraAbilitySystemLibrary::SetDebuffDuration(UPARAM(ref)FGameplayEffectContextHandle& EffectContext, float InDebuffDuration)
+{
+	FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	FYuraGameplayEffectContext* YuraContext = static_cast<FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		YuraContext->SetDebuffDuration(InDebuffDuration);
+	}
+}
+
+void UYuraAbilitySystemLibrary::SetDebuffFrequency(UPARAM(ref)FGameplayEffectContextHandle& EffectContext, float InDebuffFrequency)
+{
+	FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	FYuraGameplayEffectContext* YuraContext = static_cast<FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		YuraContext->SetDebuffFrequency(InDebuffFrequency);
+	}
+}
+
+void UYuraAbilitySystemLibrary::SetDamageTypeTag(UPARAM(ref)FGameplayEffectContextHandle& EffectContext, const FGameplayTag& InDamageTypeTag)
+{
+	FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	FYuraGameplayEffectContext* YuraContext = static_cast<FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		YuraContext->SetDamageTypeTag(InDamageTypeTag);
 	}
 }
 
@@ -287,4 +419,26 @@ bool UYuraAbilitySystemLibrary::IsNotFriend(const AActor* SourceActor, const AAc
 	return true;
 }
 
+FGameplayEffectContextHandle UYuraAbilitySystemLibrary::ApplyDamageEffectByParams(const FDamageEffectParams& Params)
+{
+	const FYuraGameplayTags YuraTags = FYuraGameplayTags::Get();
+	const AActor* AvatarActor = Params.SourceASC->GetAvatarActor();
+
+	FGameplayEffectContextHandle DamageEffectContext = Params.SourceASC->MakeEffectContext();
+	DamageEffectContext.AddSourceObject(AvatarActor);
+
+	const FGameplayEffectSpecHandle EffectSpec = Params.SourceASC->MakeOutgoingSpec(Params.DamageGameplayEffectClass, Params.AbilityLevel, DamageEffectContext);
+
+	// 基础伤害
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(EffectSpec, Params.DamageType, Params.AbilityBaseDamage);
+	// Debuff
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(EffectSpec, YuraTags.DebuffParam_Chance, Params.DebuffChance);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(EffectSpec, YuraTags.DebuffParam_Duration, Params.DebuffDuration);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(EffectSpec, YuraTags.DebuffParam_Frequency, Params.DebuffFrequency);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(EffectSpec, YuraTags.DebuffParam_BaseDamage, Params.DebuffBaseDamage);
+
+	Params.TargetASC->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data);
+
+	return DamageEffectContext;
+}
 

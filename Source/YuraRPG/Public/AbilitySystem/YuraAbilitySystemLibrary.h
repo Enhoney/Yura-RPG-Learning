@@ -69,11 +69,42 @@ public:
 	UFUNCTION(BlueprintPure, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
 	static bool IsCriticalHit(const FGameplayEffectContextHandle& EffectContext);
 
+	UFUNCTION(BlueprintPure, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
+	static bool IsSuccessfulDebuff(const FGameplayEffectContextHandle& EffectContext);
+
+	UFUNCTION(BlueprintPure, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
+	static float GetDebuffBaseDamage(const FGameplayEffectContextHandle& EffectContext);
+
+	UFUNCTION(BlueprintPure, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
+	static float GetDebuffDuration(const FGameplayEffectContextHandle& EffectContext);
+
+	UFUNCTION(BlueprintPure, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
+	static float GetDebuffFrequency(const FGameplayEffectContextHandle& EffectContext);
+
+	UFUNCTION(BlueprintPure, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
+	static FGameplayTag GetDamageTypeTag(const FGameplayEffectContextHandle& EffectContext);
+
 	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
 	static void SetDamageBlock(UPARAM(ref) FGameplayEffectContextHandle& EffectContext, bool bInDamageBlock);
 
 	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
 	static void SetCriticalHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContext, bool bInCriticalHit);
+
+	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
+	static void SetIsSuccessfulDebuff(UPARAM(ref) FGameplayEffectContextHandle& EffectContext, bool bInIsSuccessfulDebuff);
+
+	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
+	static void SetDebuffBaseDamage(UPARAM(ref) FGameplayEffectContextHandle& EffectContext, float InDebuffBaseDamage);
+
+	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
+	static void SetDebuffDuration(UPARAM(ref) FGameplayEffectContextHandle& EffectContext, float InDebuffDuration);
+
+	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
+	static void SetDebuffFrequency(UPARAM(ref) FGameplayEffectContextHandle& EffectContext, float InDebuffFrequency);
+
+	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
+	static void SetDamageTypeTag(UPARAM(ref) FGameplayEffectContextHandle& EffectContext, const FGameplayTag& InDamageTypeTag);
+
 
 
 	// 获取范围内的指定目标
@@ -84,5 +115,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "YuraAbilitySystemLibrary|Combat")
 	static bool IsNotFriend(const AActor* SourceActor, const AActor* TargetActor);
 
-
+	// 使用DamageEffectParams施加伤害
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "YuraAbilitySystemLibrary|ApplyDamageEffect")
+	static FGameplayEffectContextHandle ApplyDamageEffectByParams(const FDamageEffectParams& Params);
 };

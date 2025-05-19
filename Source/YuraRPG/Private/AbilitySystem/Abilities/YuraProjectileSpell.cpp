@@ -50,11 +50,8 @@ void UYuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 			Cast<APawn>(GetAvatarActorFromActorInfo()),
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
-		FGameplayEffectSpecHandle DamageSpecHandle;
-		// 生成handle
-		GetDamageSpecHandle(DamageSpecHandle);
-
-		Projectile->DamageEffectSpecHandle = DamageSpecHandle;
+		// 生成Params--现在targetActor肯定是空的
+		Projectile->DamageEffectParams = MakeDamageEffectParamsFromClassDefaults();
 
 		Projectile->FinishSpawning(SpawnTransform);
 	}

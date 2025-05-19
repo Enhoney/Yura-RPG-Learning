@@ -18,9 +18,29 @@ bool FYuraGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 		{
 			RepBits |= 1 << 1;
 		}
+		if (bIsSuccessfulDebuff)
+		{
+			RepBits |= 1 << 2;
+		}
+		if (DebuffBaseDamage > 0.f)
+		{
+			RepBits |= 1 << 3;
+		}
+		if (DebuffDuration > 0.f)
+		{
+			RepBits |= 1 << 4;
+		}
+		if (DebuffFrequency > 0.f)
+		{
+			RepBits |= 1 << 5;
+		}
+		if (DamageTypeTag->IsValid())
+		{
+			RepBits |= 1 << 6;
+		}
 	}
 
-	Ar.SerializeBits(&RepBits, 2);
+	Ar.SerializeBits(&RepBits, 7);
 	// 是否格挡
 	if (RepBits & (1 << 0))
 	{
@@ -30,6 +50,34 @@ bool FYuraGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 	if (RepBits & (1 << 1))
 	{
 		Ar << bIsCriticalHit;
+	}
+	// 是否施加负面效果
+	if (RepBits & (1 << 2))
+	{
+		Ar << bIsSuccessfulDebuff;
+	}
+	if (RepBits & (1 << 3))
+	{
+		Ar << DebuffBaseDamage;
+	}
+	if (RepBits & (1 << 4))
+	{
+		Ar << DebuffDuration;
+	}
+	if (RepBits & (1 << 5))
+	{
+		Ar << DebuffFrequency;
+	}
+	if (RepBits & (1 << 6))
+	{
+		if (Ar.IsLoading())
+		{
+			if (!DamageTypeTag.IsValid())
+			{
+				DamageTypeTag = TSharedPtr<FGameplayTag>(new FGameplayTag());
+			}
+		}
+		DamageTypeTag->NetSerialize(Ar, Map, bOutSuccess);
 	}
 
 	bOutSuccess = true;

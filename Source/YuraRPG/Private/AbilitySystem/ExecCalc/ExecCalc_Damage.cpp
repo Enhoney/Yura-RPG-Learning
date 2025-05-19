@@ -134,6 +134,9 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	EvalutionParameters.SourceTags = SourceTags;
 	EvalutionParameters.TargetTags = TargetTags;
 
+	// Debuff计算
+	DeterminingDebuff(Spec, ExecutionParams, EvalutionParameters);
+
 	// 通过SetByCaller拿到技能基础伤害
 	float BaseDamage = 0.f;
 
@@ -219,6 +222,42 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	FGameplayModifierEvaluatedData ModifierEvaluatedData_Armor(UYuraAttributeSet::GetIncomingDamageAttribute(), 
 		EGameplayModOp::Additive, TargetDamage > 0 ? TargetDamage : 0);
 	OutExecutionOutput.AddOutputModifier(ModifierEvaluatedData_Armor);
+}
+
+void UExecCalc_Damage::DeterminingDebuff(const FGameplayEffectSpec& Spec, const FGameplayEffectCustomExecutionParameters& ExecutionParams, FAggregatorEvaluateParameters& EvalutionParameters) const
+{
+	const FYuraGameplayTags YuraTags = FYuraGameplayTags::Get();
+	for (TTuple<FGameplayTag, FGameplayTag> Pair : YuraTags.DamageTypeToDebuff)
+	{
+		const FGameplayTag DamageType = Pair.Key;
+		const FGameplayTag DebuffType = Pair.Value;
+
+		// 找到基础伤害，如果这个技能有基础伤害，那么就可以施加Debuff--属性对应上了
+		const float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageType, false, -1.f);
+		if (DamageTypeValue > .5f)
+		{
+			// 得到基础施加Debuff成功率
+			const float SourceDeuffChance = Spec.GetSetByCallerMagnitude(YuraTags.DebuffParam_Chance, false, -1.f);
+
+			// 找对应的属性抗性
+			float TargetResistance = 0.f;
+			const FGameplayTag TargetResistanceTag = YuraTags.DamageTypeToResistanceTags[DamageType];
+			const FGameplayEffectAttributeCaptureDefinition CaptureDef = FYuraDamageStatics().TagsToCapturedAttributeDef[TargetResistanceTag];
+			ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(CaptureDef, EvalutionParameters, TargetResistance);
+			TargetResistance = FMath::Max(0.f, TargetResistance);	// 这个抗性一定是小于1，大于0的
+
+			// 计算真实的施加Debuff几率
+			const float RealDebuffChance = SourceDeuffChance * (1.f - TargetResistance);
+
+			const bool bDebuffApply = FMath::RandRange(1, 100) < RealDebuffChance * 100;
+
+			if (bDebuffApply)
+			{
+				// 这就表明成功施加负面效果了
+			}
+
+		}
+	}
 }
 
 bool UExecCalc_Damage::CalculCriticalHitDamage(float& BaseDamage, const float SourceHitCriticalChance, const float TargetHitCriticalRes, const float SourceHitCriticalDamage) const
