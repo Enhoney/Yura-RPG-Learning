@@ -12,6 +12,9 @@
 #include "Player/YuraPlayerState.h"
 #include "Player/Data/LevelUpInfo.h"
 
+#include "Data/AbilityInfo.h"
+#include "YuraGameplayTags.h"
+
 void UOverlayWidgetController::BroadcastInitialValues()
 {
 	const UYuraAttributeSet* YuraAttributeSet = CastChecked<UYuraAttributeSet>(AttributeSet);
@@ -93,6 +96,9 @@ void UOverlayWidgetController::BindCallbacksToDependiencies()
 
 				}
 			});
+
+		// 更新装备状态
+		ASC->OnAbilityEquipAndUnloadDelegate.AddUObject(this, &UOverlayWidgetController::EquipAbilityCallback);
 	}
 
 }
@@ -130,4 +136,30 @@ void UOverlayWidgetController::OnExpChanged(int32 NewExp)
 		OnExpChangedDelegate.Broadcast(ExpPercent);
 	}
 	
+}
+
+void UOverlayWidgetController::EquipAbilityCallback(const FGameplayTag& AbilityTag, const FGameplayTag& NewStatusTag, 
+	const FGameplayTag& InputSlot, const FGameplayTag& PreInputSlot, bool bIsAbilitySwap)
+{
+	check(AbilityInformations);
+
+	// 如果不是交换键位
+	if (!bIsAbilitySwap)
+	{
+		// 得先清除原来的
+		FYuraAbilityInfo PreYuraAbilityInfo = FYuraAbilityInfo();
+		PreYuraAbilityInfo.AbilityTag = FGameplayTag();
+		PreYuraAbilityInfo.AbilityInputTag = PreInputSlot;
+		PreYuraAbilityInfo.AbilityStatusTag = FYuraGameplayTags::Get().Ability_Status_Unlocked;
+		OnAbilityInfoGivenDelegate.Broadcast(PreYuraAbilityInfo);
+	}
+
+	// 再来广播当前的
+	FYuraAbilityInfo YuraAbilityInfo = AbilityInformations->FindAbilityInfoByTag(AbilityTag);
+	// 这个有可能是空的
+	YuraAbilityInfo.AbilityInputTag = InputSlot;
+	YuraAbilityInfo.AbilityStatusTag = NewStatusTag;
+
+	OnAbilityInfoGivenDelegate.Broadcast(YuraAbilityInfo);
+
 }

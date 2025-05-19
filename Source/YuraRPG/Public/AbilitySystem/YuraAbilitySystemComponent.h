@@ -16,8 +16,8 @@ DECLARE_DELEGATE_OneParam(FForEachAbilitySignature, const FGameplayAbilitySpec&)
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FAbilityStatusChangedSignature, const FGameplayTag& /** AbilityTag*/, const FGameplayTag& /** NewStatusTag*/, int32 /** NewLevel*/);
 
 // 广播技能装备与卸载
-DECLARE_MULTICAST_DELEGATE_FourParams(FAbilityEquipAndUnloadSignature, const FGameplayTag& /** AbilityTag*/, 
-	const FGameplayTag& /** NewStatusTag*/, const FGameplayTag& /** InputSlot*/, const FGameplayTag& /** PreInputSlot*/);
+DECLARE_MULTICAST_DELEGATE_FiveParams(FAbilityEquipAndUnloadSignature, const FGameplayTag& /** AbilityTag*/, 
+	const FGameplayTag& /** NewStatusTag*/, const FGameplayTag& /** InputSlot*/, const FGameplayTag& /** PreInputSlot*/, bool /** IsSwap*/);
 
 /**
  * 
@@ -89,7 +89,7 @@ protected:
 
 	// 装备技能改变，客户端回调，最终目的是通知SpellMenu和Overlay更新
 	UFUNCTION(Client, Reliable)
-	void ClientEquipAbility(const FGameplayTag& AbilityTag, const FGameplayTag& NewStatusTag, const FGameplayTag& InputSlot, const FGameplayTag& PreInputSlot);
+	void ClientEquipAbility(const FGameplayTag& AbilityTag, const FGameplayTag& NewStatusTag, const FGameplayTag& InputSlot, const FGameplayTag& PreInputSlot, bool bIsAbilitySwap);
 
 	// 重写的函数，可激活能力变动时广播
 	virtual void OnRep_ActivateAbilities() override;

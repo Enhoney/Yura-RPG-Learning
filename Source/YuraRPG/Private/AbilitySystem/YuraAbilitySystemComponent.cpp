@@ -383,6 +383,8 @@ void UYuraAbilitySystemComponent::ServerEquipSpellToInputSlot_Implementation(con
 	// 避免有能力被移除或者添加
 	FScopedAbilityListLock AbilityLock(*this);
 
+	bool bIsAbilitySwap = false;
+
 	// 如果这个技能压根就没被赋予--一般来说不会有这种情况，除非UI上面配置错了，并且上游逻辑有问题
 	if (FGameplayAbilitySpec* AbilitySpec = GetSpecByAbilityTag(AbilityTag))
 	{
@@ -410,16 +412,17 @@ void UYuraAbilitySystemComponent::ServerEquipSpellToInputSlot_Implementation(con
 				// 如果要装备的那个技能原来的槽不是空的
 				// 就交换
 				EquipAbility(PreAbilitySpec, PreIputTag);
+				bIsAbilitySwap = true;
 			}
 			// 立即执行复制
 			MarkAbilitySpecDirty(*PreAbilitySpec);
 			const FGameplayTag PreEquippedAbilityTag = GetAbilityTagFromSpec(*PreAbilitySpec);
-			ClientEquipAbility(PreEquippedAbilityTag, UYuraAbilitySystemComponent::GetAbilityStatusTagFromSpec(*PreAbilitySpec), TargetInputTag, PreIputTag);
+			ClientEquipAbility(PreEquippedAbilityTag, UYuraAbilitySystemComponent::GetAbilityStatusTagFromSpec(*PreAbilitySpec), PreIputTag, TargetInputTag, bIsAbilitySwap);
 		}
 		// 装备新技能
 		EquipAbility(AbilitySpec, TargetInputTag);
 		MarkAbilitySpecDirty(*AbilitySpec);
-		ClientEquipAbility(AbilityTag, YuraTags.Ability_Status_Equipped, PreIputTag, TargetInputTag);
+		ClientEquipAbility(AbilityTag, YuraTags.Ability_Status_Equipped, TargetInputTag, PreIputTag, bIsAbilitySwap);
 	}
 }
 
@@ -503,8 +506,9 @@ void UYuraAbilitySystemComponent::ClientAbilityStatusesChanged_Implementation(co
 	OnAbilityStatusChangedDelegate.Broadcast(AbilityTag, NewStatusTag, NewAbilityLevel);
 }
 
-void UYuraAbilitySystemComponent::ClientEquipAbility_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& NewStatusTag, const FGameplayTag& InputSlot, const FGameplayTag& PreInputSlot)
+void UYuraAbilitySystemComponent::ClientEquipAbility_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& NewStatusTag, 
+	const FGameplayTag& InputSlot, const FGameplayTag& PreInputSlot, bool bIsAbilitySwap)
 {
-	OnAbilityEquipAndUnloadDelegate.Broadcast(AbilityTag, NewStatusTag, InputSlot, PreInputSlot);
+	OnAbilityEquipAndUnloadDelegate.Broadcast(AbilityTag, NewStatusTag, InputSlot, PreInputSlot, bIsAbilitySwap);
 }
 

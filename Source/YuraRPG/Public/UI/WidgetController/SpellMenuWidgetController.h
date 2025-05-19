@@ -17,6 +17,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FSpellMenuButonSignature, bool, bS
 // 用于在点击装备按钮之后选择提示框动画
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FWaitforEquipSelectSignature, const FGameplayTag&, AbilityTypeTag);
 
+// 用于在装备成功之后，取消技能勾选状态
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpellGlobeRessignedSignature, const FGameplayTag&, AbilityTag);
+
 struct FSelectedAbility
 {
 	FGameplayTag AbilityTag = FGameplayTag();	// 选中技能的AbilityTag
@@ -57,7 +60,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SpellMenu")
 	void OnSpellRowGlobePressed(const FGameplayTag& SlotInputTag, const FGameplayTag& SlotAbilityTypeTag);
 
-	void EquipAbilityCallback(const FGameplayTag& AbilityTag, const FGameplayTag& NewStatusTag, const FGameplayTag& InputSlot, const FGameplayTag& PreInputSlot);
+	void EquipAbilityCallback(const FGameplayTag& AbilityTag, const FGameplayTag& NewStatusTag, const FGameplayTag& InputSlot, const FGameplayTag& PreInputSlot, bool bIsAbilitySwap);
 
 
 private:
@@ -82,6 +85,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "SpellMenu|Equip")
 	FWaitforEquipSelectSignature StopEquipSelectDelegate;
+
+	UPROPERTY(BlueprintAssignable, Category = "SpellMenu|Equip")
+	FSpellGlobeRessignedSignature SpellGlobeRessignedDelegate;
 
 private:
 	FSelectedAbility SelectedAbility;

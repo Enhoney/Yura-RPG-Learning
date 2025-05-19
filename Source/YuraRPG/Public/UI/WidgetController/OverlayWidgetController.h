@@ -68,7 +68,8 @@ protected:
 
 	void OnExpChanged(int32 NewExp);
 
-
+	// 装备技能变更时，用于更新主菜单
+	void EquipAbilityCallback(const FGameplayTag& AbilityTag, const FGameplayTag& NewStatusTag, const FGameplayTag& InputSlot, const FGameplayTag& PreInputSlot, bool bIsAbilitySwap);
 
 public:
 	UPROPERTY(BlueprintAssignable,Category = "GAS|Attributes")

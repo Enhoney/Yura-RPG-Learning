@@ -19,12 +19,13 @@ void USpellMenuWidgetController::BindCallbacksToDependiencies()
 {
 	UYuraAbilitySystemComponent* YuraASC = CastChecked<UYuraAbilitySystemComponent>(AbilitySystemComponent);
 
-	YuraASC->OnAbilityStatusChangedDelegate.AddLambda([this](const FGameplayTag& AbilityTag, const FGameplayTag& NewStatusTag, int32 NewAbilityLevel)
+	YuraASC->OnAbilityStatusChangedDelegate.AddLambda([this, YuraASC](const FGameplayTag& AbilityTag, const FGameplayTag& NewStatusTag, int32 NewAbilityLevel)
 		{
 			check(AbilityInformations);
 			FYuraAbilityInfo AbilityInfo = AbilityInformations->FindAbilityInfoByTag(AbilityTag);
 			AbilityInfo.AbilityStatusTag = NewStatusTag;
 			AbilityInfo.AbilityLevel = NewAbilityLevel;
+			AbilityInfo.AbilityInputTag = YuraASC->GetInputByAbilityTag(AbilityTag);
 			OnAbilityInfoGivenDelegate.Broadcast(AbilityInfo);
 			// 处理按钮状态
 			if (AbilityTag.MatchesTagExact(SelectedAbility.AbilityTag))
@@ -183,16 +184,20 @@ void USpellMenuWidgetController::OnSpellRowGlobePressed(const FGameplayTag& Slot
 
 }
 
-void USpellMenuWidgetController::EquipAbilityCallback(const FGameplayTag& AbilityTag, const FGameplayTag& NewStatusTag, const FGameplayTag& InputSlot, const FGameplayTag& PreInputSlot)
+void USpellMenuWidgetController::EquipAbilityCallback(const FGameplayTag& AbilityTag, const FGameplayTag& NewStatusTag, const FGameplayTag& InputSlot, const FGameplayTag& PreInputSlot, bool bIsAbilitySwap)
 {
 	check(AbilityInformations);
 
-	// 得先清除原来的
-	FYuraAbilityInfo PreYuraAbilityInfo = FYuraAbilityInfo();
-	PreYuraAbilityInfo.AbilityTag = FGameplayTag();
-	PreYuraAbilityInfo.AbilityInputTag = PreInputSlot;
-	PreYuraAbilityInfo.AbilityStatusTag = FYuraGameplayTags::Get().Ability_Status_Unlocked;
-	OnAbilityInfoGivenDelegate.Broadcast(PreYuraAbilityInfo);
+	// 如果不是交换键位
+	if (!bIsAbilitySwap)
+	{
+		// 得先清除原来的
+		FYuraAbilityInfo PreYuraAbilityInfo = FYuraAbilityInfo();
+		PreYuraAbilityInfo.AbilityTag = FGameplayTag();
+		PreYuraAbilityInfo.AbilityInputTag = PreInputSlot;
+		PreYuraAbilityInfo.AbilityStatusTag = FYuraGameplayTags::Get().Ability_Status_Unlocked;
+		OnAbilityInfoGivenDelegate.Broadcast(PreYuraAbilityInfo);
+	}
 
 	// 再来广播当前的
 	FYuraAbilityInfo YuraAbilityInfo = AbilityInformations->FindAbilityInfoByTag(AbilityTag);
@@ -203,11 +208,9 @@ void USpellMenuWidgetController::EquipAbilityCallback(const FGameplayTag& Abilit
 	OnAbilityInfoGivenDelegate.Broadcast(YuraAbilityInfo);
 
 	// 退出装备状态-如果是在装备状态的话
-	if (bWaitforEquipSelect)
-	{
-		bWaitforEquipSelect = false;
-		StopEquipSelectDelegate.Broadcast(SelectedAbility.TypeTag);
-	}
+	GlobeSelfDeselect();
+	// 取消技能勾选状态
+	SpellGlobeRessignedDelegate.Broadcast(AbilityTag);
 
 }
 
