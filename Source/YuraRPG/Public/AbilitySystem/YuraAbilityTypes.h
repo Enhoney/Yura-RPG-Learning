@@ -93,7 +93,7 @@ public:
 
 	FGameplayTag GetDamageTypeTag() const 
 	{ 
-		if (DamageTypeTag->IsValid())
+		if (DamageTypeTag)
 		{
 			return *DamageTypeTag;
 		}
@@ -111,7 +111,7 @@ public:
 
 	void SetDamageTypeTag(const FGameplayTag& InDamageTypeTag) 
 	{
-		if (!DamageTypeTag->IsValid())
+		if (!DamageTypeTag)
 		{
 			DamageTypeTag = MakeShared<FGameplayTag>(InDamageTypeTag);
 		}

@@ -34,7 +34,7 @@ bool FYuraGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 		{
 			RepBits |= 1 << 5;
 		}
-		if (DamageTypeTag->IsValid())
+		if (DamageTypeTag)
 		{
 			RepBits |= 1 << 6;
 		}

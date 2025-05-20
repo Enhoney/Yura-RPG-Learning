@@ -291,9 +291,16 @@ public:
 private:
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& OutProps) const;
 
-	void ShowDamageText(const float DamageNum, const FEffectProperties& Props, bool bDamageBlock, bool bCriticalHit) const;
+	void ShowDamageText(const float DamageNum, const FEffectProperties& EffectProps, bool bDamageBlock, bool bCriticalHit) const;
 
-	void SendExpEvent(const FEffectProperties& OutProps) const;
+	void SendExpEvent(const FEffectProperties& EffectProps) const;
+
+	void HandleIncomingDamage(const FEffectProperties& EffectProps);
+
+	void HandleIncomingExp(const FEffectProperties& EffectProps);
+
+	// 处理负面效果施加
+	void HandleDebuffApply(const FEffectProperties& EffectProps);
 	
 	// 用于判断是否是由升级导致的最大血量和Man变动
 	bool bTopOffHealth = false;

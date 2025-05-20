@@ -10,6 +10,13 @@
 #include "CombatInterface.generated.h"
 
 class UNiagaraSystem;
+class UAbilitySystemComponent;
+
+// ASC初始化完成回调
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnASCInitializedSignature, UAbilitySystemComponent*);
+
+// 死亡回调
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActorDeathSignature, AActor*, DeadActor);
 
 USTRUCT(BlueprintType)
 struct FTaggedMontage
@@ -104,4 +111,10 @@ public:
 
 	// 获取角色类别
 	virtual ECharacterClass GetCharacterClass() const;
+
+	// 获取FOnASCInitializedSignature
+	virtual FOnASCInitializedSignature& GetOnASCInitializedDelegate() = 0;
+
+	// 获取死亡回调
+	virtual FOnActorDeathSignature& GetOnActorDeathDelegate() = 0;
 };

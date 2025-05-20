@@ -184,4 +184,7 @@ void AYuraEnemy::InitAbilityActorInfo()
 
 	// 初始化属性
 	InitializeDefaultAttributes();
+
+	// 广播ASC初始化完成--为了绑定代理到DebuffNiagaraComp
+	OnASCInitializedDelegate.Broadcast(AbilitySystemComponent);
 }

@@ -254,6 +254,18 @@ void UExecCalc_Damage::DeterminingDebuff(const FGameplayEffectSpec& Spec, const 
 			if (bDebuffApply)
 			{
 				// 这就表明成功施加负面效果了
+				// 从Spec中拿到DebuffInfo：
+				const float SourceDebuffBaseDamage = Spec.GetSetByCallerMagnitude(YuraTags.DebuffParam_BaseDamage, false);
+				const float SourceDebuffDuration = Spec.GetSetByCallerMagnitude(YuraTags.DebuffParam_Duration, false);
+				const float SourceDebuffFrequency = Spec.GetSetByCallerMagnitude(YuraTags.DebuffParam_Frequency, false);
+				// 然后设置DebuffInfo到Context中：
+				FGameplayEffectContextHandle ContextHandle = Spec.GetEffectContext();
+				UYuraAbilitySystemLibrary::SetIsSuccessfulDebuff(ContextHandle, bDebuffApply);
+				UYuraAbilitySystemLibrary::SetDebuffBaseDamage(ContextHandle, SourceDebuffBaseDamage);
+				UYuraAbilitySystemLibrary::SetDebuffDuration(ContextHandle, SourceDebuffDuration);
+				UYuraAbilitySystemLibrary::SetDebuffFrequency(ContextHandle, SourceDebuffFrequency);
+				UYuraAbilitySystemLibrary::SetDamageTypeTag(ContextHandle, DamageType);
+
 			}
 
 		}

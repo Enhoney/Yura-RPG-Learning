@@ -19,3 +19,4 @@ ECharacterClass ICombatInterface::GetCharacterClass() const
 {
 	return ECharacterClass();
 }
+

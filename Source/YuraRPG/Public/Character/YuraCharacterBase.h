@@ -16,6 +16,8 @@ class UGameplayAbility;
 
 class UMaterialInstance;
 class UNiagaraSystem;
+class UDebuffNiagaraComponent;
+
 
 UCLASS(Abstract)
 class YURARPG_API AYuraCharacterBase : public ACharacter, public IAbilitySystemInterface, public ICombatInterface
@@ -57,6 +59,10 @@ public:
 
 	virtual ECharacterClass GetCharacterClass() const override;
 
+	virtual FOnASCInitializedSignature& GetOnASCInitializedDelegate() override;
+
+	virtual FOnActorDeathSignature& GetOnActorDeathDelegate() override;
+
 	/** ConbatInterface end*/
 
 	// 处理死亡动画，玩家死亡逻辑和敌人的是不一样的，所以需要分开来做
@@ -89,6 +95,10 @@ private:
 	virtual void InitAbilityActorInfo();
 
 	void ApplyGameplayEffectToSelf(const TSubclassOf<UGameplayEffect>& GEForAttributes, float Level = 1.0f) const;
+
+public:
+	UPROPERTY(BlueprintAssignable, Category = "Combat|Death")
+	FOnActorDeathSignature OnCharacterDeathDelegate;
 
 protected:
 
@@ -142,6 +152,12 @@ protected:
 	// 类别
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Default Class")
 	ECharacterClass CharacterClass = ECharacterClass::Warrior;
+
+	// DebuffNiagaraComponents
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Debuff")
+	TObjectPtr<UDebuffNiagaraComponent> BurnDebuffNiagaraComp;
+
+	FOnASCInitializedSignature OnASCInitializedDelegate;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Abilities")

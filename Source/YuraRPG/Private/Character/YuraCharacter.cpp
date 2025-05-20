@@ -211,6 +211,9 @@ void AYuraCharacter::InitAbilityActorInfo()
 	// 自定义函数，绑定代理
 	Cast<UYuraAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 
+	// 广播ASC初始化完成--为了绑定代理到DebuffNiagaraComp
+	OnASCInitializedDelegate.Broadcast(AbilitySystemComponent);
+
 	// 这里不要用断言，因为要知道，在客户端上，多人游戏场景下，其他玩家的Character也是存在的，即便是模拟代理
 	// 这个时候，GetController得到的就是空指针，这是很正常的情况
 	// 这也就是为什么check要慎用

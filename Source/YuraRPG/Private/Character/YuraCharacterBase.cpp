@@ -12,6 +12,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "MotionWarpingComponent.h"
 
+#include "AbilitySystem/Debuff/DebuffNiagaraComponent.h"
 #include "YuraRPG.h"
 
 #include "YuraGameplayTags.h"
@@ -36,6 +37,11 @@ AYuraCharacterBase::AYuraCharacterBase()
 	GetMesh()->SetCollisionResponseToChannel(ECC_Projectile, ECR_Overlap);
 
 	MotionWarping = CreateDefaultSubobject<UMotionWarpingComponent>("MotionWarping");
+
+	// BurnDebuffNiagaraComponent
+	BurnDebuffNiagaraComp = CreateDefaultSubobject<UDebuffNiagaraComponent>(TEXT("BurnDebuffNiagaraComponent"));
+	BurnDebuffNiagaraComp->SetupAttachment(GetRootComponent());
+	BurnDebuffNiagaraComp->DebuffTag = FYuraGameplayTags::Get().Debuff_Fire_Burn;
 
 }
 
@@ -144,9 +150,21 @@ ECharacterClass AYuraCharacterBase::GetCharacterClass() const
 	return CharacterClass;
 }
 
+FOnASCInitializedSignature& AYuraCharacterBase::GetOnASCInitializedDelegate()
+{
+	return OnASCInitializedDelegate;
+}
+
+FOnActorDeathSignature& AYuraCharacterBase::GetOnActorDeathDelegate()
+{
+	return OnCharacterDeathDelegate;
+}
+
 void AYuraCharacterBase::MulticastHandleDeath_Implementation()
 {
 	bIsDead = true;
+	OnCharacterDeathDelegate.Broadcast(this);
+
 	if (DeathSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, DeathSound.Get(), GetActorLocation(), GetActorRotation());
