@@ -4,7 +4,7 @@ bool FYuraGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 
-	uint8 RepBits = 0;
+	uint32 RepBits = 0;
 
 	if (Ar.IsSaving())
 	{
@@ -38,9 +38,17 @@ bool FYuraGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 		{
 			RepBits |= 1 << 6;
 		}
+		if (!DeathImpulse.IsZero())
+		{
+			RepBits |= 1 << 7;
+		}
+		if (!KnockbackVector.IsZero())
+		{
+			RepBits |= 1 << 8;
+		}
 	}
 
-	Ar.SerializeBits(&RepBits, 7);
+	Ar.SerializeBits(&RepBits, 9);
 	// 是否格挡
 	if (RepBits & (1 << 0))
 	{
@@ -78,6 +86,14 @@ bool FYuraGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 			}
 		}
 		DamageTypeTag->NetSerialize(Ar, Map, bOutSuccess);
+	}
+	if (RepBits & (1 << 7))
+	{
+		DeathImpulse.NetSerialize(Ar, Map, bOutSuccess);
+	}
+	if (RepBits & (1 << 8))
+	{
+		KnockbackVector.NetSerialize(Ar, Map, bOutSuccess);
 	}
 
 	bOutSuccess = true;

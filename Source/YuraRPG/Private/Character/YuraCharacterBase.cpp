@@ -83,14 +83,14 @@ void AYuraCharacterBase::SetWarpTargetFacing(const FVector& TargetLocation)
 	MotionWarping->AddOrUpdateWarpTargetFromLocation(WarpingTargetName, TargetLocation);
 }
 
-void AYuraCharacterBase::Die()
+void AYuraCharacterBase::Die(const FVector& InDeathImpulse)
 {
 	// 这个函数一定是在服务器执行的
 	// 武器分离，并保留到世界中
 	// 第二个参数--是否在分离相关组件时调用Modify（），按照DeepSeek的说法，就是是否重置移动状态
 	Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
 
-	MulticastHandleDeath();
+	MulticastHandleDeath(InDeathImpulse);
 }
 
 bool AYuraCharacterBase::IsDead_Implementation() const
@@ -160,7 +160,8 @@ FOnActorDeathSignature& AYuraCharacterBase::GetOnActorDeathDelegate()
 	return OnCharacterDeathDelegate;
 }
 
-void AYuraCharacterBase::MulticastHandleDeath_Implementation()
+
+void AYuraCharacterBase::MulticastHandleDeath_Implementation(const FVector& InDeathImpulse)
 {
 	bIsDead = true;
 	OnCharacterDeathDelegate.Broadcast(this);
@@ -173,11 +174,14 @@ void AYuraCharacterBase::MulticastHandleDeath_Implementation()
 	Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	Weapon->SetEnableGravity(true);
 	Weapon->SetSimulatePhysics(true);
+	Weapon->AddImpulse(InDeathImpulse * 0.1f, NAME_None, true);
 
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	GetMesh()->SetEnableGravity(true);
 	GetMesh()->SetSimulatePhysics(true);
 	GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	// 施加死亡冲量
+	GetMesh()->AddImpulse(InDeathImpulse, NAME_None, true);
 
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 

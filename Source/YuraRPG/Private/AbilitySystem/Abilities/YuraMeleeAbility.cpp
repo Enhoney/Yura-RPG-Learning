@@ -2,19 +2,13 @@
 
 
 #include "AbilitySystem/Abilities/YuraMeleeAbility.h"
-#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "YuraAbilitySystemLibrary.h"
 
 void UYuraMeleeAbility::CauseMeleeDamageToTarget(AActor* TargetActor)
 {
-	// 生成Handle
-	FGameplayEffectSpecHandle DamageSpecHandle;
-	GetDamageSpecHandle(DamageSpecHandle);
+	// 生成参数
+	FDamageEffectParams DamageEffectParams = MakeDamageEffectParamsFromClassDefaults(TargetActor);
 
-	// 获取目标身上的ASC
-	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
-	if (TargetASC)
-	{
-		GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToTarget(*DamageSpecHandle.Data.Get(), TargetASC);
-	}
+	UYuraAbilitySystemLibrary::ApplyDamageEffectByParams(DamageEffectParams);
 }

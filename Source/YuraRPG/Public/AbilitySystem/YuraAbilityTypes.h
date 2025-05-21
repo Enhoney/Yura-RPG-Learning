@@ -36,6 +36,26 @@ struct FDamageEffectParams
 	UPROPERTY()
 	FGameplayTag DamageType = FGameplayTag();
 
+	// 死亡冲量幅度
+	UPROPERTY()
+	float DeathImpulseMagnitude = 0.f;
+
+	// 击退几率
+	UPROPERTY()
+	float KnockbackChance = 0.f;
+
+	// 击退力度
+	UPROPERTY()
+	float KnockbackForceMagnitude = 0.f;
+
+	// 死亡冲量
+	UPROPERTY()
+	FVector DeathImpulse = FVector::ZeroVector;
+
+	// 击退向量
+	UPROPERTY()
+	FVector KnockbackVector = FVector::ZeroVector;
+
 	/** Debuff*/
 	UPROPERTY()
 	float DebuffChance = 0.2f;	// 触发几率
@@ -100,11 +120,16 @@ public:
 		return FGameplayTag();
 	}
 
+	FVector GetDeathImpulse() const { return DeathImpulse; }
+
+	FVector GetKnockbackVector() const { return KnockbackVector; }
+
 	//Set
 	void SetIsDamageBlock(bool bInIsDamageBlock) { bIsDamgeBlock = bInIsDamageBlock; }
 	void SetIsCriticalHit(bool bInIsCriticalHit) { bIsCriticalHit = bInIsCriticalHit; }
 
 	void SetIsSuccessfulDebuff(bool bInIsSuccessfulDebuff) { bIsSuccessfulDebuff = bInIsSuccessfulDebuff; }
+	
 	void SetDebuffBaseDamage(float InDebuffBaseDamage) { DebuffBaseDamage = InDebuffBaseDamage; }
 	void SetDebuffDuration(float InDebuffDuration) { DebuffDuration = InDebuffDuration; }
 	void SetDebuffFrequency(float InDebuffFrequency) { DebuffFrequency = InDebuffFrequency; }
@@ -121,6 +146,10 @@ public:
 		}
 		
 	}
+
+	void SetDeathImpulse(const FVector& InDeathImpulse) { DeathImpulse = InDeathImpulse; }
+
+	void SetKnockbackVector(const FVector& InKnockbackVector) { KnockbackVector = InKnockbackVector; }
 
 protected:
 
@@ -147,6 +176,15 @@ protected:
 	float DebuffFrequency = 0.f;
 
 	TSharedPtr<FGameplayTag> DamageTypeTag;
+
+	// 这里为什么就用UPROPERTY了
+	// --因为FVector就是单纯的值类型结构体，没有成员函数，基本可以当作UE基础的数据类型了
+	UPROPERTY()
+	FVector DeathImpulse = FVector::ZeroVector;
+
+	// 击退向量
+	UPROPERTY()
+	FVector KnockbackVector = FVector::ZeroVector;
 
 };
 

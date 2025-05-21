@@ -34,7 +34,7 @@ public:
 	/** Combat Interface start*/
 	virtual int32 GetCharacterLevel() const override;
 
-	virtual void Die() override;
+	virtual void Die(const FVector& InDeathImpulse) override;
 
 	virtual AActor* GetCombatTarget_Implementation() const override;
 

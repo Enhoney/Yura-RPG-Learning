@@ -94,6 +94,20 @@ void AYuraProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedCompon
 		DamageEffectParams.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor);
 		if (DamageEffectParams.TargetASC)
 		{
+			// 设置冲量
+			DamageEffectParams.DeathImpulse = GetActorForwardVector() * DamageEffectParams.DeathImpulseMagnitude;
+
+			// 如果成功触发击退了
+			if (FMath::RandRange(1, 100) < DamageEffectParams.KnockbackChance * 100)
+			{
+				// 计算击退向量
+				FRotator ActorMoveRotation = ProjectileMovementComponent->Velocity.Rotation();
+				ActorMoveRotation.Pitch = 45.f;
+				FVector KnockDirection = ActorMoveRotation.Vector().GetSafeNormal();
+				// 最终得到击退的向量
+				DamageEffectParams.KnockbackVector = KnockDirection * DamageEffectParams.KnockbackForceMagnitude;
+			}
+
 			UYuraAbilitySystemLibrary::ApplyDamageEffectByParams(DamageEffectParams);
 		}
 		// 无论如何都销毁，但只有命中敌人的时候才施加效果

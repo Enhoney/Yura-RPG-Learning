@@ -46,10 +46,29 @@ FDamageEffectParams UYuraDamageGameplayAbility::MakeDamageEffectParamsFromClassD
 	OutParams.AbilityBaseDamage = SpellBaseDamage.GetValueAtLevel(GetAbilityLevel());
 	OutParams.AbilityLevel = GetAbilityLevel();
 	OutParams.DamageType = DamageTypeTag;
+	OutParams.DeathImpulseMagnitude = DeathImpulseMagnitude;
 	OutParams.DebuffChance = DebuffChance;
 	OutParams.DebuffDuration = DebuffDuration;
 	OutParams.DebuffFrequency = DebuffFrequency;
 	OutParams.DebuffBaseDamage = DebuffBaseDamage;
+
+	// 击退
+	OutParams.KnockbackChance = KnockbackChance;
+	OutParams.KnockbackForceMagnitude = KnockbackForceMagnitude;
+
+	if (IsValid(TargetActor))
+	{
+		// 击退判定
+		if (FMath::RandRange(1, 100) < OutParams.KnockbackChance * 100)
+		{
+			FRotator KnockbackRotation = (TargetActor->GetActorLocation() - GetAvatarActorFromActorInfo()->GetActorLocation()).Rotation();
+			KnockbackRotation.Pitch = 45.f;
+
+			OutParams.KnockbackVector = KnockbackRotation.Vector().GetSafeNormal() * OutParams.KnockbackForceMagnitude;
+			// 击杀冲量
+			OutParams.DeathImpulse = KnockbackRotation.Vector().GetSafeNormal() * OutParams.DeathImpulseMagnitude;
+		}
+	}
 
 	return OutParams;
 }

@@ -20,6 +20,7 @@ class YURARPG_API UYuraDamageGameplayAbility : public UYuraGameplayAbility
 
 public:
 	// 生成DamageEffectParams
+	UFUNCTION(BlueprintPure)
 	FDamageEffectParams MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
 protected:
 
@@ -40,8 +41,12 @@ protected:
 	FScalableFloat SpellBaseDamage;
 
 	// 伤害的GE
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability")
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
+
+	// 死亡冲量
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
+	float DeathImpulseMagnitude = 1000.f;
 
 	/** Debuff Parameters*/
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability|Debuff")
@@ -52,5 +57,14 @@ protected:
 	float DebuffFrequency = 0.2f;	// 频率
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability|Debuff")
 	float DebuffBaseDamage = 40.f;	// 基础伤害--伤害结算会计算抗性
+
+	// 击退力度
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
+	float KnockbackForceMagnitude = 1000.f;
+
+	// 击退几率
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
+	float KnockbackChance = 0.3f;
+
 	
 };

@@ -60,7 +60,7 @@ int32 AYuraEnemy::GetCharacterLevel() const
 	return CharacterLevel;
 }
 
-void AYuraEnemy::Die()
+void AYuraEnemy::Die(const FVector& InDeathImpulse)
 {
 	if (HasAuthority())
 	{
@@ -70,7 +70,7 @@ void AYuraEnemy::Die()
 	// 设置寿命
 	SetLifeSpan(LifeSpawnOnDeath);
 	// 
-	Super::Die();
+	Super::Die(InDeathImpulse);
 }
 
 AActor* AYuraEnemy::GetCombatTarget_Implementation() const

@@ -84,6 +84,12 @@ public:
 	UFUNCTION(BlueprintPure, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
 	static FGameplayTag GetDamageTypeTag(const FGameplayEffectContextHandle& EffectContext);
 
+	UFUNCTION(BlueprintPure, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
+	static FVector GetDeathImpulse(const FGameplayEffectContextHandle& EffectContext);
+
+	UFUNCTION(BlueprintPure, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
+	static FVector GetKnockbackVector(const FGameplayEffectContextHandle& EffectContext);
+
 	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
 	static void SetDamageBlock(UPARAM(ref) FGameplayEffectContextHandle& EffectContext, bool bInDamageBlock);
 
@@ -105,7 +111,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
 	static void SetDamageTypeTag(UPARAM(ref) FGameplayEffectContextHandle& EffectContext, const FGameplayTag& InDamageTypeTag);
 
+	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
+	static void SetDeathImpulse(UPARAM(ref) FGameplayEffectContextHandle& EffectContext, const FVector& InDeathImpulse);
 
+	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
+	static void SetKnockbackVector(UPARAM(ref) FGameplayEffectContextHandle& EffectContext, const FVector& InKnockbackVector);
 
 	// 获取范围内的指定目标
 	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Gameplay Mechinces")

@@ -39,7 +39,7 @@ public:
 
 	virtual void SetWarpTargetFacing(const FVector& TargetLocation) override;
 
-	virtual void Die() override;
+	virtual void Die(const FVector& InDeathImpulse) override;
 
 	virtual bool IsDead_Implementation() const override;
 
@@ -67,7 +67,7 @@ public:
 
 	// 处理死亡动画，玩家死亡逻辑和敌人的是不一样的，所以需要分开来做
 	UFUNCTION(NetMulticast, Reliable)
-	virtual void MulticastHandleDeath();
+	virtual void MulticastHandleDeath(const FVector& InDeathImpulse);
 
 	/** 溶解--创建动态材质，并调用开始溶解的函数*/ 
 	void Disslove();

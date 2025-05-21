@@ -167,10 +167,21 @@ void UYuraAttributeSet::HandleIncomingDamage(const FEffectProperties& EffectProp
 		// 激活受击能力
 		if (!bFatal)
 		{
-			FGameplayTagContainer TagContainer;
-			// 直接就使用Effect.HitReact这个Tag即可，激活能力不会给ASC授予上面的标签吧
-			TagContainer.AddTag(FYuraGameplayTags::Get().Effects_HitReact);
-			EffectProps.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+			// 如果触发击退了
+			FVector KnockbackVector = UYuraAbilitySystemLibrary::GetKnockbackVector(EffectProps.GEContectHandle);
+			if (!KnockbackVector.IsZero())
+			{
+				EffectProps.TargetCharacter->LaunchCharacter(KnockbackVector, true, true);
+			}
+			else
+			{
+				// 击退和受击不会同时触发
+				FGameplayTagContainer TagContainer;
+				// 直接就使用Effect.HitReact这个Tag即可，激活能力不会给ASC授予上面的标签吧
+				TagContainer.AddTag(FYuraGameplayTags::Get().Effects_HitReact);
+				EffectProps.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+			}
+			
 		}
 		else
 		{
@@ -179,7 +190,7 @@ void UYuraAttributeSet::HandleIncomingDamage(const FEffectProperties& EffectProp
 			if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(EffectProps.TargetAvatorActor))
 			{
 				// 发起GameplayEvent，向伤害发起者奖励经验
-				CombatInterface->Die();
+				CombatInterface->Die(UYuraAbilitySystemLibrary::GetDeathImpulse(EffectProps.GEContectHandle));
 			}
 		}
 
@@ -256,6 +267,7 @@ void UYuraAttributeSet::HandleDebuffApply(const FEffectProperties& EffectProps)
 	// 创建动态GE
 	// GetTransientPackage()--获取暂态包--不知道干啥的，注释说是临时存储永远不会保存的对象的，这个位置是Outer
 	UGameplayEffect* DebuffEffect = NewObject<UGameplayEffect>(GetTransientPackage(), DebuffName);
+
 	// 配置
 	// 持续时间
 	DebuffEffect->DurationPolicy = EGameplayEffectDurationType::HasDuration;

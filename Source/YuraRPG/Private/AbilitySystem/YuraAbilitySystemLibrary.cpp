@@ -286,6 +286,34 @@ FGameplayTag UYuraAbilitySystemLibrary::GetDamageTypeTag(const FGameplayEffectCo
 	return FGameplayTag();
 }
 
+FVector UYuraAbilitySystemLibrary::GetDeathImpulse(const FGameplayEffectContextHandle& EffectContext)
+{
+	const FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	const FYuraGameplayEffectContext* YuraContext = static_cast<const FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		return YuraContext->GetDeathImpulse();
+	}
+
+	return FVector::ZeroVector;
+}
+
+FVector UYuraAbilitySystemLibrary::GetKnockbackVector(const FGameplayEffectContextHandle& EffectContext)
+{
+	const FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	const FYuraGameplayEffectContext* YuraContext = static_cast<const FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		return YuraContext->GetKnockbackVector();
+	}
+
+	return FVector::ZeroVector;
+}
+
 void UYuraAbilitySystemLibrary::SetDamageBlock(UPARAM(ref) FGameplayEffectContextHandle& EffectContext, bool bInDamageBlock)
 {
 	FGameplayEffectContext* Context = EffectContext.Get();
@@ -371,6 +399,30 @@ void UYuraAbilitySystemLibrary::SetDamageTypeTag(UPARAM(ref)FGameplayEffectConte
 	}
 }
 
+void UYuraAbilitySystemLibrary::SetDeathImpulse(FGameplayEffectContextHandle& EffectContext, const FVector& InDeathImpulse)
+{
+	FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	FYuraGameplayEffectContext* YuraContext = static_cast<FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		YuraContext->SetDeathImpulse(InDeathImpulse);
+	}
+}
+
+void UYuraAbilitySystemLibrary::SetKnockbackVector(FGameplayEffectContextHandle& EffectContext, const FVector& InKnockbackVector)
+{
+	FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	FYuraGameplayEffectContext* YuraContext = static_cast<FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		YuraContext->SetKnockbackVector(InKnockbackVector);
+	}
+}
+
 void UYuraAbilitySystemLibrary::GetLivePlayersWithinRadius(const UObject* InWorldContextObject, TArray<AActor*>& OutOverlapActors,
 	const TArray<AActor*>& ActorsToIgnore, float Radius, const FVector& InSphereCenterLocation)
 {
@@ -426,7 +478,10 @@ FGameplayEffectContextHandle UYuraAbilitySystemLibrary::ApplyDamageEffectByParam
 
 	FGameplayEffectContextHandle DamageEffectContext = Params.SourceASC->MakeEffectContext();
 	DamageEffectContext.AddSourceObject(AvatarActor);
-
+	// 设置死亡冲量
+	SetDeathImpulse(DamageEffectContext, Params.DeathImpulse);
+	// 设置击退冲量
+	SetKnockbackVector(DamageEffectContext, Params.KnockbackVector);
 	const FGameplayEffectSpecHandle EffectSpec = Params.SourceASC->MakeOutgoingSpec(Params.DamageGameplayEffectClass, Params.AbilityLevel, DamageEffectContext);
 
 	// 基础伤害

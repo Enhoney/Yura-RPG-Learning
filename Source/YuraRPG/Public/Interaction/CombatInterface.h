@@ -69,7 +69,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	UAnimMontage* GetHitReactAnimMontage();
 
-	virtual void Die() = 0;
+	virtual void Die(const FVector& InDeathImpulse) = 0;
 
 	// 敌人使用，获取和设置攻击目标
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
