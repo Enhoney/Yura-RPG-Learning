@@ -44,6 +44,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, Replicated, meta = (ExposeOnSpawn = "true"))
 	FDamageEffectParams DamageEffectParams;
 
+	// 归航目标--当点击位置不是敌人的时候使用
+	UPROPERTY()
+	TObjectPtr<USceneComponent> HomingTargetSceneComponent;
+
 private:
 	// 球体碰撞
 	UPROPERTY(VisibleDefaultsOnly, Category = "Projectile")

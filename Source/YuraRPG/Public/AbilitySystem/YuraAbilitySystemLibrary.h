@@ -128,4 +128,11 @@ public:
 	// 使用DamageEffectParams施加伤害
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "YuraAbilitySystemLibrary|ApplyDamageEffect")
 	static FGameplayEffectContextHandle ApplyDamageEffectByParams(const FDamageEffectParams& Params);
+
+	// 获取均匀分布的角度
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "YuraAbilitySystemLibrary|Algorithm")
+	static TArray<FRotator> EvenlySpacedRotators(const FVector& Forward, const FVector& Axis, float Spread, int32 NumToDivide);
+	// 获取均匀分布的向量
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "YuraAbilitySystemLibrary|Algorithm")
+	static TArray<FVector> EvenlySpacedVectors(const FVector& Forward, const FVector& Axis, float Spread, int32 NumToDivide);
 };

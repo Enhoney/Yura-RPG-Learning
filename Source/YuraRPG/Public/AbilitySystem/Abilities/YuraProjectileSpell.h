@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystem/Abilities/YuraDamageGameplayAbility.h"
+#include "Actor/YuraProjectile.h"
 #include "YuraProjectileSpell.generated.h"
 
-class AYuraProjectile;
 class UGameplayEffect;
 
 struct FGameplayTag;

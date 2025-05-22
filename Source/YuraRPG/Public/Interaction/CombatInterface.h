@@ -117,4 +117,7 @@ public:
 
 	// 获取死亡回调
 	virtual FOnActorDeathSignature& GetOnActorDeathDelegate() = 0;
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void SetCastShockingLoop(bool bInShockingLoop);
 };

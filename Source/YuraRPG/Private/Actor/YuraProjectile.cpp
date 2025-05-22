@@ -122,7 +122,11 @@ void AYuraProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedCompon
 void AYuraProjectile::OnHit()
 {
 	// 停止播放飞行的声音
-	if (AudioComponent) AudioComponent->Stop();
+	if (AudioComponent)
+	{
+		AudioComponent->Stop();
+		AudioComponent->DestroyComponent();
+	}
 
 	// 在指定位置播放音效
 	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);

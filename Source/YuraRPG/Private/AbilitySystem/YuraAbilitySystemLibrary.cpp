@@ -497,3 +497,59 @@ FGameplayEffectContextHandle UYuraAbilitySystemLibrary::ApplyDamageEffectByParam
 	return DamageEffectContext;
 }
 
+TArray<FRotator> UYuraAbilitySystemLibrary::EvenlySpacedRotators(const FVector& Forward, const FVector& Axis, float Spread, int32 NumToDivide)
+{
+	TArray<FRotator> OutRotators;
+
+	// 只有一个就直接从中间生成
+	if (NumToDivide == 1)
+	{
+		OutRotators.Add(Forward.Rotation());
+	}
+	else if (NumToDivide > 1)
+	{
+		// 第0个Vector
+		FVector LeftVector = Forward.RotateAngleAxis(-Spread / 2, Axis);
+		// 最后一个Vector
+		FVector RightVector = Forward.RotateAngleAxis(Spread / 2, Axis);
+		// DeltaSpread
+		const float DeltaSpread = Spread / (NumToDivide - 1);
+		for (int32 i = 0; i < NumToDivide; i++)
+		{
+			const FVector Direction = LeftVector.RotateAngleAxis(DeltaSpread * i, Axis);
+			OutRotators.Add(Direction.Rotation());
+
+		}
+	}
+
+	return OutRotators;
+}
+
+TArray<FVector> UYuraAbilitySystemLibrary::EvenlySpacedVectors(const FVector& Forward, const FVector& Axis, float Spread, int32 NumToDivide)
+{
+	TArray<FVector> OutVectors;
+
+	// 只有一个就直接从中间生成
+	if (NumToDivide == 1)
+	{
+		OutVectors.Add(Forward);
+	}
+	else if (NumToDivide > 1)
+	{
+		// 第0个Vector
+		FVector LeftVector = Forward.RotateAngleAxis(-Spread / 2, Axis);
+		// 最后一个Vector
+		FVector RightVector = Forward.RotateAngleAxis(Spread / 2, Axis);
+		// DeltaSpread
+		const float DeltaSpread = Spread / (NumToDivide - 1);
+		for (int32 i = 0; i < NumToDivide; i++)
+		{
+			const FVector Direction = LeftVector.RotateAngleAxis(DeltaSpread * i, Axis);
+			OutVectors.Add(Direction);
+
+		}
+	}
+
+	return OutVectors;
+}
+

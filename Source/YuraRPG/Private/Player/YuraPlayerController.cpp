@@ -20,6 +20,7 @@
 
 #include "GameFramework/Character.h"
 #include "UI/Widget/DamageFloatingComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 AYuraPlayerController::AYuraPlayerController()
 {
@@ -182,6 +183,11 @@ void AYuraPlayerController::AbilityInputTagPressed(FGameplayTag AbilityActionTag
 		bTargeting = (ThisActor == nullptr) ? false : true;
 		bAutoRunning = false;	// 默认值
 	}
+
+	if (GetAbilitySystemComponent())
+	{
+		GetAbilitySystemComponent()->AbilityInputTagPressed(AbilityActionTag);
+	}
 	
 }
 
@@ -205,6 +211,8 @@ void AYuraPlayerController::AbilityInputTagReleased(FGameplayTag AbilityActionTa
 		// 这就表示短按，这个时候我们要去创建一条路径，这需要导航系统了
 		if (FollowingTime <= ShortPressThreshould && ControlledPawn)
 		{
+			// 在这个位置放一个箭头
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagaraSystem, CachedDestinationLocation);
 
 			const FVector CurrentLocation = ControlledPawn->GetActorLocation();
 			// 生成一条导航路径

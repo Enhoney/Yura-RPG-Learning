@@ -12,6 +12,7 @@ class IEnemyInterface;
 class UYuraInputConfig;
 class USplineComponent;
 class UDamageFloatingComponent;
+class UNiagaraSystem;
 
 struct FGameplayTag;
 struct FInputActionValue;
@@ -113,4 +114,8 @@ private:
 	// 用于创建伤害数字组件
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TSubclassOf<UDamageFloatingComponent> DamageFloatingCompClass;
+
+	// 点击位置的箭头
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UNiagaraSystem> ClickNiagaraSystem;
 };
