@@ -89,6 +89,8 @@ void FYuraGameplayTags::InitializeGameplayTags()
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.2"), FString("InputTag 2 Key."));
 	YuraGameplayTags.InputTag_3 =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.3"), FString("InputTag 3 Key."));
+	YuraGameplayTags.InputTag_4 =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.4"), FString("InputTag 4 Key."));
 	YuraGameplayTags.InputTag_Passive_1 =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Passive.1"), FString("InputTag Passive 1."));
 	// 被动技能的InputTag--不是激活技能用的，而是标识位置用的
@@ -181,5 +183,15 @@ void FYuraGameplayTags::InitializeGameplayTags()
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.4"), FString("Montage Attack4."));
 	YuraGameplayTags.Montage_Summon =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Summon"), FString("Montage Summon."));
+
+	// PlayerBlock Tags
+	YuraGameplayTags.Player_Block_InputPressed =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Player.Block.InputPressed"), FString("Player Block InputPressed."));
+	YuraGameplayTags.Player_Block_InputHeld =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Player.Block.InputHeld"), FString("Player Block InputHeld."));
+	YuraGameplayTags.Player_Block_InputReleased =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Player.Block.InputReleased"), FString("Player Block InputReleased."));
+	YuraGameplayTags.Player_Block_CursorTrace =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Player.Block.CursorTrace"), FString("Player Block CursorTrace."));
 
 }

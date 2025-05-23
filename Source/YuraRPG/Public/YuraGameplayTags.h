@@ -129,6 +129,12 @@ public:
 	FGameplayTag Montage_Attack_4;
 	FGameplayTag Montage_Summon;
 
+	// PlayerBlockTag--用于禁用PlayerController中的某些行为
+	FGameplayTag Player_Block_InputPressed;
+	FGameplayTag Player_Block_InputHeld;
+	FGameplayTag Player_Block_InputReleased;
+	FGameplayTag Player_Block_CursorTrace;
+
 private:
 	static FYuraGameplayTags YuraGameplayTags;
 };

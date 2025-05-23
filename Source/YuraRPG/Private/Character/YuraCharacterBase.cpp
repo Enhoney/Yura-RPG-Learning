@@ -160,6 +160,11 @@ FOnActorDeathSignature& AYuraCharacterBase::GetOnActorDeathDelegate()
 	return OnCharacterDeathDelegate;
 }
 
+USkeletalMeshComponent* AYuraCharacterBase::GetWeaponComponent_Implementation()
+{
+	return Weapon;
+}
+
 
 void AYuraCharacterBase::MulticastHandleDeath_Implementation(const FVector& InDeathImpulse)
 {

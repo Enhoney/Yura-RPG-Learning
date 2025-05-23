@@ -120,4 +120,8 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void SetCastShockingLoop(bool bInShockingLoop);
+
+	// 获取武器的骨骼网格体
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	USkeletalMeshComponent* GetWeaponComponent();
 };

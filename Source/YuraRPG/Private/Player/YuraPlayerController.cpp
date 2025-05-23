@@ -106,6 +106,12 @@ void AYuraPlayerController::SetupInputComponent()
 
 void AYuraPlayerController::Move(const FInputActionValue& InputActionValue)
 {
+	// 如果禁止输入按下，也不能移动
+	if (AbilitySystemComponent && AbilitySystemComponent->HasMatchingGameplayTag(FYuraGameplayTags::Get().Player_Block_InputPressed))
+	{
+		return;
+	}
+
 	// 退出自动移动状态
 	bAutoRunning = false;
 	FollowingTime = 0.f;
@@ -129,16 +135,42 @@ void AYuraPlayerController::Move(const FInputActionValue& InputActionValue)
 
 void AYuraPlayerController::ShiftPressed()
 {
+	if (AbilitySystemComponent && AbilitySystemComponent->HasMatchingGameplayTag(FYuraGameplayTags::Get().Player_Block_InputPressed))
+	{
+		return;
+	}
+
 	bShiftDown = true;
 }
 
 void AYuraPlayerController::ShiftReleased()
 {
+	if (AbilitySystemComponent && AbilitySystemComponent->HasMatchingGameplayTag(FYuraGameplayTags::Get().Player_Block_InputReleased))
+	{
+		return;
+	}
+
 	bShiftDown = false;
 }
 
 void AYuraPlayerController::CursorTrace()
 {
+	// 如果禁用了光标追踪就取消现在高亮的这些Actor
+	if (AbilitySystemComponent && AbilitySystemComponent->HasMatchingGameplayTag(FYuraGameplayTags::Get().Player_Block_CursorTrace))
+	{
+		if (LastActor)
+		{
+			LastActor->UnhighlightActor();
+		}
+		if (ThisActor)
+		{
+			ThisActor->UnhighlightActor();
+		}
+		LastActor = nullptr;
+		ThisActor = nullptr;
+
+		return;
+	}
 
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
 
@@ -177,6 +209,11 @@ void AYuraPlayerController::CursorTrace()
 
 void AYuraPlayerController::AbilityInputTagPressed(FGameplayTag AbilityActionTag)
 {
+	if (AbilitySystemComponent && AbilitySystemComponent->HasMatchingGameplayTag(FYuraGameplayTags::Get().Player_Block_InputPressed))
+	{
+		return;
+	}
+
 	// 只针对鼠标左键输入响应
 	if (AbilityActionTag.MatchesTagExact(FYuraGameplayTags::Get().InputTag_LMB))
 	{
@@ -193,6 +230,11 @@ void AYuraPlayerController::AbilityInputTagPressed(FGameplayTag AbilityActionTag
 
 void AYuraPlayerController::AbilityInputTagReleased(FGameplayTag AbilityActionTag)
 {
+	if (AbilitySystemComponent && AbilitySystemComponent->HasMatchingGameplayTag(FYuraGameplayTags::Get().Player_Block_InputReleased))
+	{
+		return;
+	}
+
 	if (GetAbilitySystemComponent() == nullptr) 
 	{
 		return;
@@ -211,8 +253,11 @@ void AYuraPlayerController::AbilityInputTagReleased(FGameplayTag AbilityActionTa
 		// 这就表示短按，这个时候我们要去创建一条路径，这需要导航系统了
 		if (FollowingTime <= ShortPressThreshould && ControlledPawn)
 		{
-			// 在这个位置放一个箭头
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagaraSystem, CachedDestinationLocation);
+			if (AbilitySystemComponent && !AbilitySystemComponent->HasMatchingGameplayTag(FYuraGameplayTags::Get().Player_Block_InputPressed))
+			{
+				// 在这个位置放一个箭头
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagaraSystem, CachedDestinationLocation);
+			}
 
 			const FVector CurrentLocation = ControlledPawn->GetActorLocation();
 			// 生成一条导航路径
@@ -246,6 +291,11 @@ void AYuraPlayerController::AbilityInputTagReleased(FGameplayTag AbilityActionTa
 
 void AYuraPlayerController::AbilityInputTagHeld(FGameplayTag AbilityActionTag)
 {
+	if (AbilitySystemComponent && AbilitySystemComponent->HasMatchingGameplayTag(FYuraGameplayTags::Get().Player_Block_InputHeld))
+	{
+		return;
+	}
+
 	if (GetAbilitySystemComponent() == nullptr)
 	{
 		return;

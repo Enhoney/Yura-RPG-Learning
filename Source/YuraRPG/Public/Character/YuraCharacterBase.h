@@ -63,6 +63,8 @@ public:
 
 	virtual FOnActorDeathSignature& GetOnActorDeathDelegate() override;
 
+	virtual USkeletalMeshComponent* GetWeaponComponent_Implementation() override;
+
 	/** ConbatInterface end*/
 
 	// 处理死亡动画，玩家死亡逻辑和敌人的是不一样的，所以需要分开来做
