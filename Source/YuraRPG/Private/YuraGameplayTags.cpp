@@ -100,13 +100,10 @@ void FYuraGameplayTags::InitializeGameplayTags()
 	// DamageType
 	YuraGameplayTags.DamageType_Fire =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("DamageType.Fire"), FString("Flame Damage (Player's normal attack)."));
-
 	YuraGameplayTags.DamageType_Physic =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("DamageType.Physic"), FString("Warrior melee damage."));
-
 	YuraGameplayTags.DamageType_Lighting =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("DamageType.Lighting"), FString("Lightning damage."));
-
 	YuraGameplayTags.DamageType_Arcane =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("DamageType.Arcane"), FString("Arcane damage."));
 
@@ -163,6 +160,9 @@ void FYuraGameplayTags::InitializeGameplayTags()
 	// Coowdown Tag
 	YuraGameplayTags.Cooldown_Fire_FireBolt =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Fire.FireBolt"), FString("Cooldown Tag for Yura FireBolt."));
+	YuraGameplayTags.Cooldown_Lightning_Electrocute =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Lightning.Electrocute"), FString("Cooldown Tag for Yura Electrocute."));
+
 
 	// CombatSocket Tag
 	YuraGameplayTags.CombatSocket_Weapon =

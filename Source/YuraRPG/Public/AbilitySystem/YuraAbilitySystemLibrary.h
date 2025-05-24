@@ -122,6 +122,11 @@ public:
 	static void GetLivePlayersWithinRadius(const UObject* InWorldContextObject, TArray<AActor*>& OutOverlapActors , 
 		const TArray<AActor*>& ActorsToIgnore, float Radius, const FVector& InSphereCenterLocation);
 
+	// 获取最近的几个Actor
+	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Gameplay Mechinces")
+	static void GetClosetActors(int32 InNumToGet, const FVector& InOriginLocation, 
+		const TArray<AActor*>& InOriginActors, TArray<AActor*>& OutActors);
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "YuraAbilitySystemLibrary|Combat")
 	static bool IsNotFriend(const AActor* SourceActor, const AActor* TargetActor);
 

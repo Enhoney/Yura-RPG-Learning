@@ -457,6 +457,46 @@ void UYuraAbilitySystemLibrary::GetLivePlayersWithinRadius(const UObject* InWorl
 	}
 }
 
+void UYuraAbilitySystemLibrary::GetClosetActors(int32 InNumToGet, const FVector& InOriginLocation, 
+	const TArray<AActor*>& InOriginActors, TArray<AActor*>& OutActors)
+{
+	// 如果数量不足
+	if (InNumToGet >= InOriginActors.Num())
+	{
+		OutActors = InOriginActors;
+		return;
+	}
+
+	// 方便删除用的
+	TArray<AActor*> TempOrignActors = InOriginActors;
+	int32 NumFound = 0;
+	while (NumFound < InNumToGet)
+	{
+		// 一般来说不会这样，为了保险还是加上
+		if (TempOrignActors.Num() == 0) break;
+
+		// 这是获取各个类型最大极限值的通用方法
+		double ClosetDistance = TNumericLimits<double>::Max();
+		int32 ClosedActorIndex = 0;
+		// 每次遍历完，都能找到一个最近的
+		for (int32 Index = 0; Index < TempOrignActors.Num(); ++Index)
+		{
+			// 计算到目标点的距离
+			double DistanceToOriginActor = FVector::Distance(TempOrignActors[Index]->GetActorLocation(), InOriginLocation);
+			if (DistanceToOriginActor < ClosetDistance)
+			{
+				ClosetDistance = DistanceToOriginActor;
+				ClosedActorIndex = Index;
+			}
+		}
+		// 然后，把它添加到OutActors中，并从Temp中移除，NumFound加一
+		OutActors.AddUnique(TempOrignActors[ClosedActorIndex]);
+		TempOrignActors.RemoveAt(ClosedActorIndex);
+		++NumFound;
+
+	}
+}
+
 bool UYuraAbilitySystemLibrary::IsNotFriend(const AActor* SourceActor, const AActor* TargetActor)
 {
 	const FName PlayerTag = FName("YuraCharacter.Player");
