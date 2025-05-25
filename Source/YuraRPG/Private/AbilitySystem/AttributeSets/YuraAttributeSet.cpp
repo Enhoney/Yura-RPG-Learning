@@ -175,11 +175,17 @@ void UYuraAttributeSet::HandleIncomingDamage(const FEffectProperties& EffectProp
 			}
 			else
 			{
-				// 击退和受击不会同时触发
-				FGameplayTagContainer TagContainer;
-				// 直接就使用Effect.HitReact这个Tag即可，激活能力不会给ASC授予上面的标签吧
-				TagContainer.AddTag(FYuraGameplayTags::Get().Effects_HitReact);
-				EffectProps.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+				// 如果是被电击，就不要执行受击能力
+				if (EffectProps.TargetCharacter->Implements<UCombatInterface>() &&
+					!ICombatInterface::Execute_GetIsBeingShocked(EffectProps.TargetCharacter))
+				{
+					// 击退和受击不会同时触发
+					FGameplayTagContainer TagContainer;
+					// 直接就使用Effect.HitReact这个Tag即可，激活能力不会给ASC授予上面的标签吧
+					TagContainer.AddTag(FYuraGameplayTags::Get().Effects_HitReact);
+					EffectProps.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+				}
+
 			}
 			
 		}
@@ -279,8 +285,17 @@ void UYuraAttributeSet::HandleDebuffApply(const FEffectProperties& EffectProps)
 	// 5.4之后就只能通过Component来给目标添加tag了
 	UTargetTagsGameplayEffectComponent& TargetTagsComponent = DebuffEffect->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
 	FInheritedTagContainer TagContainerMods;
-	TagContainerMods.AddTag(YuraTags.DamageTypeToDebuff[DamageTypeTag]);
-	TargetTagsComponent.SetAndApplyTargetTagChanges(TagContainerMods);	// 只是看了源码注释，不知道这样用对不对，先试试看
+	const FGameplayTag DebuffTag = YuraTags.DamageTypeToDebuff[DamageTypeTag];
+	TagContainerMods.AddTag(DebuffTag);
+	// 如果是眩晕，就直接禁用玩家的各种行为
+	if (DebuffTag.MatchesTag(YuraTags.Debuff_Lighting_Stun))
+	{
+		TagContainerMods.AddTag(YuraTags.Player_Block_CursorTrace);
+		TagContainerMods.AddTag(YuraTags.Player_Block_InputHeld);
+		TagContainerMods.AddTag(YuraTags.Player_Block_InputPressed);
+		TagContainerMods.AddTag(YuraTags.Player_Block_InputReleased);
+	}
+	TargetTagsComponent.SetAndApplyTargetTagChanges(TagContainerMods);
 
 	// 堆叠策略--按来源堆叠
 	DebuffEffect->StackingType = EGameplayEffectStackingType::AggregateBySource;

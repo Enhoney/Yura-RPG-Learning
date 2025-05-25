@@ -5,7 +5,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "GameplayEffectTypes.h"
-
+#include "GameFramework/CharacterMovementComponent.h"
 #include "YuraAbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -16,6 +16,7 @@
 #include "YuraRPG.h"
 
 #include "YuraGameplayTags.h"
+#include "Net/UnrealNetwork.h"
 
 AYuraCharacterBase::AYuraCharacterBase()
 {
@@ -42,6 +43,10 @@ AYuraCharacterBase::AYuraCharacterBase()
 	BurnDebuffNiagaraComp = CreateDefaultSubobject<UDebuffNiagaraComponent>(TEXT("BurnDebuffNiagaraComponent"));
 	BurnDebuffNiagaraComp->SetupAttachment(GetRootComponent());
 	BurnDebuffNiagaraComp->DebuffTag = FYuraGameplayTags::Get().Debuff_Fire_Burn;
+
+	StunDebuffNiagaraComp = CreateDefaultSubobject<UDebuffNiagaraComponent>(TEXT("StunDebuffNiagaraComponent"));
+	StunDebuffNiagaraComp->SetupAttachment(GetRootComponent());
+	StunDebuffNiagaraComp->DebuffTag = FYuraGameplayTags::Get().Debuff_Lighting_Stun;
 
 }
 
@@ -165,6 +170,16 @@ USkeletalMeshComponent* AYuraCharacterBase::GetWeaponComponent_Implementation()
 	return Weapon;
 }
 
+bool AYuraCharacterBase::GetIsBeingShocked_Implementation() const
+{
+	return bBeingShocked;
+}
+
+void AYuraCharacterBase::SetIsBeingShocked_Implementation(bool bInBeingShocked)
+{
+	bBeingShocked = bInBeingShocked;
+}
+
 
 void AYuraCharacterBase::MulticastHandleDeath_Implementation(const FVector& InDeathImpulse)
 {
@@ -217,9 +232,20 @@ void AYuraCharacterBase::Disslove()
 	}
 }
 
+void AYuraCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION_NOTIFY(AYuraCharacterBase, bStunned, COND_None, REPNOTIFY_OnChanged);
+	DOREPLIFETIME_CONDITION_NOTIFY(AYuraCharacterBase, bBurned, COND_None, REPNOTIFY_OnChanged);
+	DOREPLIFETIME(AYuraCharacterBase, bBeingShocked);
+}
+
 void AYuraCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 	
 }
 
@@ -258,6 +284,25 @@ void AYuraCharacterBase::ApplyGameplayEffectToSelf(const TSubclassOf<UGameplayEf
 	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), GetAbilitySystemComponent());
 }
 
+
+void AYuraCharacterBase::HandleStunDebuffInAnim(const FGameplayTag InDebuffTag, int32 NewCount)
+{
+
+	bStunned = (NewCount > 0);
+
+	GetCharacterMovement()->MaxWalkSpeed = (bStunned ? 0.f : BaseWalkSpeed);
+	
+}
+
+void AYuraCharacterBase::OnRep_Stunned()
+{
+
+}
+
+void AYuraCharacterBase::OnRep_Burned()
+{
+
+}
 
 void AYuraCharacterBase::InitAbilityActorInfo()
 {

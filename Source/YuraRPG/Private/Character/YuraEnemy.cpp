@@ -118,6 +118,9 @@ void AYuraEnemy::PossessedBy(AController* NewController)
 	// 初始化受击状态
 	EnemyAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsHitReacting"), false);
 
+	// 初始化眩晕状态
+	EnemyAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsStunned"), false);
+
 	// 是否为远程攻击角色
 	EnemyAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsRangedAttacker"), (CharacterClass != ECharacterClass::Warrior));
 
@@ -129,7 +132,6 @@ void AYuraEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 	InitAbilityActorInfo();
 
 	// 授予通用能力和独有能力
@@ -166,12 +168,24 @@ void AYuraEnemy::BeginPlay()
 		AbilitySystemComponent->RegisterGameplayTagEvent(FYuraGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(
 			this, &AYuraEnemy::OnHitReactTagChange
 		);
+
+		// 眩晕状态回调
+		AbilitySystemComponent->RegisterGameplayTagEvent(FYuraGameplayTags::Get().Debuff_Lighting_Stun).AddUObject(this, &AYuraEnemy::HandleStunDebuffInAnim);
 	}
 }
 
 void AYuraEnemy::InitializeDefaultAttributes() const
 {
 	UYuraAbilitySystemLibrary::InitDefaultAttributes(this, CharacterClass, CharacterLevel, AbilitySystemComponent);
+}
+
+void AYuraEnemy::HandleStunDebuffInAnim(const FGameplayTag InDebuffTag, int32 NewCount)
+{
+	bStunned = (NewCount > 0);
+
+	GetCharacterMovement()->MaxWalkSpeed = (bStunned ? 0.f : BaseWalkSpeed);
+
+	EnemyAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsStunned"), bStunned);
 }
 
 void AYuraEnemy::InitAbilityActorInfo()

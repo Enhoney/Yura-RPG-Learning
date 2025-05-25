@@ -13,6 +13,8 @@
 #include "YuraPlayerController.h"
 #include "UI/HUD/YuraHUD.h"
 #include "Interaction/CombatInterface.h"
+#include "YuraGameplayTags.h"
+#include "AbilitySystem/Debuff/DebuffNiagaraComponent.h"
 
 AYuraCharacter::AYuraCharacter()
 {
@@ -195,6 +197,42 @@ void AYuraCharacter::ConsumeSpellPoint_Implementation(int32 SpellPointToUse)
 }
 
 
+void AYuraCharacter::OnRep_Stunned()
+{
+	const FYuraGameplayTags YuraTags = FYuraGameplayTags::Get();
+	FGameplayTagContainer BlockTags;
+	BlockTags.AddTag(YuraTags.Player_Block_CursorTrace);
+	BlockTags.AddTag(YuraTags.Player_Block_InputHeld);
+	BlockTags.AddTag(YuraTags.Player_Block_InputPressed);
+	BlockTags.AddTag(YuraTags.Player_Block_InputReleased);
+
+	// 动态GE不会复制，所以客户端在眩晕的时候，无法禁用这些行为，所以客户端会不断预测和被服务器回溯，导致抽搐
+	// 所以我们要在客户端也添加这些Tag
+	if (bStunned)
+	{
+		AbilitySystemComponent->AddLooseGameplayTags(BlockTags);
+		StunDebuffNiagaraComp->Activate();
+	}
+	else
+	{
+		AbilitySystemComponent->RemoveLooseGameplayTags(BlockTags);
+		StunDebuffNiagaraComp->Deactivate();
+	}
+
+}
+
+void AYuraCharacter::OnRep_Burned()
+{
+	if (bStunned)
+	{
+		BurnDebuffNiagaraComp->Activate();
+	}
+	else
+	{
+		BurnDebuffNiagaraComp->Deactivate();
+	}
+}
+
 void AYuraCharacter::InitAbilityActorInfo()
 {
 	AYuraPlayerState* YuraPlayerState = GetPlayerState<AYuraPlayerState>();
@@ -210,6 +248,9 @@ void AYuraCharacter::InitAbilityActorInfo()
 
 	// 自定义函数，绑定代理
 	Cast<UYuraAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
+
+	// 眩晕状态
+	AbilitySystemComponent->RegisterGameplayTagEvent(FYuraGameplayTags::Get().Debuff_Lighting_Stun).AddUObject(this, &AYuraCharacter::HandleStunDebuffInAnim);
 
 	// 广播ASC初始化完成--为了绑定代理到DebuffNiagaraComp
 	OnASCInitializedDelegate.Broadcast(AbilitySystemComponent);

@@ -56,6 +56,8 @@ protected:
 
 	virtual void InitializeDefaultAttributes() const override;
 
+	void HandleStunDebuffInAnim(const FGameplayTag InDebuffTag, int32 NewCount) override;
+
 private:
 
 	virtual void InitAbilityActorInfo() override;
@@ -73,12 +75,6 @@ public:
 	// 是否处于受击状态
 	UPROPERTY(BlueprintReadOnly, Category = "Combat")
 	bool bHitReacting = false;
-
-	// 记录移动速度
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category = "Combat")
-	float BaseWalkSpeed = 0.f;
-
-	
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Default Class")

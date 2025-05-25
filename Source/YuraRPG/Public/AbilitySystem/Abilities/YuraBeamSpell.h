@@ -34,6 +34,14 @@ public:
 	void StoreAdditionalTargets(TArray<AActor*>& OutTargets);
 
 protected:
+	// 目标死亡代理回调函数
+	UFUNCTION(BlueprintImplementableEvent, Category = "Beam")
+	void OnPrimaryTargetDeath(AActor* DeadActor);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Beam")
+	void OnAdditionalTargetDeath(AActor* DeadActor);
+
+protected:
 	// 鼠标下方位置--从PlayerController中获取，用于光束的结束位置
 	UPROPERTY(BlueprintReadWrite, Category = "Beam")
 	FVector CursorHitLocation;

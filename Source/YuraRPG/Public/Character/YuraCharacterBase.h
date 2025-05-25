@@ -65,6 +65,10 @@ public:
 
 	virtual USkeletalMeshComponent* GetWeaponComponent_Implementation() override;
 
+	virtual bool GetIsBeingShocked_Implementation() const override;
+
+	virtual void SetIsBeingShocked_Implementation(bool bInBeingShocked) override;
+
 	/** ConbatInterface end*/
 
 	// 处理死亡动画，玩家死亡逻辑和敌人的是不一样的，所以需要分开来做
@@ -77,6 +81,8 @@ public:
 	// 获取武器骨骼网格体
 	UFUNCTION(BlueprintPure)
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return Weapon; }
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -92,15 +98,43 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void StartWeaponDissolveTimeLine(UMaterialInstanceDynamic* DissolveMatDynamic);
 
+	virtual void HandleStunDebuffInAnim(const FGameplayTag InDebuffTag, int32 NewCount);
+
+	UFUNCTION()
+	virtual void OnRep_Stunned();
+
+
+	UFUNCTION()
+	virtual void OnRep_Burned();
+
+	
 private:
 
 	virtual void InitAbilityActorInfo();
 
 	void ApplyGameplayEffectToSelf(const TSubclassOf<UGameplayEffect>& GEForAttributes, float Level = 1.0f) const;
 
+	
+
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Combat|Death")
 	FOnActorDeathSignature OnCharacterDeathDelegate;
+
+	// 眩晕
+	UPROPERTY(ReplicatedUsing = OnRep_Stunned, BlueprintReadOnly, Category = "Debuff")
+	bool bStunned = false;
+
+	// 烧伤--为玩家准备的
+	UPROPERTY(ReplicatedUsing = OnRep_Burned, BlueprintReadOnly, Category = "Debuff")
+	bool bBurned = false;
+
+	// 是否被电击
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Debuff")
+	bool bBeingShocked = false;
+
+	// 记录移动速度
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category = "Combat")
+	float BaseWalkSpeed = 600.f;
 
 protected:
 
@@ -158,6 +192,9 @@ protected:
 	// DebuffNiagaraComponents
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Debuff")
 	TObjectPtr<UDebuffNiagaraComponent> BurnDebuffNiagaraComp;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Debuff")
+	TObjectPtr<UDebuffNiagaraComponent> StunDebuffNiagaraComp;
 
 	FOnASCInitializedSignature OnASCInitializedDelegate;
 

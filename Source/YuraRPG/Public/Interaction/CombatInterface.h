@@ -124,4 +124,11 @@ public:
 	// 获取武器的骨骼网格体
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	USkeletalMeshComponent* GetWeaponComponent();
+
+	// 是否被电击
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	bool GetIsBeingShocked() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void SetIsBeingShocked(bool bInBeingShocked);
 };

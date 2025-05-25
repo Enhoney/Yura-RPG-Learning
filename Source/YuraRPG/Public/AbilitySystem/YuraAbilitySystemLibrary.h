@@ -131,7 +131,7 @@ public:
 	static bool IsNotFriend(const AActor* SourceActor, const AActor* TargetActor);
 
 	// 使用DamageEffectParams施加伤害
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "YuraAbilitySystemLibrary|ApplyDamageEffect")
+	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|ApplyDamageEffect")
 	static FGameplayEffectContextHandle ApplyDamageEffectByParams(const FDamageEffectParams& Params);
 
 	// 获取均匀分布的角度

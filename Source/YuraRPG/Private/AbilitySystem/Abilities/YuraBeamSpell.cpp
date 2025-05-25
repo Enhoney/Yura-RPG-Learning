@@ -64,6 +64,16 @@ void UYuraBeamSpell::FirstTraceTarget(const FVector& BeamTargetLocation)
 			CursorHitActor = HitResult.GetActor();
 		}
 	}
+
+	// 绑定死亡回调
+	if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(CursorHitActor))
+	{
+		// 因为要避免多次绑定，同一个目标只绑定一次这个代理
+		if (!CombatInterface->GetOnActorDeathDelegate().IsAlreadyBound(this, &ThisClass::OnPrimaryTargetDeath))
+		{
+			CombatInterface->GetOnActorDeathDelegate().AddDynamic(this, &ThisClass::OnPrimaryTargetDeath);
+		}
+	}
 }
 
 void UYuraBeamSpell::StoreAdditionalTargets(TArray<AActor*>& OutTargets)
@@ -81,5 +91,18 @@ void UYuraBeamSpell::StoreAdditionalTargets(TArray<AActor*>& OutTargets)
 	const int32 AdditionalNumToShock = FMath::Min(MaxNumShocked, GetAbilityLevel()) - 1;
 	// 找到离目标最近的几个
 	UYuraAbilitySystemLibrary::GetClosetActors(AdditionalNumToShock, CursorHitActor->GetActorLocation(), LiveTargetInRadius, OutTargets);
+
+	// 绑定额外目标死亡回调
+	for (AActor* AdditionalTargets : OutTargets)
+	{
+		if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(AdditionalTargets))
+		{
+			// 因为要避免多次绑定，同一个目标只绑定一次这个代理
+			if (!CombatInterface->GetOnActorDeathDelegate().IsAlreadyBound(this, &ThisClass::OnAdditionalTargetDeath))
+			{
+				CombatInterface->GetOnActorDeathDelegate().AddDynamic(this, &ThisClass::OnAdditionalTargetDeath);
+			}
+		}
+	}
 }
 
