@@ -153,9 +153,16 @@ void FYuraGameplayTags::InitializeGameplayTags()
 	// Yura Ability Tag
 	YuraGameplayTags.Ability_Fire_FireBolt =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Fire.FireBolt"), FString("Ability Tag for Yura FireBolt."));
-
 	YuraGameplayTags.Ability_Lightning_Electrocute =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Lightning.Electrocute"), FString("Ability Tag for Yura Electrocute."));
+
+	// Passive Ability Tag
+	YuraGameplayTags.Ability_Passive_HaloOfProtection =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Passive.HaloOfProtection"), FString("Ability Tag for Yura HaloOfProtection."));
+	YuraGameplayTags.Ability_Passive_HealthSiphon =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Passive.HealthSiphon"), FString("Ability Tag for Yura HealthSiphon."));
+	YuraGameplayTags.Ability_Passive_ManaSiphon =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Passive.ManaSiphon"), FString("Ability Tag for Yura ManaSiphon."));
 
 	// Coowdown Tag
 	YuraGameplayTags.Cooldown_Fire_FireBolt =

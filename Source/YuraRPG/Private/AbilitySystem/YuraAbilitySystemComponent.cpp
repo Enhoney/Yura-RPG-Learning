@@ -471,6 +471,12 @@ void UYuraAbilitySystemComponent::UnloadAbilityEquipped(FGameplayAbilitySpec* Ab
 	// 避免有能力被移除或者添加
 	FScopedAbilityListLock AbilityLock(*this);
 
+	// 如果是被动技能，就结束它
+	if (IsPassiveAbility(*AbilitySpec))
+	{
+		UnloadPassiveAbilityEquipped(GetAbilityTagFromSpec(*AbilitySpec));
+	}
+
 	// 修改状态
 	AbilitySpec->DynamicAbilityTags.RemoveTag(FYuraGameplayTags::Get().Ability_Status_Equipped);
 	AbilitySpec->DynamicAbilityTags.AddTag(FYuraGameplayTags::Get().Ability_Status_Unlocked);
@@ -490,6 +496,12 @@ bool UYuraAbilitySystemComponent::EquipAbility(FGameplayAbilitySpec* AbilitySpec
 	// 修改状态--如果没有装备上的话
 	if (!AbilitySpec->DynamicAbilityTags.HasTagExact(FYuraGameplayTags::Get().Ability_Status_Equipped))
 	{
+		// 如果是被动技能，就激活它
+		if (IsPassiveAbility(*AbilitySpec))
+		{
+			EquipPassiveAbility(GetAbilityTagFromSpec(*AbilitySpec));
+		}
+
 		// 只有解锁状态才能点击装备，所以这个技能一定至少是解锁状态
 		AbilitySpec->DynamicAbilityTags.RemoveTag(FYuraGameplayTags::Get().Ability_Status_Unlocked);
 		AbilitySpec->DynamicAbilityTags.AddTag(FYuraGameplayTags::Get().Ability_Status_Equipped);
@@ -515,6 +527,37 @@ bool UYuraAbilitySystemComponent::EquipAbility(FGameplayAbilitySpec* AbilitySpec
 	}
 
 	return bNewEquip;
+}
+
+void UYuraAbilitySystemComponent::UnloadPassiveAbilityEquipped(const FGameplayTag& AbilityTag)
+{
+	OnPassiveAbilityDeactive.Broadcast(AbilityTag);
+}
+
+bool UYuraAbilitySystemComponent::EquipPassiveAbility(const FGameplayTag& AbilityTag)
+{
+	FGameplayTagContainer PassiveAbilityTags;
+	PassiveAbilityTags.AddTag(AbilityTag);
+
+	return TryActivateAbilitiesByTag(PassiveAbilityTags);
+}
+
+bool UYuraAbilitySystemComponent::IsPassiveAbility(const FGameplayAbilitySpec& AbilitySpec)
+{
+	const FGameplayTag AbilityTag = GetAbilityTagFromSpec(AbilitySpec);
+
+	// 首先拿到在GameMode中的配置信息
+	UAbilityInfo* AbilityInfo = UYuraAbilitySystemLibrary::GetAbilityInfoOnGameMode(GetAvatarActor());
+	check(AbilityInfo);
+	FYuraAbilityInfo YuraAbilityInfo = AbilityInfo->FindAbilityInfoByTag(AbilityTag);
+
+	const FGameplayTag PassiveTag = FYuraGameplayTags::Get().Ability_Type_Passive;
+
+	if (PassiveTag.IsValid())
+	{
+		return YuraAbilityInfo.AbilityTypeTag.MatchesTag(PassiveTag);
+	}
+	return false;
 }
 
 void UYuraAbilitySystemComponent::ClientEffectApplied_Implementation(UAbilitySystemComponent* ASC, const FGameplayEffectSpec& GESpec, FActiveGameplayEffectHandle ActiveGEHandle)

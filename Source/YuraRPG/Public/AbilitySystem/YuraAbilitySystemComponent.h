@@ -19,6 +19,9 @@ DECLARE_MULTICAST_DELEGATE_ThreeParams(FAbilityStatusChangedSignature, const FGa
 DECLARE_MULTICAST_DELEGATE_FiveParams(FAbilityEquipAndUnloadSignature, const FGameplayTag& /** AbilityTag*/, 
 	const FGameplayTag& /** NewStatusTag*/, const FGameplayTag& /** InputSlot*/, const FGameplayTag& /** PreInputSlot*/, bool /** IsSwap*/);
 
+// 停止某个被动技能
+DECLARE_MULTICAST_DELEGATE_OneParam(FDeactivePassiveAbilitySignature, const FGameplayTag& /** PassiveAbilityTag*/);
+
 /**
  * 
  */
@@ -102,6 +105,14 @@ protected:
 	// 服务器上调配用--装备技能
 	bool EquipAbility(FGameplayAbilitySpec* AbilitySpec, const FGameplayTag& TargetInputTag);
 
+	// 服务器调用--如果是被动技能，就在卸载的时候结束
+	void UnloadPassiveAbilityEquipped(const FGameplayTag& AbilityTag);
+
+	// 服务器调用--如果是被动技能，就在装备的时候激活
+	bool EquipPassiveAbility(const FGameplayTag& AbilityTag);
+
+	bool IsPassiveAbility(const FGameplayAbilitySpec& AbilitySpec);
+
 public:
 	FEffectAssetTagsDelegate OnEffectAssetTags;
 
@@ -115,5 +126,7 @@ public:
 
 	// 标记初始能力是否赋予--处理时序问题
 	bool bStartupAbilitiesGiven = false;
+
+	FDeactivePassiveAbilitySignature OnPassiveAbilityDeactive;
 	
 };

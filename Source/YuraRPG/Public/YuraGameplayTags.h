@@ -114,6 +114,11 @@ public:
 	FGameplayTag Ability_Fire_FireBolt;
 	FGameplayTag Ability_Lightning_Electrocute;
 
+	// 被动技能
+	FGameplayTag Ability_Passive_HaloOfProtection;
+	FGameplayTag Ability_Passive_HealthSiphon;
+	FGameplayTag Ability_Passive_ManaSiphon;
+
 	// 技能冷却时间的tag
 	FGameplayTag Cooldown_Fire_FireBolt;
 	FGameplayTag Cooldown_Lightning_Electrocute;
