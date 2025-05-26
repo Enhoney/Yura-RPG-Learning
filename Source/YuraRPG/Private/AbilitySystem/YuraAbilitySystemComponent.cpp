@@ -532,12 +532,16 @@ bool UYuraAbilitySystemComponent::EquipAbility(FGameplayAbilitySpec* AbilitySpec
 void UYuraAbilitySystemComponent::UnloadPassiveAbilityEquipped(const FGameplayTag& AbilityTag)
 {
 	OnPassiveAbilityDeactive.Broadcast(AbilityTag);
+
+	ClientPassiveAbilityEquipAndUnload(AbilityTag, false);
 }
 
 bool UYuraAbilitySystemComponent::EquipPassiveAbility(const FGameplayTag& AbilityTag)
 {
 	FGameplayTagContainer PassiveAbilityTags;
 	PassiveAbilityTags.AddTag(AbilityTag);
+
+	ClientPassiveAbilityEquipAndUnload(AbilityTag, true);
 
 	return TryActivateAbilitiesByTag(PassiveAbilityTags);
 }
@@ -579,5 +583,10 @@ void UYuraAbilitySystemComponent::ClientEquipAbility_Implementation(const FGamep
 	const FGameplayTag& InputSlot, const FGameplayTag& PreInputSlot, bool bIsAbilitySwap)
 {
 	OnAbilityEquipAndUnloadDelegate.Broadcast(AbilityTag, NewStatusTag, InputSlot, PreInputSlot, bIsAbilitySwap);
+}
+
+void UYuraAbilitySystemComponent::ClientPassiveAbilityEquipAndUnload_Implementation(const FGameplayTag& PassivaAbilityTag, bool bIsEquipped)
+{
+	OnPassiveAbilityEquipAndUnload.Broadcast(PassivaAbilityTag, bIsEquipped);
 }
 

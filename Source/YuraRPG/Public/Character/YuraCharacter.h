@@ -10,6 +10,7 @@
 class USpringArmComponent;
 class UCameraComponent;
 class UNiagaraComponent;
+class UPassiveNiagaraComponent;
 
 /**
  * 
@@ -74,5 +75,15 @@ private:
 	// 升级特效组件
 	UPROPERTY(VisibleAnywhere, Category = "Level Up")
 	TObjectPtr<UNiagaraComponent> LevelingUpNiagaraComp;
-	
+
+	// 被动技能的粒子效果--技能装备上之后显示
+
+	UPROPERTY(VisibleAnywhere, Category = "Passive Ability")
+	TObjectPtr<UPassiveNiagaraComponent> HaloOfProtectionNiagara;
+
+	UPROPERTY(VisibleAnywhere, Category = "Passive Ability")
+	TObjectPtr<UPassiveNiagaraComponent> HealthSiphonNiagara;
+
+	UPROPERTY(VisibleAnywhere, Category = "Passive Ability")
+	TObjectPtr<UPassiveNiagaraComponent> ManaSiphonNiagara;
 };

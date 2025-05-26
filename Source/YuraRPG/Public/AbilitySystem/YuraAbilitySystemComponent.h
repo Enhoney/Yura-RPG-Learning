@@ -22,6 +22,9 @@ DECLARE_MULTICAST_DELEGATE_FiveParams(FAbilityEquipAndUnloadSignature, const FGa
 // 停止某个被动技能
 DECLARE_MULTICAST_DELEGATE_OneParam(FDeactivePassiveAbilitySignature, const FGameplayTag& /** PassiveAbilityTag*/);
 
+// 广播被动技能的装备于卸载
+DECLARE_MULTICAST_DELEGATE_TwoParams(FPassiveAbilitySignature, const FGameplayTag& /** PassivaAbilityTag*/, bool /** bIsEquipped*/);
+
 /**
  * 
  */
@@ -96,6 +99,9 @@ protected:
 	UFUNCTION(Client, Reliable)
 	void ClientEquipAbility(const FGameplayTag& AbilityTag, const FGameplayTag& NewStatusTag, const FGameplayTag& InputSlot, const FGameplayTag& PreInputSlot, bool bIsAbilitySwap);
 
+	UFUNCTION(Client, Reliable)
+	void ClientPassiveAbilityEquipAndUnload(const FGameplayTag& PassivaAbilityTag, bool bIsEquipped);
+
 	// 重写的函数，可激活能力变动时广播
 	virtual void OnRep_ActivateAbilities() override;
 
@@ -128,5 +134,7 @@ public:
 	bool bStartupAbilitiesGiven = false;
 
 	FDeactivePassiveAbilitySignature OnPassiveAbilityDeactive;
+
+	FPassiveAbilitySignature OnPassiveAbilityEquipAndUnload;
 	
 };

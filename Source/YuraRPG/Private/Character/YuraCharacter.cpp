@@ -15,6 +15,7 @@
 #include "Interaction/CombatInterface.h"
 #include "YuraGameplayTags.h"
 #include "AbilitySystem/Debuff/DebuffNiagaraComponent.h"
+#include "AbilitySystem/PassiveNiagara/PassiveNiagaraComponent.h"
 
 AYuraCharacter::AYuraCharacter()
 {
@@ -59,6 +60,14 @@ AYuraCharacter::AYuraCharacter()
 	LevelingUpNiagaraComp->SetupAttachment(GetRootComponent());
 	LevelingUpNiagaraComp->bAutoActivate = false;
 	// LevelingUpNiagaraComp->SetRelativeRotation(FRotator(45.f, 0.f, 0.f));
+
+	// 被动技能粒子组件--别忘了在ASC初始初始化完成之后手动调用Init
+	HaloOfProtectionNiagara = CreateDefaultSubobject<UPassiveNiagaraComponent>(TEXT("HaloOfProtectionNiagara"));
+	HaloOfProtectionNiagara->SetupAttachment(GetRootComponent());
+	HealthSiphonNiagara = CreateDefaultSubobject<UPassiveNiagaraComponent>(TEXT("HealthSiphonNiagara"));
+	HealthSiphonNiagara->SetupAttachment(GetRootComponent());
+	ManaSiphonNiagara = CreateDefaultSubobject<UPassiveNiagaraComponent>(TEXT("ManaSiphonNiagara"));
+	ManaSiphonNiagara->SetupAttachment(GetRootComponent());
 }
 
 void AYuraCharacter::PossessedBy(AController* NewController)
@@ -254,6 +263,11 @@ void AYuraCharacter::InitAbilityActorInfo()
 
 	// 广播ASC初始化完成--为了绑定代理到DebuffNiagaraComp
 	OnASCInitializedDelegate.Broadcast(AbilitySystemComponent);
+
+	// 初始化三个PassiveNiagaraComponent--主要是绑定回调函数
+	HaloOfProtectionNiagara->InitPassiveNiagaraComponent(FYuraGameplayTags::Get().Ability_Passive_HaloOfProtection);
+	HealthSiphonNiagara->InitPassiveNiagaraComponent(FYuraGameplayTags::Get().Ability_Passive_HealthSiphon);
+	ManaSiphonNiagara->InitPassiveNiagaraComponent(FYuraGameplayTags::Get().Ability_Passive_ManaSiphon);
 
 	// 这里不要用断言，因为要知道，在客户端上，多人游戏场景下，其他玩家的Character也是存在的，即便是模拟代理
 	// 这个时候，GetController得到的就是空指针，这是很正常的情况
