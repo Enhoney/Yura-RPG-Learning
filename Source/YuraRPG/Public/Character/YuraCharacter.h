@@ -49,6 +49,10 @@ public:
 	virtual int32 GetAttributePoint_Implementation() const override;
 	virtual void ConsumeAttributePoint_Implementation(int32 AttributePointToUse) override;
 	virtual void ConsumeSpellPoint_Implementation(int32 SpellPointToUse) override;
+
+	virtual void ShowMagicCircle_Implementation() override;
+	virtual void HideMagicCircle_Implementation() override;
+	virtual void SetMagicCircleMaterial_Implementation(UMaterialInterface* InMagicMaterial) override;
 	/** IPlayerInterface end*/
 
 protected:

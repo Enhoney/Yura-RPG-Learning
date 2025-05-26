@@ -108,6 +108,33 @@ int32 AYuraCharacter::GetCharacterLevel() const
 }
 
 
+void AYuraCharacter::SetMagicCircleMaterial_Implementation(UMaterialInterface* InMagicMaterial)
+{
+	if (InMagicMaterial)
+	{
+		AYuraPlayerController* YuraController = Cast<AYuraPlayerController>(GetController());
+		check(YuraController);
+
+		YuraController->SetMagicCircleMaterial(InMagicMaterial);
+	}
+}
+
+void AYuraCharacter::HideMagicCircle_Implementation()
+{
+	AYuraPlayerController* YuraController = Cast<AYuraPlayerController>(GetController());
+	check(YuraController);
+
+	YuraController->HideMagicCircle();
+}
+
+void AYuraCharacter::ShowMagicCircle_Implementation()
+{
+	AYuraPlayerController* YuraController = Cast<AYuraPlayerController>(GetController());
+	check(YuraController);
+
+	YuraController->ShowMagicCircle();
+}
+
 void AYuraCharacter::AddToExp_Implementation(int32 ExpToAdd)
 {
 	AYuraPlayerState* YuraPlayerState = GetPlayerState<AYuraPlayerState>();

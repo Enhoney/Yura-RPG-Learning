@@ -61,4 +61,15 @@ public:
 	// 消耗技能点
 	UFUNCTION(BlueprintNativeEvent)
 	void ConsumeSpellPoint(int32 SpellPointToUse);
+
+	// 显示MagicCircle
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ShowMagicCircle();
+	// 隐藏MagicCircle
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void HideMagicCircle();
+	// 设置MagicCircle的材质
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetMagicCircleMaterial(UMaterialInterface* InMagicMaterial);
+
 };

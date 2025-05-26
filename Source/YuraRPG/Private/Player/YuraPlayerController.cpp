@@ -22,6 +22,8 @@
 #include "UI/Widget/DamageFloatingComponent.h"
 #include "NiagaraFunctionLibrary.h"
 
+#include "Actor/MagicCircle.h"
+
 AYuraPlayerController::AYuraPlayerController()
 {
 
@@ -37,6 +39,9 @@ void AYuraPlayerController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 
 	CursorTrace();
+
+	// 自动更新Magic位置
+	UpdateMacicCircleLocation();
 
 	YuraAutoRunning();
 }
@@ -61,6 +66,31 @@ void AYuraPlayerController::ShowDamageText_Implementation(float DamageFloating, 
 	}
 	
 	
+}
+
+void AYuraPlayerController::ShowMagicCircle()
+{
+	if (!IsValid(MagicCircle))
+	{
+		MagicCircle = GetWorld()->SpawnActor<AMagicCircle>(MagicCircleClass);
+	}
+	
+}
+
+void AYuraPlayerController::HideMagicCircle()
+{
+	if (IsValid(MagicCircle))
+	{
+		MagicCircle->Destroy();
+	}
+}
+
+void AYuraPlayerController::SetMagicCircleMaterial(UMaterialInterface* InMagicCircleMat)
+{
+	if (IsValid(MagicCircle))
+	{
+		MagicCircle->SetMagicCircleMaterial(InMagicCircleMat);
+	}
 }
 
 void AYuraPlayerController::BeginPlay()
@@ -370,5 +400,13 @@ void AYuraPlayerController::YuraAutoRunning()
 				bAutoRunning = false;
 			}
 		}
+	}
+}
+
+void AYuraPlayerController::UpdateMacicCircleLocation()
+{
+	if (IsValid(MagicCircle))
+	{
+		MagicCircle->SetActorLocation(CursorHit.ImpactPoint);
 	}
 }

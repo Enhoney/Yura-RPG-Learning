@@ -13,6 +13,7 @@ class UYuraInputConfig;
 class USplineComponent;
 class UDamageFloatingComponent;
 class UNiagaraSystem;
+class AMagicCircle;
 
 struct FGameplayTag;
 struct FInputActionValue;
@@ -34,6 +35,15 @@ public:
 	// 在敌人头上显示伤害--Client RPC，只在当前客户端显示
 	UFUNCTION(Client, Reliable)
 	void ShowDamageText(float DamageFloating, ACharacter* TargetCharacter, bool bDamageBlock, bool bCriticalHit);
+
+	UFUNCTION(BlueprintCallable, Category = "MagicCircle")
+	void ShowMagicCircle();
+
+	UFUNCTION(BlueprintCallable, Category = "MagicCircle")
+	void HideMagicCircle();
+
+	UFUNCTION(BlueprintCallable, Category = "MagicCircle")
+	void SetMagicCircleMaterial(UMaterialInterface* InMagicCircleMat);
 
 protected:
 	virtual void BeginPlay() override;
@@ -62,6 +72,9 @@ private:
 
 	// 分帧移动--自动
 	void YuraAutoRunning();
+
+	// 让MagicCircl跟随鼠标移动
+	void UpdateMacicCircleLocation();
 
 private:
 	// 鼠标命中结果
@@ -118,4 +131,11 @@ private:
 	// 点击位置的箭头
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UNiagaraSystem> ClickNiagaraSystem;
+
+	// Magic Circle
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AMagicCircle> MagicCircleClass;
+
+	UPROPERTY()
+	TObjectPtr<AMagicCircle> MagicCircle;
 };
