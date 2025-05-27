@@ -155,6 +155,9 @@ void FYuraGameplayTags::InitializeGameplayTags()
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Fire.FireBolt"), FString("Ability Tag for Yura FireBolt."));
 	YuraGameplayTags.Ability_Lightning_Electrocute =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Lightning.Electrocute"), FString("Ability Tag for Yura Electrocute."));
+	YuraGameplayTags.Ability_Arcane_ArcaneShards =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Arcane.ArcaneShards"), FString("Ability Tag for Yura ArcaneShards."));
+	
 
 	// Passive Ability Tag
 	YuraGameplayTags.Ability_Passive_HaloOfProtection =

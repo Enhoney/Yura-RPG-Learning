@@ -113,6 +113,7 @@ public:
 	// 玩家的技能Tag
 	FGameplayTag Ability_Fire_FireBolt;
 	FGameplayTag Ability_Lightning_Electrocute;
+	FGameplayTag Ability_Arcane_ArcaneShards;
 
 	// 被动技能
 	FGameplayTag Ability_Passive_HaloOfProtection;

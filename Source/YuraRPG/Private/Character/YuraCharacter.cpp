@@ -125,6 +125,8 @@ void AYuraCharacter::HideMagicCircle_Implementation()
 	check(YuraController);
 
 	YuraController->HideMagicCircle();
+
+	YuraController->bShowMouseCursor = true;
 }
 
 void AYuraCharacter::ShowMagicCircle_Implementation()
@@ -133,6 +135,8 @@ void AYuraCharacter::ShowMagicCircle_Implementation()
 	check(YuraController);
 
 	YuraController->ShowMagicCircle();
+	// 显示MagicCircle的时候，隐藏鼠标光标
+	YuraController->bShowMouseCursor = false;
 }
 
 void AYuraCharacter::AddToExp_Implementation(int32 ExpToAdd)

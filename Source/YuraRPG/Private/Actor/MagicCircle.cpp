@@ -8,6 +8,7 @@ AMagicCircle::AMagicCircle()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	RootComponent = CreateDefaultSubobject<USceneComponent>("RootComponent");
 	MaginCircleDecal = CreateDefaultSubobject<UDecalComponent>(TEXT("MaginCircleDecal"));
 	MaginCircleDecal->SetupAttachment(GetRootComponent());
 
