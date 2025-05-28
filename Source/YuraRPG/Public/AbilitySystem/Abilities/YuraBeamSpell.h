@@ -18,6 +18,11 @@ class YURARPG_API UYuraBeamSpell : public UYuraDamageGameplayAbility
 
 public:
 
+	// 获取当前描述
+	virtual FString GetCurrentLevelDescription(int Level) override;
+	// 获取下一级的描述
+	virtual FString GetNextLevelDescription(int Level) override;
+
 	UFUNCTION(BlueprintCallable, Category = "Beam")
 	void StoreCursorHitInfo(const FHitResult& CursorHitResult);
 

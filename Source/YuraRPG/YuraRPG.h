@@ -7,3 +7,5 @@
 #define CUSTOM_DEPTH_FOR_HIGHLIGHT_RED 250
 
 #define ECC_Projectile ECollisionChannel::ECC_GameTraceChannel1
+
+#define ECC_ExceptCharacter ECollisionChannel::ECC_GameTraceChannel2

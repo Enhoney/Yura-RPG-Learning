@@ -314,6 +314,62 @@ FVector UYuraAbilitySystemLibrary::GetKnockbackVector(const FGameplayEffectConte
 	return FVector::ZeroVector;
 }
 
+bool UYuraAbilitySystemLibrary::IsRadialDamage(const FGameplayEffectContextHandle& EffectContext)
+{
+	const FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	const FYuraGameplayEffectContext* YuraContext = static_cast<const FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		return YuraContext->IsRadialDamage();
+	}
+
+	return false;
+}
+
+float UYuraAbilitySystemLibrary::GetRadialInnerRadius(const FGameplayEffectContextHandle& EffectContext)
+{
+	const FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	const FYuraGameplayEffectContext* YuraContext = static_cast<const FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		return YuraContext->GetRadialInnerRadius();
+	}
+
+	return 0.f;
+}
+
+float UYuraAbilitySystemLibrary::GetRadialOuterRadius(const FGameplayEffectContextHandle& EffectContext)
+{
+	const FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	const FYuraGameplayEffectContext* YuraContext = static_cast<const FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		return YuraContext->GetRadialOuterRadius();
+	}
+
+	return 0.f;
+}
+
+FVector UYuraAbilitySystemLibrary::GetRadialCenterLocation(const FGameplayEffectContextHandle& EffectContext)
+{
+	const FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	const FYuraGameplayEffectContext* YuraContext = static_cast<const FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		return YuraContext->GetRadialCenterLocation();
+	}
+
+	return FVector::ZeroVector;
+}
+
 void UYuraAbilitySystemLibrary::SetDamageBlock(UPARAM(ref) FGameplayEffectContextHandle& EffectContext, bool bInDamageBlock)
 {
 	FGameplayEffectContext* Context = EffectContext.Get();
@@ -423,6 +479,54 @@ void UYuraAbilitySystemLibrary::SetKnockbackVector(FGameplayEffectContextHandle&
 	}
 }
 
+void UYuraAbilitySystemLibrary::SetIsRadialDamage(FGameplayEffectContextHandle& EffectContext, bool bInIsRadialDamage)
+{
+	FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	FYuraGameplayEffectContext* YuraContext = static_cast<FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		YuraContext->SetIsRadialDamage(bInIsRadialDamage);
+	}
+}
+
+void UYuraAbilitySystemLibrary::SetRadialInnerRadius(FGameplayEffectContextHandle& EffectContext, float InRadialInnerRadius)
+{
+	FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	FYuraGameplayEffectContext* YuraContext = static_cast<FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		YuraContext->SetRadialInnerRadius(InRadialInnerRadius);
+	}
+}
+
+void UYuraAbilitySystemLibrary::SetRadialOuterRadius(FGameplayEffectContextHandle& EffectContext, float InRadialOuterRadius)
+{
+	FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	FYuraGameplayEffectContext* YuraContext = static_cast<FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		YuraContext->SetRadialOuterRadius(InRadialOuterRadius);
+	}
+}
+
+void UYuraAbilitySystemLibrary::SetRadialCenterLocation(FGameplayEffectContextHandle& EffectContext, const FVector& InRadialCenterLocation)
+{
+	FGameplayEffectContext* Context = EffectContext.Get();
+	// 转化，因为Cast<>只能用于UObject及其子类，所以这里只能用C++原生的static_cast
+	FYuraGameplayEffectContext* YuraContext = static_cast<FYuraGameplayEffectContext*>(Context);
+
+	if (YuraContext)
+	{
+		YuraContext->SetRadialCenterLocation(InRadialCenterLocation);
+	}
+}
+
 void UYuraAbilitySystemLibrary::GetLivePlayersWithinRadius(const UObject* InWorldContextObject, TArray<AActor*>& OutOverlapActors,
 	const TArray<AActor*>& ActorsToIgnore, float Radius, const FVector& InSphereCenterLocation)
 {
@@ -522,6 +626,13 @@ FGameplayEffectContextHandle UYuraAbilitySystemLibrary::ApplyDamageEffectByParam
 	SetDeathImpulse(DamageEffectContext, Params.DeathImpulse);
 	// 设置击退冲量
 	SetKnockbackVector(DamageEffectContext, Params.KnockbackVector);
+
+	// 设置范围伤害
+	SetIsRadialDamage(DamageEffectContext, Params.bIsRadialDamge);
+	SetRadialInnerRadius(DamageEffectContext, Params.RadialInnerRadius);
+	SetRadialOuterRadius(DamageEffectContext, Params.RadialOuterRadius);
+	SetRadialCenterLocation(DamageEffectContext, Params.RadialCenterLocation);
+
 	const FGameplayEffectSpecHandle EffectSpec = Params.SourceASC->MakeOutgoingSpec(Params.DamageGameplayEffectClass, Params.AbilityLevel, DamageEffectContext);
 
 	// 基础伤害

@@ -18,6 +18,8 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnASCInitializedSignature, UAbilitySystemCo
 // 死亡回调
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActorDeathSignature, AActor*, DeadActor);
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnDamageTakenSignature, float /** DamageAmount */);
+
 USTRUCT(BlueprintType)
 struct FTaggedMontage
 {
@@ -131,4 +133,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void SetIsBeingShocked(bool bInBeingShocked);
+
+	virtual FOnDamageTakenSignature& GetDamageTakenDelegate() = 0;
 };

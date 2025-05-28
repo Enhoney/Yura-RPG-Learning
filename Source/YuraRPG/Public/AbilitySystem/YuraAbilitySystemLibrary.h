@@ -90,6 +90,18 @@ public:
 	UFUNCTION(BlueprintPure, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
 	static FVector GetKnockbackVector(const FGameplayEffectContextHandle& EffectContext);
 
+	UFUNCTION(BlueprintPure, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
+	static bool IsRadialDamage(const FGameplayEffectContextHandle& EffectContext);
+
+	UFUNCTION(BlueprintPure, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
+	static float GetRadialInnerRadius(const FGameplayEffectContextHandle& EffectContext);
+
+	UFUNCTION(BlueprintPure, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
+	static float GetRadialOuterRadius(const FGameplayEffectContextHandle& EffectContext);
+
+	UFUNCTION(BlueprintPure, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
+	static FVector GetRadialCenterLocation(const FGameplayEffectContextHandle& EffectContext);
+
 	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
 	static void SetDamageBlock(UPARAM(ref) FGameplayEffectContextHandle& EffectContext, bool bInDamageBlock);
 
@@ -116,6 +128,18 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
 	static void SetKnockbackVector(UPARAM(ref) FGameplayEffectContextHandle& EffectContext, const FVector& InKnockbackVector);
+
+	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
+	static void SetIsRadialDamage(UPARAM(ref) FGameplayEffectContextHandle& EffectContext, bool bInIsRadialDamage);
+
+	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
+	static void SetRadialInnerRadius(UPARAM(ref) FGameplayEffectContextHandle& EffectContext, float InRadialInnerRadius);
+
+	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
+	static void SetRadialOuterRadius(UPARAM(ref) FGameplayEffectContextHandle& EffectContext, float InRadialOuterRadius);
+
+	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Yura GameplayEffect Context")
+	static void SetRadialCenterLocation(UPARAM(ref) FGameplayEffectContextHandle& EffectContext, const FVector& InRadialCenterLocation);
 
 	// 获取范围内的指定目标
 	UFUNCTION(BlueprintCallable, Category = "YuraAbilitySystemLibrary|Gameplay Mechinces")

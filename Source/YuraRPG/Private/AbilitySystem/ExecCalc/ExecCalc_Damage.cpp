@@ -13,6 +13,9 @@
 #include "Interaction/CombatInterface.h"
 
 #include "YuraAbilityTypes.h"
+#include "Kismet/GameplayStatics.h"
+
+#include "YuraLogChannel.h"
 
 struct FYuraDamageStatics
 {
@@ -134,6 +137,9 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	EvalutionParameters.SourceTags = SourceTags;
 	EvalutionParameters.TargetTags = TargetTags;
 
+	// 根据Spec拿到Context
+	FGameplayEffectContextHandle ContextHandle = Spec.GetEffectContext();
+
 	// Debuff计算
 	DeterminingDebuff(Spec, ExecutionParams, EvalutionParameters);
 
@@ -154,9 +160,36 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 		RealResistence = FMath::Clamp(RealResistence, 0.00f, 1.00f);
 
 		// 拿到对应属性的技能基础伤害
-		const float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageTypeToResistance.Key, false);
-		// 因为现在只有一种伤害类型，所以先这样做，保证之前的逻辑没问题
-		BaseDamage += DamageTypeValue * (1 - RealResistence);
+		float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageTypeToResistance.Key, false);
+
+		// 省去无意义的操作
+		if (DamageTypeValue <= 0.f)
+		{
+			continue;
+		}
+		
+		if (ICombatInterface* TargetInterface = Cast<ICombatInterface>(TargetAvatortActor))
+		{
+			TargetInterface->GetDamageTakenDelegate().AddLambda([&](float DamageAmount) {
+				DamageTypeValue = DamageAmount;
+				});
+		}
+
+		// 这里的用法及其烧脑，为什么可以这样用，在Apply之后，这里会等吗？
+		UGameplayStatics::ApplyRadialDamageWithFalloff(
+			TargetAvatortActor,
+			DamageTypeValue,
+			0.f,
+			UYuraAbilitySystemLibrary::GetRadialCenterLocation(ContextHandle),
+			UYuraAbilitySystemLibrary::GetRadialInnerRadius(ContextHandle),
+			UYuraAbilitySystemLibrary::GetRadialOuterRadius(ContextHandle),
+			1.f,
+			UDamageType::StaticClass(),
+			TArray<AActor*>(),
+			SourceAvatorActor);
+
+		BaseDamage += DamageTypeValue * (1 - RealResistence);	
+		
 	}
 
 	// 获取目标护甲
@@ -214,7 +247,6 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	// 设置自定义Context参数
 	// 首先需要拿到Context，并转换为我们自定义的类型
 	// 这里返回的是引用，所以可以直接使用
-	FGameplayEffectContextHandle ContextHandle = Spec.GetEffectContext();
 	UYuraAbilitySystemLibrary::SetDamageBlock(ContextHandle, bBlock);
 	UYuraAbilitySystemLibrary::SetCriticalHit(ContextHandle, bCriticalHit);
 

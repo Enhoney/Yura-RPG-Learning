@@ -69,6 +69,8 @@ public:
 
 	virtual void SetIsBeingShocked_Implementation(bool bInBeingShocked) override;
 
+	virtual FOnDamageTakenSignature& GetDamageTakenDelegate() override;
+
 	/** ConbatInterface end*/
 
 	// 处理死亡动画，玩家死亡逻辑和敌人的是不一样的，所以需要分开来做
@@ -83,6 +85,8 @@ public:
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return Weapon; }
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -135,6 +139,8 @@ public:
 	// 记录移动速度
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category = "Combat")
 	float BaseWalkSpeed = 600.f;
+
+	FOnDamageTakenSignature OnDamageTakenDelegate;
 
 protected:
 

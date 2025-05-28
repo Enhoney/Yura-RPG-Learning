@@ -9,6 +9,84 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "AbilitySystem/YuraAbilitySystemLibrary.h"
 
+FString UYuraBeamSpell::GetCurrentLevelDescription(int Level)
+{
+	const int32 BaseDamageCause = GetBaseDamageTyped(DamageTypeTag, Level);
+	const float ManaCost = GetManaCost(Level);
+	const float Cooldown = GetCooldown(Level);
+
+	if (Level == 1)
+	{
+		return FString::Printf(TEXT(
+			/** Title*/
+			"<Title>Beam Spell</>\n\n"
+			/** Level*/
+			"<Default>CurrentLevel:</>\t<Level>%d</>\n\n"
+			/** DamageType*/
+			"<Small>DamageType: </><Type>Lightning</>\n"
+			/** BaseDamage*/
+			"<Small>BaseDamage: </><Damage>%d</>\n"
+			/** ManaCost*/
+			"<Small>ManaCost: </><Cost>%.2f</>\n"
+			/** Cooldown*/
+			"<Small>Cooldown: </><Cooldown>%.2fs</>\n\n"
+			/** Details*/
+			"<Default>Launch an electric shock to the designated target, causing </>"
+			"<Damage>%d</>""<Type> lightning </>"
+			"<Default> damage every 0.5 seconds until the button is released</>"),
+			Level, BaseDamageCause, ManaCost, Cooldown, BaseDamageCause);
+	}
+	else
+	{
+		const int32 AdditionalBeamNum = FMath::Min(Level, MaxNumShocked) - 1;
+
+		return FString::Printf(TEXT(
+			/** Title*/
+			"<Title>Beam Spell</>\n\n"
+			/** Level*/
+			"<Default>CurrentLevel:</>\t<Level>%d</>\n\n"
+			/** DamageType*/
+			"<Small>DamageType: </><Type>Lightning</>\n"
+			/** BaseDamage*/
+			"<Small>BaseDamage: </><Damage>%d</>\n"
+			/** ManaCost*/
+			"<Small>ManaCost: </><Cost>%.2f</>\n"
+			/** Cooldown*/
+			"<Small>Cooldown: </><Cooldown>%.2fs</>\n\n"
+			/** Details*/
+			"<Default>Launch an electric shock to the designated target, causing </>"
+			"<Damage>%d</>""<Type> lightning </>"
+			"<Default> damage every 0.5 seconds and deal 0.8 times the damage to %d "
+			"surrounding targets until the button is releaseduntil the button is released</>"),
+			Level, BaseDamageCause, ManaCost, Cooldown, BaseDamageCause, AdditionalBeamNum);
+	}
+}
+
+FString UYuraBeamSpell::GetNextLevelDescription(int Level)
+{
+	const int32 BaseDamageCause = GetBaseDamageTyped(DamageTypeTag, Level);
+	const float ManaCost = GetManaCost(Level);
+	const float Cooldown = GetCooldown(Level);
+
+	const int32 AdditionalBeamNum = FMath::Min(Level, MaxNumShocked) - 1;
+	return FString::Printf(TEXT(
+		/** Title*/
+		"<Title>NextLevel:    %d</>\n\n"
+		/** DamageType*/
+		"<Small>DamageType: </><Type>Lightning</>\n"
+		/** BaseDamage*/
+		"<Small>BaseDamage: </><Damage>%d</>\n"
+		/** ManaCost*/
+		"<Small>ManaCost: </><Cost>%.2f</>\n"
+		/** Cooldown*/
+		"<Small>Cooldown: </><Cooldown>%.2fs</>\n\n"
+		"<Default>Launch an electric shock to the designated target, causing </>"
+		"<Damage>%d</>""<Type> lightning </>"
+		"<Default> damage every 0.5 seconds and deal 0.8 times the damage to %d "
+		"surrounding targets until the button is releaseduntil the button is released</>"),
+		Level, BaseDamageCause, ManaCost, Cooldown, BaseDamageCause, AdditionalBeamNum);
+}
+
 void UYuraBeamSpell::StoreCursorHitInfo(const FHitResult& CursorHitResult)
 {
 	if (CursorHitResult.bBlockingHit)

@@ -181,6 +181,11 @@ void AYuraCharacterBase::SetIsBeingShocked_Implementation(bool bInBeingShocked)
 }
 
 
+FOnDamageTakenSignature& AYuraCharacterBase::GetDamageTakenDelegate()
+{
+	return OnDamageTakenDelegate;
+}
+
 void AYuraCharacterBase::MulticastHandleDeath_Implementation(const FVector& InDeathImpulse)
 {
 	bIsDead = true;
@@ -239,6 +244,15 @@ void AYuraCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 	DOREPLIFETIME_CONDITION_NOTIFY(AYuraCharacterBase, bStunned, COND_None, REPNOTIFY_OnChanged);
 	DOREPLIFETIME_CONDITION_NOTIFY(AYuraCharacterBase, bBurned, COND_None, REPNOTIFY_OnChanged);
 	DOREPLIFETIME(AYuraCharacterBase, bBeingShocked);
+}
+
+float AYuraCharacterBase::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float OutDamageAmount = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+
+	OnDamageTakenDelegate.Broadcast(OutDamageAmount);
+
+	return OutDamageAmount;
 }
 
 void AYuraCharacterBase::BeginPlay()

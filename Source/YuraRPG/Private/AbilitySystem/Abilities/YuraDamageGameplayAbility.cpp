@@ -36,7 +36,7 @@ float UYuraDamageGameplayAbility::GetBaseDamageTyped(const FGameplayTag& DamageT
 	
 }
 
-FDamageEffectParams UYuraDamageGameplayAbility::MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor)  const
+FDamageEffectParams UYuraDamageGameplayAbility::MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor, FVector SourceActorLocation)  const
 {
 	FDamageEffectParams OutParams;
 	OutParams.WorldContextObject = GetAvatarActorFromActorInfo();
@@ -61,13 +61,26 @@ FDamageEffectParams UYuraDamageGameplayAbility::MakeDamageEffectParamsFromClassD
 		// 击退判定
 		if (FMath::RandRange(1, 100) < OutParams.KnockbackChance * 100)
 		{
-			FRotator KnockbackRotation = (TargetActor->GetActorLocation() - GetAvatarActorFromActorInfo()->GetActorLocation()).Rotation();
+			if (SourceActorLocation == FVector::ZeroVector)
+			{
+				SourceActorLocation = GetAvatarActorFromActorInfo()->GetActorLocation();
+			}
+			FRotator KnockbackRotation = (TargetActor->GetActorLocation() - SourceActorLocation).Rotation();
 			KnockbackRotation.Pitch = 45.f;
 
 			OutParams.KnockbackVector = KnockbackRotation.Vector().GetSafeNormal() * OutParams.KnockbackForceMagnitude;
 			// 击杀冲量
 			OutParams.DeathImpulse = KnockbackRotation.Vector().GetSafeNormal() * OutParams.DeathImpulseMagnitude;
 		}
+	}
+
+	// 如果是径向伤害
+	if (bIsRadialDamge)
+	{
+		OutParams.bIsRadialDamge = true;
+		OutParams.RadialInnerRadius = RadialInnerRadius;
+		OutParams.RadialOuterRadius = RadialOuterRadius;
+		OutParams.RadialCenterLocation = RadialCenterLocation;
 	}
 
 	return OutParams;

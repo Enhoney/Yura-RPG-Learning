@@ -23,6 +23,7 @@
 #include "NiagaraFunctionLibrary.h"
 
 #include "Actor/MagicCircle.h"
+#include "../YuraRPG.h"
 
 AYuraPlayerController::AYuraPlayerController()
 {
@@ -202,7 +203,9 @@ void AYuraPlayerController::CursorTrace()
 		return;
 	}
 
-	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
+	// 在执行MagicCircle的时候，忽略Character
+	ECollisionChannel CursorTraceChannel = IsValid(MagicCircle) ? ECC_ExceptCharacter : ECC_Visibility;
+	GetHitResultUnderCursor(CursorTraceChannel, false, CursorHit);
 
 	// 如果没有命中目标
 	if (!CursorHit.bBlockingHit)

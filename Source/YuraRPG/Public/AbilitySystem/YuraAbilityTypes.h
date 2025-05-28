@@ -14,60 +14,74 @@ struct FDamageEffectParams
 
 	FDamageEffectParams() {}
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	TObjectPtr<UObject> WorldContextObject;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	TSubclassOf<UGameplayEffect> DamageGameplayEffectClass;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	TObjectPtr<UAbilitySystemComponent> SourceASC;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	TObjectPtr<UAbilitySystemComponent> TargetASC;
 	
 	/** 技能本身*/
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	float AbilityBaseDamage = 0.f;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	float AbilityLevel = 1.f;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	FGameplayTag DamageType = FGameplayTag();
 
 	// 死亡冲量幅度
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	float DeathImpulseMagnitude = 0.f;
 
 	// 击退几率
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	float KnockbackChance = 0.f;
 
 	// 击退力度
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	float KnockbackForceMagnitude = 0.f;
 
 	// 死亡冲量
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	FVector DeathImpulse = FVector::ZeroVector;
 
 	// 击退向量
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	FVector KnockbackVector = FVector::ZeroVector;
 
 	/** Debuff*/
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	float DebuffChance = 0.2f;	// 触发几率
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	float DebuffDuration = 3.f;	// 持续时间
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	float DebuffFrequency = 0.2f;	// 频率
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	float DebuffBaseDamage = 40.f;	// 单次触发伤害
+
+	/** 径向衰减范围伤害*/
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsRadialDamge = false;	// 是否为径向伤害
+
+	UPROPERTY(BlueprintReadWrite)
+	float RadialInnerRadius = 0.f;	// 中心半径
+
+	UPROPERTY(BlueprintReadWrite)
+	float RadialOuterRadius = 0.f;	// 伤害范围
+
+	UPROPERTY(BlueprintReadWrite)
+	FVector RadialCenterLocation = FVector::ZeroVector;	// 伤害中心点
+
 	
 };
 
@@ -124,6 +138,11 @@ public:
 
 	FVector GetKnockbackVector() const { return KnockbackVector; }
 
+	bool IsRadialDamage() const { return bIsRadialDamge; }
+	float GetRadialInnerRadius() const { return RadialInnerRadius; }
+	float GetRadialOuterRadius() const { return RadialOuterRadius; }
+	FVector GetRadialCenterLocation() const { return RadialCenterLocation; }
+
 	//Set
 	void SetIsDamageBlock(bool bInIsDamageBlock) { bIsDamgeBlock = bInIsDamageBlock; }
 	void SetIsCriticalHit(bool bInIsCriticalHit) { bIsCriticalHit = bInIsCriticalHit; }
@@ -150,6 +169,12 @@ public:
 	void SetDeathImpulse(const FVector& InDeathImpulse) { DeathImpulse = InDeathImpulse; }
 
 	void SetKnockbackVector(const FVector& InKnockbackVector) { KnockbackVector = InKnockbackVector; }
+
+
+	void SetIsRadialDamage(bool bInIsRadialDamage) { bIsRadialDamge = bInIsRadialDamage; }
+	void SetRadialInnerRadius(float InRadialInnerRadius) { RadialInnerRadius = InRadialInnerRadius; }
+	void SetRadialOuterRadius(float InRadialOuterRadius) { RadialOuterRadius = InRadialOuterRadius; }
+	void SetRadialCenterLocation(const FVector& InRadialCenterLocation) { RadialCenterLocation = InRadialCenterLocation; }
 
 protected:
 
@@ -185,6 +210,20 @@ protected:
 	// 击退向量
 	UPROPERTY()
 	FVector KnockbackVector = FVector::ZeroVector;
+
+
+	/** 范围伤害*/
+	UPROPERTY()
+	bool bIsRadialDamge = false;	// 是否为径向伤害
+
+	UPROPERTY()
+	float RadialInnerRadius = 0.f;	// 中心半径
+
+	UPROPERTY()
+	float RadialOuterRadius = 0.f;	// 伤害范围
+
+	UPROPERTY()
+	FVector RadialCenterLocation = FVector::ZeroVector;	// 伤害中心点
 
 };
 

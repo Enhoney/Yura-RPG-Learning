@@ -46,9 +46,27 @@ bool FYuraGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 		{
 			RepBits |= 1 << 8;
 		}
+		if (bIsRadialDamge)
+		{
+			RepBits |= 1 << 9;
+
+			if (RadialInnerRadius > 0.f)
+			{
+				RepBits |= 1 << 10;
+			}
+			if (RadialOuterRadius > 0.f)
+			{
+				RepBits |= 1 << 11;
+			}
+			if (!RadialCenterLocation.IsZero())
+			{
+				RepBits |= 1 << 12;
+			}
+		}
+		
 	}
 
-	Ar.SerializeBits(&RepBits, 9);
+	Ar.SerializeBits(&RepBits, 13);
 	// 是否格挡
 	if (RepBits & (1 << 0))
 	{
@@ -95,6 +113,24 @@ bool FYuraGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 	{
 		KnockbackVector.NetSerialize(Ar, Map, bOutSuccess);
 	}
+	if (RepBits & (1 << 9))
+	{
+		Ar << bIsRadialDamge;
+
+		if (RepBits & (1 << 10))
+		{
+			Ar << RadialInnerRadius;
+		}
+		if (RepBits & (1 << 11))
+		{
+			Ar << RadialOuterRadius;
+		}
+		if (RepBits & (1 << 12))
+		{
+			RadialCenterLocation.NetSerialize(Ar, Map, bOutSuccess);
+		}
+	}
+	
 
 	bOutSuccess = true;
 	return true;

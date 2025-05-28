@@ -172,6 +172,8 @@ void FYuraGameplayTags::InitializeGameplayTags()
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Fire.FireBolt"), FString("Cooldown Tag for Yura FireBolt."));
 	YuraGameplayTags.Cooldown_Lightning_Electrocute =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Lightning.Electrocute"), FString("Cooldown Tag for Yura Electrocute."));
+	YuraGameplayTags.Cooldown_Arcane_ArcaneShards =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Arcane.ArcaneShards"), FString("Cooldown Tag for Yura ArcaneShards."));
 
 
 	// CombatSocket Tag

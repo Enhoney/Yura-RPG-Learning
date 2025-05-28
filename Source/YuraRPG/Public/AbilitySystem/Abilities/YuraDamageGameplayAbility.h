@@ -21,7 +21,7 @@ class YURARPG_API UYuraDamageGameplayAbility : public UYuraGameplayAbility
 public:
 	// 生成DamageEffectParams
 	UFUNCTION(BlueprintPure)
-	FDamageEffectParams MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
+	FDamageEffectParams MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor = nullptr, FVector SourceActorLocation = FVector::ZeroVector) const;
 protected:
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
@@ -30,8 +30,6 @@ protected:
 	// 从表格中，根据伤害类型获取当前等级的伤害
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 	float GetBaseDamageTyped(const FGameplayTag& DamageType, int32 Level) const;
-
-	
 
 protected:
 
@@ -67,5 +65,16 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
 	float KnockbackChance = 0.3f;
 
-	
+	/** 径向衰减范围伤害*/
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
+	bool bIsRadialDamge = false;	// 是否为径向伤害
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
+	float RadialInnerRadius = 0.f;	// 中心半径
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
+	float RadialOuterRadius = 0.f;	// 伤害范围
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Ability")
+	FVector RadialCenterLocation = FVector();	// 伤害中心点
 };

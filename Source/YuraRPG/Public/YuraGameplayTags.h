@@ -123,6 +123,7 @@ public:
 	// 技能冷却时间的tag
 	FGameplayTag Cooldown_Fire_FireBolt;
 	FGameplayTag Cooldown_Lightning_Electrocute;
+	FGameplayTag Cooldown_Arcane_ArcaneShards;
 
 	// 和Socket关联的Tag--攻击时用于生成Trace的位置
 	FGameplayTag CombatSocket_Weapon;
