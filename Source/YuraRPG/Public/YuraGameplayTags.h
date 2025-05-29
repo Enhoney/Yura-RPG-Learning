@@ -112,6 +112,7 @@ public:
 
 	// 玩家的技能Tag
 	FGameplayTag Ability_Fire_FireBolt;
+	FGameplayTag Ability_Fire_FireBlast;
 	FGameplayTag Ability_Lightning_Electrocute;
 	FGameplayTag Ability_Arcane_ArcaneShards;
 
@@ -122,6 +123,7 @@ public:
 
 	// 技能冷却时间的tag
 	FGameplayTag Cooldown_Fire_FireBolt;
+	FGameplayTag Cooldown_Fire_FireBlast;
 	FGameplayTag Cooldown_Lightning_Electrocute;
 	FGameplayTag Cooldown_Arcane_ArcaneShards;
 

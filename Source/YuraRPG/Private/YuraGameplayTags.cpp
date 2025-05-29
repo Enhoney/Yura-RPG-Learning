@@ -153,6 +153,8 @@ void FYuraGameplayTags::InitializeGameplayTags()
 	// Yura Ability Tag
 	YuraGameplayTags.Ability_Fire_FireBolt =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Fire.FireBolt"), FString("Ability Tag for Yura FireBolt."));
+	YuraGameplayTags.Ability_Fire_FireBlast =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Fire.FireBlast"), FString("Ability Tag for Yura FireBlast."));
 	YuraGameplayTags.Ability_Lightning_Electrocute =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Ability.Lightning.Electrocute"), FString("Ability Tag for Yura Electrocute."));
 	YuraGameplayTags.Ability_Arcane_ArcaneShards =
@@ -170,6 +172,8 @@ void FYuraGameplayTags::InitializeGameplayTags()
 	// Coowdown Tag
 	YuraGameplayTags.Cooldown_Fire_FireBolt =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Fire.FireBolt"), FString("Cooldown Tag for Yura FireBolt."));
+	YuraGameplayTags.Cooldown_Fire_FireBlast =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Fire.FireBlast"), FString("Cooldown Tag for Yura FireBlast."));
 	YuraGameplayTags.Cooldown_Lightning_Electrocute =
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Lightning.Electrocute"), FString("Cooldown Tag for Yura Electrocute."));
 	YuraGameplayTags.Cooldown_Arcane_ArcaneShards =
