@@ -36,7 +36,8 @@ protected:
 	UFUNCTION()
 	virtual void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	void OnHit();
+	UFUNCTION(BlueprintCallable)
+	virtual void OnHit();
 
 public:
 	// 存储一个FDamageEffectParams
@@ -48,7 +49,8 @@ public:
 	UPROPERTY()
 	TObjectPtr<USceneComponent> HomingTargetSceneComponent;
 
-private:
+protected:
+
 	// 球体碰撞
 	UPROPERTY(VisibleDefaultsOnly, Category = "Projectile")
 	TObjectPtr<USphereComponent> Sphere;

@@ -145,6 +145,9 @@ public:
 	FGameplayTag Player_Block_InputReleased;
 	FGameplayTag Player_Block_CursorTrace;
 
+	// GameplayCue for Fire Blast
+	FGameplayTag GameplayCue_FireBlast;
+
 private:
 	static FYuraGameplayTags YuraGameplayTags;
 };
