@@ -7,6 +7,8 @@
 #include "MVVM_LoadSlot.h"
 #include "MVVM_LoadScreen.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSelectButtonSelectedOnTaken);
+
 /**
  * 
  */
@@ -24,6 +26,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	UMVVM_LoadSlot* GetLoadSlotViewModelFromIndex(int32 Index) const;
 
+	// 加载存档数据到LoadSlot
+	void LoadSaveData();
+
 	/** EnterName Slot 按钮点击回调*/
 	UFUNCTION(BlueprintCallable)
 	void OnNewSlotButtonClicked(int32 SlotIndex, const FString& InPlayerName);
@@ -36,12 +41,24 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnSlectSlotButtonClicked(int32 SlotIndex);
 
+	/** Play 按钮点击回调*/
+	UFUNCTION(BlueprintCallable)
+	void OnPlayButtonClicked();
+
+	// AreYouSure中的Delete按钮点击回调--删除存档，刷新UI
+	UFUNCTION(BlueprintCallable)
+	void OnDeleteSlotButtonClicked();
+
 	/** Field Notify*/
 	// Getter
 	int32 GetLoadSlotNum() const { return LoadSlotNum; }
 
 	// Setter
 	void SetLoadSlotNum(int32 InLoadSlotNum);
+
+public:
+	UPROPERTY(BlueprintAssignable)
+	FSelectButtonSelectedOnTaken SelectButtonSelectedOnTaken;
 
 
 private:
@@ -59,10 +76,15 @@ private:
 	UPROPERTY()
 	TObjectPtr<UMVVM_LoadSlot> LoadSlot_2;
 
+	// 点击SelectSlot是改变--表示选择的Slot
+	UPROPERTY()
+	TObjectPtr<UMVVM_LoadSlot> SelectedSlot;
 
 private:
 	// Field Notify
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta = (AllowPrivateAccess = "true"))
 	int32 LoadSlotNum;
+
+
 	
 };

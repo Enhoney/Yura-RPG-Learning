@@ -2,14 +2,22 @@
 
 
 #include "UI/ViewModel/MVVM_LoadScreen.h"
+#include "Kismet/GameplayStatics.h"
+#include "Game/YuraGameModeBase.h"
 
 void UMVVM_LoadScreen::InitViewModelForLoadSlot()
 {
 	LoadSlot_0 = NewObject<UMVVM_LoadSlot>(this, LoadSlotViewModelClass);
+	LoadSlot_0->SetLoadSlotName(TEXT("LoadSlot_0"));
+	LoadSlot_0->SlotIndex = 0;
 	LoadSlots.Add(0, LoadSlot_0);
 	LoadSlot_1 = NewObject<UMVVM_LoadSlot>(this, LoadSlotViewModelClass);
+	LoadSlot_1->SetLoadSlotName(TEXT("LoadSlot_1"));
+	LoadSlot_1->SlotIndex = 1;
 	LoadSlots.Add(1, LoadSlot_1);
 	LoadSlot_2 = NewObject<UMVVM_LoadSlot>(this, LoadSlotViewModelClass);
+	LoadSlot_2->SetLoadSlotName(TEXT("LoadSlot_2"));
+	LoadSlot_2->SlotIndex = 2;
 	LoadSlots.Add(2, LoadSlot_2);
 }
 
@@ -18,9 +26,37 @@ UMVVM_LoadSlot* UMVVM_LoadScreen::GetLoadSlotViewModelFromIndex(int32 Index) con
 	return LoadSlots.FindChecked(Index);
 }
 
+void UMVVM_LoadScreen::LoadSaveData()
+{
+	if (AYuraGameModeBase* GameMode = Cast<AYuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
+	{
+		for (const TTuple<int32, UMVVM_LoadSlot*>& TempLoadSlot : LoadSlots)
+		{
+			ULoadScreenSaveGame* SaveObject = GameMode->GetSaveSlotData(TempLoadSlot.Value->GetLoadSlotName(), TempLoadSlot.Key);
+			TempLoadSlot.Value->SetPlayerName(SaveObject->PlayerName);
+			TempLoadSlot.Value->SlotStatus = SaveObject->LoadSlotStatus;
+			TempLoadSlot.Value->SetMapName(SaveObject->MapName);
+			// 广播初始加载的数据
+			TempLoadSlot.Value->InitializeSlot();
+		}
+	}
+	
+}
+
 void UMVVM_LoadScreen::OnNewSlotButtonClicked(int32 SlotIndex, const FString& InPlayerName)
 {
-
+	// 创建存档
+	if (AYuraGameModeBase* GameMode = Cast<AYuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
+	{
+		LoadSlots[SlotIndex]->SetPlayerName(InPlayerName);
+		LoadSlots[SlotIndex]->SlotStatus = ESaveSlotStatus::Taken;
+		GameMode->SaveSlotData(LoadSlots[SlotIndex], SlotIndex);
+		// 新档，使用默认地图
+		LoadSlots[SlotIndex]->SetMapName(GameMode->DefaultMapName);
+		// 切换到Taken
+		LoadSlots[SlotIndex]->InitializeSlot();
+	}
+	
 }
 
 void UMVVM_LoadScreen::OnNewGameButtonClicked(int32 SlotIndex)
@@ -31,7 +67,53 @@ void UMVVM_LoadScreen::OnNewGameButtonClicked(int32 SlotIndex)
 
 void UMVVM_LoadScreen::OnSlectSlotButtonClicked(int32 SlotIndex)
 {
+	// 让其他Slot中的SelectButton可用
+	for (TTuple<int32, UMVVM_LoadSlot*> LoadSlot : LoadSlots)
+	{
+		if (LoadSlot.Key != SlotIndex)
+		{
+			LoadSlot.Value->SelectButtonEnable.Broadcast(true);
+		}
+		else
+		{
+			LoadSlot.Value->SelectButtonEnable.Broadcast(false);
+		}
+	}
 
+	// 存储选中的Slot
+	SelectedSlot = LoadSlots[SlotIndex];
+	// 让下面的Play和Delete按钮可用，也需要代理来做
+	SelectButtonSelectedOnTaken.Broadcast();
+}
+
+void UMVVM_LoadScreen::OnPlayButtonClicked()
+{
+	if (IsValid(SelectedSlot))
+	{
+		// 前往指定地图
+		if (AYuraGameModeBase* GameMode = Cast<AYuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
+		{
+			GameMode->TravelToMap(SelectedSlot);
+		}
+	}
+}
+
+void UMVVM_LoadScreen::OnDeleteSlotButtonClicked()
+{
+	if (IsValid(SelectedSlot))
+	{
+		// 删除存档
+		if (AYuraGameModeBase* GameMode = Cast<AYuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
+		{
+			GameMode->DeleteSaveSlotDate(SelectedSlot->GetLoadSlotName(), SelectedSlot->SlotIndex);
+		}
+
+		// 刷新UI
+		SelectedSlot->SlotStatus = ESaveSlotStatus::Vacant;
+		SelectedSlot->SetPlayerName(FString());
+		SelectedSlot->InitializeSlot();
+		SelectedSlot->SelectButtonEnable.Broadcast(true);
+	}
 }
 
 void UMVVM_LoadScreen::SetLoadSlotNum(int32 InLoadSlotNum)

@@ -19,6 +19,9 @@ void ALoadScreenHUD::BeginPlay()
 	LoadMenuWidget->AddToViewport();
 	LoadMenuWidget->BlueprintInitializeWidget();
 
+	// 加载存档数据
+	LoadScreenModel->LoadSaveData();
+
 	
 	if (APlayerController* FirstPlayerController = GetWorld()->GetFirstPlayerController())
 	{
