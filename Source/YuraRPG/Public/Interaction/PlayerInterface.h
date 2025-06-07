@@ -72,4 +72,8 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SetMagicCircleMaterial(UMaterialInterface* InMagicMaterial);
 
+	// 存档
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SaveProgress(const FName& CheckpointTag);
+
 };

@@ -32,6 +32,17 @@ public:
 
 	void TravelToMap(UMVVM_LoadSlot* LoadSlot);
 
+	// 重写选择PlayerStart的方法
+	AActor* ChoosePlayerStart_Implementation(AController* Player) override;
+
+	// 保存进度到磁盘
+	UFUNCTION(BlueprintCallable, Category = "SaveGame")
+	void SaveProgress(ULoadScreenSaveGame* SaveObject) const;
+
+	// 从磁盘加载存档到程序
+	UFUNCTION(BlueprintCallable, Category = "SaveGame")
+	ULoadScreenSaveGame* GetSaveProgress() const;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -55,6 +66,10 @@ public:
 	FString DefaultMapName;
 	UPROPERTY(EditDefaultsOnly)
 	TSoftObjectPtr<UWorld> DefaultMap;
+
+	// 默认PlayerStartTag
+	UPROPERTY(EditDefaultsOnly)
+	FName DefaultPlayerStartTag;
 
 	// 映射地图及其名字
 	UPROPERTY(EditDefaultsOnly)

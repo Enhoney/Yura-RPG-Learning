@@ -5,6 +5,8 @@
 #include "UI/ViewModel/MVVM_LoadSlot.h"
 #include "Kismet/GameplayStatics.h"
 #include "LoadScreenSaveGame.h"
+#include "GameFramework/PlayerStart.h"
+#include "Game/YuraGameInstance.h"
 
 void AYuraGameModeBase::SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex)
 {
@@ -19,8 +21,9 @@ void AYuraGameModeBase::SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex)
 	ULoadScreenSaveGame* SaveGame = Cast<ULoadScreenSaveGame>(UGameplayStatics::CreateSaveGameObject(LoadScreenSaveGameClass));
 	SaveGame->LoadSlotName = LoadSlot->GetLoadSlotName();
 	SaveGame->LoadSlotIndex = SlotIndex;
-	SaveGame->PlayerName = LoadSlot->GetPlayerName();
 	SaveGame->LoadSlotStatus = LoadSlot->SlotStatus;
+	SaveGame->PlayerName = LoadSlot->GetPlayerName();
+	SaveGame->PlayerStartTag = LoadSlot->PlayerStartTag;
 	// 新存档使用默认地图
 	SaveGame->MapName = DefaultMapName;
 
@@ -62,6 +65,57 @@ void AYuraGameModeBase::TravelToMap(UMVVM_LoadSlot* LoadSlot)
 	// const FName LevelName = FName(*FPackageName::ObjectPathToPackageName(Level.ToString()));
 	// UGameplayStatics::OpenLevel(WorldContextObject, LevelName, bAbsolute, Options);
 	UGameplayStatics::OpenLevelBySoftObjectPtr(this, MapToTravel);
+}
+
+void AYuraGameModeBase::SaveProgress(ULoadScreenSaveGame* SaveObject) const
+{
+	if (UYuraGameInstance* YuraGameInstance = Cast<UYuraGameInstance>(GetGameInstance()))
+	{
+
+		YuraGameInstance->PlayerStartTag = SaveObject->PlayerStartTag;
+		UGameplayStatics::SaveGameToSlot(SaveObject, YuraGameInstance->LoadSlotName, YuraGameInstance->LoadSlotIndex);
+	}
+	
+}
+
+ULoadScreenSaveGame* AYuraGameModeBase::GetSaveProgress() const
+{
+	ULoadScreenSaveGame* OutSaveObject = nullptr;
+	if (UYuraGameInstance* YuraGameInstance = Cast<UYuraGameInstance>(GetGameInstance()))
+	{
+		OutSaveObject = GetSaveSlotData(YuraGameInstance->LoadSlotName, YuraGameInstance->LoadSlotIndex);
+	}
+
+	return OutSaveObject;
+}
+
+AActor* AYuraGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
+{
+	if (UYuraGameInstance* YureGameInstance = Cast<UYuraGameInstance>(GetGameInstance()))
+	{
+		TArray<AActor*> AllPlayerStarts;
+		UGameplayStatics::GetAllActorsOfClass(this, APlayerStart::StaticClass(), AllPlayerStarts);
+
+		if (AllPlayerStarts.Num() > 0)
+		{
+			AActor* PlayerStartFound = AllPlayerStarts[0];
+			for (AActor* PlayerStartActor : AllPlayerStarts)
+			{
+				if (APlayerStart* PlayerStart = Cast<APlayerStart>(PlayerStartActor))
+				{
+					if (PlayerStart->PlayerStartTag == YureGameInstance->PlayerStartTag)
+					{
+						PlayerStartFound = PlayerStart;
+						break;
+					}
+				}
+			}
+
+			return PlayerStartFound;
+		}
+	}
+
+	return nullptr;
 }
 
 void AYuraGameModeBase::BeginPlay()

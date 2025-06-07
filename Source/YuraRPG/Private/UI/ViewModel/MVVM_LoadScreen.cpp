@@ -4,6 +4,7 @@
 #include "UI/ViewModel/MVVM_LoadScreen.h"
 #include "Kismet/GameplayStatics.h"
 #include "Game/YuraGameModeBase.h"
+#include "Game/YuraGameInstance.h"
 
 void UMVVM_LoadScreen::InitViewModelForLoadSlot()
 {
@@ -36,6 +37,7 @@ void UMVVM_LoadScreen::LoadSaveData()
 			TempLoadSlot.Value->SetPlayerName(SaveObject->PlayerName);
 			TempLoadSlot.Value->SlotStatus = SaveObject->LoadSlotStatus;
 			TempLoadSlot.Value->SetMapName(SaveObject->MapName);
+			TempLoadSlot.Value->PlayerStartTag = SaveObject->PlayerStartTag;
 			// 广播初始加载的数据
 			TempLoadSlot.Value->InitializeSlot();
 		}
@@ -50,9 +52,13 @@ void UMVVM_LoadScreen::OnNewSlotButtonClicked(int32 SlotIndex, const FString& In
 	{
 		LoadSlots[SlotIndex]->SetPlayerName(InPlayerName);
 		LoadSlots[SlotIndex]->SlotStatus = ESaveSlotStatus::Taken;
-		GameMode->SaveSlotData(LoadSlots[SlotIndex], SlotIndex);
+		
 		// 新档，使用默认地图
 		LoadSlots[SlotIndex]->SetMapName(GameMode->DefaultMapName);
+		// 新档。使用默认的PlayerStart
+		LoadSlots[SlotIndex]->PlayerStartTag = GameMode->DefaultPlayerStartTag;
+		// 保存到存档文件中
+		GameMode->SaveSlotData(LoadSlots[SlotIndex], SlotIndex);
 		// 切换到Taken
 		LoadSlots[SlotIndex]->InitializeSlot();
 	}
@@ -93,6 +99,13 @@ void UMVVM_LoadScreen::OnPlayButtonClicked()
 		// 前往指定地图
 		if (AYuraGameModeBase* GameMode = Cast<AYuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
 		{
+			// 设置PlayerStart
+			if (UYuraGameInstance* YuraGameInstance = Cast<UYuraGameInstance>(GameMode->GetGameInstance()))
+			{
+				YuraGameInstance->LoadSlotIndex = SelectedSlot->SlotIndex;
+				YuraGameInstance->LoadSlotName = SelectedSlot->GetLoadSlotName();
+				YuraGameInstance->PlayerStartTag = SelectedSlot->PlayerStartTag;
+			}
 			GameMode->TravelToMap(SelectedSlot);
 		}
 	}

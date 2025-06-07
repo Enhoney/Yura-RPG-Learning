@@ -49,6 +49,9 @@ public:
 	UPROPERTY()
 	int32 SlotIndex;
 
+	UPROPERTY()
+	FName PlayerStartTag;
+
 private:
 	// Field Notify
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta = (AllowPrivateAccess = "true"))

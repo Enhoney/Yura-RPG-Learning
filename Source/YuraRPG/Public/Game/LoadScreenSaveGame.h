@@ -40,4 +40,36 @@ public:
 
 	UPROPERTY()
 	FString MapName = FString();
+
+	// 相当于玩家的位置
+	UPROPERTY()
+	FName PlayerStartTag;
+
+	/** Player*/
+
+	UPROPERTY()
+	int32 Level = 0;
+
+	UPROPERTY()
+	int32 Exp = 0;
+
+	UPROPERTY()
+	int32 AttributePoint = 0;
+
+	UPROPERTY()
+	int32 SpellPoint = 0;
+
+	/** Attribute*/
+
+	UPROPERTY()
+	float Strength = 0.f;
+
+	UPROPERTY()
+	float Intelligence = 0.f;
+
+	UPROPERTY()
+	float Resilience = 0.f;
+
+	UPROPERTY()
+	float Vigor = 0.f;
 };

@@ -16,6 +16,10 @@
 #include "YuraGameplayTags.h"
 #include "AbilitySystem/Debuff/DebuffNiagaraComponent.h"
 #include "AbilitySystem/PassiveNiagara/PassiveNiagaraComponent.h"
+#include "Game/YuraGameModeBase.h"
+#include "Kismet/GameplayStatics.h"
+#include "Game/LoadScreenSaveGame.h"
+#include "AbilitySystem/AttributeSets/YuraAttributeSet.h"
 
 AYuraCharacter::AYuraCharacter()
 {
@@ -107,6 +111,39 @@ int32 AYuraCharacter::GetCharacterLevel() const
 	return YuraPlayerState->GetCharacterLevel();
 }
 
+
+void AYuraCharacter::SaveProgress_Implementation(const FName& CheckpointTag)
+{
+	if (AYuraGameModeBase* YuraGameMode = Cast<AYuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
+	{
+		ULoadScreenSaveGame* GameProgress = YuraGameMode->GetSaveProgress();
+		if (!IsValid(GameProgress))
+		{
+			return;
+		}
+
+		// 赋值
+		GameProgress->PlayerStartTag = CheckpointTag;
+
+		// PlayerState上的重要参数
+		if (AYuraPlayerState* YuraPlayerState = GetPlayerState<AYuraPlayerState>())
+		{
+			GameProgress->Level = YuraPlayerState->GetCharacterLevel();
+			GameProgress->Exp = YuraPlayerState->GetPlayerExp();
+			GameProgress->AttributePoint = YuraPlayerState->GetAttributePoint();
+			GameProgress->SpellPoint = YuraPlayerState->GetSpellPoint();
+		}
+		// 主要属性
+		GameProgress->Strength = UYuraAttributeSet::GetStrengthAttribute().GetNumericValue(GetAttributeSet());
+		GameProgress->Intelligence = UYuraAttributeSet::GetIntelligenceAttribute().GetNumericValue(GetAttributeSet());
+		GameProgress->Resilience = UYuraAttributeSet::GetResilienceAttribute().GetNumericValue(GetAttributeSet());
+		GameProgress->Vigor = UYuraAttributeSet::GetVigorAttribute().GetNumericValue(GetAttributeSet());
+
+
+		// 存档，即便有存档，也是直接覆盖
+		YuraGameMode->SaveProgress(GameProgress);
+	}
+}
 
 void AYuraCharacter::SetMagicCircleMaterial_Implementation(UMaterialInterface* InMagicMaterial)
 {
