@@ -16,7 +16,7 @@ class UYuraUserWidget;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnExpPercentChangedSignature, float, NewPercent);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLevelChangedSignature, int32, NewLevel);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnLevelChangedSignature, int32, NewLevel, bool , bIsLoading);
 
 
 // 数据表行结构
@@ -64,7 +64,7 @@ public:
 
 protected:
 
-	void OnPlayerLevelChanged(int32 NewLevel);
+	void OnPlayerLevelChanged(int32 NewLevel, bool bIsLoading);
 
 	void OnExpChanged(int32 NewExp);
 

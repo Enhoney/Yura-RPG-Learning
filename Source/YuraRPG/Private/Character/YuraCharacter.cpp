@@ -20,6 +20,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "Game/LoadScreenSaveGame.h"
 #include "AbilitySystem/AttributeSets/YuraAttributeSet.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystem/YuraAbilitySystemLibrary.h"
+#include "AbilitySystem/Data/AbilityInfo.h"
 
 AYuraCharacter::AYuraCharacter()
 {
@@ -82,8 +85,8 @@ void AYuraCharacter::PossessedBy(AController* NewController)
 	if (GetLocalRole() == ENetRole::ROLE_Authority)
 	{
 		InitAbilityActorInfo();
-		// 注册能力
-		AddCharacterAbilities();
+		// 读档
+		LoadProgress();
 	}
 }
 
@@ -125,6 +128,8 @@ void AYuraCharacter::SaveProgress_Implementation(const FName& CheckpointTag)
 		// 赋值
 		GameProgress->PlayerStartTag = CheckpointTag;
 
+		GameProgress->bVitalDataSaved = true;
+
 		// PlayerState上的重要参数
 		if (AYuraPlayerState* YuraPlayerState = GetPlayerState<AYuraPlayerState>())
 		{
@@ -138,6 +143,35 @@ void AYuraCharacter::SaveProgress_Implementation(const FName& CheckpointTag)
 		GameProgress->Intelligence = UYuraAttributeSet::GetIntelligenceAttribute().GetNumericValue(GetAttributeSet());
 		GameProgress->Resilience = UYuraAttributeSet::GetResilienceAttribute().GetNumericValue(GetAttributeSet());
 		GameProgress->Vigor = UYuraAttributeSet::GetVigorAttribute().GetNumericValue(GetAttributeSet());
+
+		// 保存Abilities
+		FForEachAbilitySignature SaveAbilityDelegate;
+		// 先清空
+		GameProgress->SavedAbilities.Empty();
+		// 再保存
+		SaveAbilityDelegate.BindLambda([GameProgress, this](const FGameplayAbilitySpec& InAbilitySpec)
+			{
+				FGameplayTag AbilityTypeTag = UYuraAbilitySystemLibrary::GetAbilityTypeTagFromSpec(this, InAbilitySpec);
+				// 不保存固有能力
+				if (AbilityTypeTag.MatchesTagExact(FYuraGameplayTags::Get().Ability_Type_None))
+				{
+					return;
+				}
+				// 直接引用
+				FSavedAbilityInfo& SavedAbilityInfo =  GameProgress->SavedAbilities.AddDefaulted_GetRef();
+				
+				SavedAbilityInfo.AbilityTag = UYuraAbilitySystemComponent::GetAbilityTagFromSpec(InAbilitySpec);
+				SavedAbilityInfo.AbilityTypeTag = AbilityTypeTag;
+				SavedAbilityInfo.AbilityStatusTag = UYuraAbilitySystemComponent::GetAbilityStatusTagFromSpec(InAbilitySpec);
+				SavedAbilityInfo.AbilityInputTag = UYuraAbilitySystemComponent::GetAbilityInputTagFromSpec(InAbilitySpec);
+				SavedAbilityInfo.AbilityLevel = InAbilitySpec.Ability->GetAbilityLevel();
+
+				UAbilityInfo* AbilityInfo = UYuraAbilitySystemLibrary::GetAbilityInfoOnGameMode(this);
+				SavedAbilityInfo.GameplayAbilityClass = AbilityInfo->FindAbilityInfoByTag(SavedAbilityInfo.AbilityTag).AbilityClass;
+				
+			});
+		// 知道不会Cast失败，否则需要验证一下的
+		Cast<UYuraAbilitySystemComponent>(GetAbilitySystemComponent())->ForEachAbility(SaveAbilityDelegate);
 
 
 		// 存档，即便有存档，也是直接覆盖
@@ -310,6 +344,15 @@ void AYuraCharacter::OnRep_Burned()
 	}
 }
 
+void AYuraCharacter::InitializeDefaultAttributes() const
+{
+	// 主要属性在读档的时候设置
+	// 初始化SecondaryAttributes，这个必须在初始化完PrimaryAttribute之后
+	ApplyGameplayEffectToSelf(DefaultSedcondaryAttributes);
+	// 初始化生命值和魔法值，这个必须在MaxHealth和HealthMana初始化之后
+	ApplyGameplayEffectToSelf(DefaultVitalAttributes);
+}
+
 void AYuraCharacter::InitAbilityActorInfo()
 {
 	AYuraPlayerState* YuraPlayerState = GetPlayerState<AYuraPlayerState>();
@@ -320,8 +363,6 @@ void AYuraCharacter::InitAbilityActorInfo()
 	AbilitySystemComponent = YuraPlayerState->GetAbilitySystemComponent();
 	AttributeSet = YuraPlayerState->GetAttributeSet();
 
-	// 初始化属性
-	InitializeDefaultAttributes();
 
 	// 自定义函数，绑定代理
 	Cast<UYuraAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
@@ -347,6 +388,65 @@ void AYuraCharacter::InitAbilityActorInfo()
 			YuraHUD->InitOverlay(YuraPlayerController, YuraPlayerState, AbilitySystemComponent, AttributeSet);
 		}
 		
+	}
+}
+
+void AYuraCharacter::LoadProgress()
+{
+	if (AYuraGameModeBase* YuraGameMode = Cast<AYuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
+	{
+		ULoadScreenSaveGame* GameProgress = YuraGameMode->GetSaveProgress();
+		if (!IsValid(GameProgress))
+		{
+			return;
+		}
+
+		// PlayerState上的重要参数
+		if (AYuraPlayerState* YuraPlayerState = GetPlayerState<AYuraPlayerState>())
+		{
+			YuraPlayerState->SetCharacterLevel(GameProgress->Level);
+			YuraPlayerState->SetExp(GameProgress->Exp);
+			YuraPlayerState->SetAttributePoint(GameProgress->AttributePoint);
+			YuraPlayerState->SetSpellPoint(GameProgress->SpellPoint);
+		}
+
+		
+		if (GameProgress->bVitalDataSaved)
+		{
+			// 设置主要属性--根据存档状况决定
+			FYuraGameplayTags YuraTags = FYuraGameplayTags::Get();
+			// 如果存档中有，就使用存档中的值
+			FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+			ContextHandle.AddSourceObject(this);
+			const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(LoadAttributeEffectClass, 1.f, ContextHandle);
+
+			// SetByCaller
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, YuraTags.SaveAndLoad_Attribute_Strength, GameProgress->Strength);
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, YuraTags.SaveAndLoad_Attribute_Intelligence, GameProgress->Intelligence);
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, YuraTags.SaveAndLoad_Attribute_Resilience, GameProgress->Resilience);
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, YuraTags.SaveAndLoad_Attribute_Vigor, GameProgress->Vigor);
+
+			GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), GetAbilitySystemComponent());
+
+			// 读取存档中保存的能力，赋予己身--先放在这里
+			// 固有被动技能--这里就是获取经验的能力
+			UYuraAbilitySystemComponent* YuraASC = Cast<UYuraAbilitySystemComponent>(GetAbilitySystemComponent());
+			YuraASC->GrantCharacterPassiveAbilities(StartupPassiveAbilities);
+			// 赋予主动与被动技能
+			YuraASC->LoadingAbilities(GameProgress->SavedAbilities);
+
+		}
+		else
+		{
+			// 如果存档中没有，就使用默认的值
+			ApplyGameplayEffectToSelf(DefaultPrimaryAttributes);
+
+			// 赋予初始能力
+			AddCharacterAbilities();
+		}
+
+		// 初始化次要属性和Vital属性
+		InitializeDefaultAttributes();
 	}
 }
 

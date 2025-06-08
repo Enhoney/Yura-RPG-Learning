@@ -111,14 +111,13 @@ protected:
 	UFUNCTION()
 	virtual void OnRep_Burned();
 
+	void ApplyGameplayEffectToSelf(const TSubclassOf<UGameplayEffect>& GEForAttributes, float Level = 1.0f) const;
+
 	
 private:
 
 	virtual void InitAbilityActorInfo();
 
-	void ApplyGameplayEffectToSelf(const TSubclassOf<UGameplayEffect>& GEForAttributes, float Level = 1.0f) const;
-
-	
 
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Combat|Death")
@@ -204,13 +203,13 @@ protected:
 
 	FOnASCInitializedSignature OnASCInitializedDelegate;
 
-private:
 	UPROPERTY(EditAnywhere, Category = "Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> AbilitiesGrantIngOnStart;
 
 	UPROPERTY(EditAnywhere, Category = "Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartupPassiveAbilities;
 
+private:
 	bool bIsDead = false;
 
 	/** Monion Count*/

@@ -148,6 +148,12 @@ public:
 	// GameplayCue for Fire Blast
 	FGameplayTag GameplayCue_FireBlast;
 
+	// 存档读档使用
+	FGameplayTag SaveAndLoad_Attribute_Strength;
+	FGameplayTag SaveAndLoad_Attribute_Intelligence;
+	FGameplayTag SaveAndLoad_Attribute_Resilience;
+	FGameplayTag SaveAndLoad_Attribute_Vigor;
+
 private:
 	static FYuraGameplayTags YuraGameplayTags;
 };

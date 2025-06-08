@@ -10,6 +10,37 @@
 #include "Data/AbilityInfo.h"
 #include "AbilitySystem/YuraAbilitySystemLibrary.h"
 
+void UYuraAbilitySystemComponent::LoadingAbilities(const TArray<FSavedAbilityInfo>& InSavedAbilities)
+{
+	// 赋予能力
+	for (const FSavedAbilityInfo& SavedAbilityInfo : InSavedAbilities)
+	{
+		FGameplayAbilitySpec LoadingAbilitySpec = FGameplayAbilitySpec(SavedAbilityInfo.GameplayAbilityClass, SavedAbilityInfo.AbilityLevel);
+
+		LoadingAbilitySpec.DynamicAbilityTags.AddTag(SavedAbilityInfo.AbilityStatusTag);
+		LoadingAbilitySpec.DynamicAbilityTags.AddTag(SavedAbilityInfo.AbilityInputTag);
+		if (SavedAbilityInfo.AbilityTypeTag.MatchesTagExact(FYuraGameplayTags::Get().Ability_Type_Offensive))
+		{
+			GiveAbility(LoadingAbilitySpec);
+		}
+		else if(SavedAbilityInfo.AbilityTypeTag.MatchesTagExact(FYuraGameplayTags::Get().Ability_Type_Passive))
+		{
+			if (SavedAbilityInfo.AbilityStatusTag.MatchesTagExact(FYuraGameplayTags::Get().Ability_Status_Equipped))
+			{
+				GiveAbilityAndActivateOnce(LoadingAbilitySpec);
+				// 这个是为了让这个被动技能生效--在这个项目中的表现就是粒子效果
+				ClientPassiveAbilityEquipAndUnload(SavedAbilityInfo.AbilityTag, true);
+			}
+			else
+			{
+				GiveAbility(LoadingAbilitySpec);
+			}
+		}
+	}
+	bStartupAbilitiesGiven = true;
+	OnAbilitiesGivenDelegate.Broadcast();
+}
+
 void UYuraAbilitySystemComponent::AbilityActorInfoSet()
 {
 	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &UYuraAbilitySystemComponent::ClientEffectApplied);

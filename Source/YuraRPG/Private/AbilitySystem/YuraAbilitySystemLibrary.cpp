@@ -11,7 +11,8 @@
 #include "AbilitySystemComponent.h"
 #include "YuraGameplayTags.h"
 #include "YuraAbilityTypes.h"
-
+#include "AbilitySystem/YuraAbilitySystemComponent.h"
+#include "AbilitySystem/Data/AbilityInfo.h"
 #include "Engine/OverlapResult.h"
 #include "Interaction/CombatInterface.h"
 #include "AbilitySystemBlueprintLibrary.h"
@@ -185,6 +186,22 @@ UAbilityInfo* UYuraAbilitySystemLibrary::GetAbilityInfoOnGameMode(const UObject*
 	// 获取CharacterInfo
 	UAbilityInfo* AbilityInfo = YuraGameMode->DefaultAbilityInfo;
 	return AbilityInfo;
+}
+
+FGameplayTag UYuraAbilitySystemLibrary::GetAbilityTypeTagFromSpec(const UObject* InWorldContextObject, const FGameplayAbilitySpec& InAbilitySpec)
+{
+	FGameplayTag OutAbilityTypeTag = FYuraGameplayTags::Get().Ability_Type_None;
+
+	FGameplayTag AbilityTag = UYuraAbilitySystemComponent::GetAbilityTagFromSpec(InAbilitySpec);
+	UAbilityInfo* AbilityInfo = GetAbilityInfoOnGameMode(InWorldContextObject);
+	FGameplayTag AbilityTypeTag = AbilityInfo->FindAbilityInfoByTag(AbilityTag).AbilityTypeTag;
+
+	if (AbilityTypeTag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Ability.Type"))))
+	{
+		OutAbilityTypeTag = AbilityTypeTag;
+	}
+	
+	return OutAbilityTypeTag;
 }
 
 bool UYuraAbilitySystemLibrary::IsDamageBlock(const FGameplayEffectContextHandle& EffectContext)

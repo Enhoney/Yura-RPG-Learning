@@ -103,9 +103,9 @@ void UOverlayWidgetController::BindCallbacksToDependiencies()
 
 }
 
-void UOverlayWidgetController::OnPlayerLevelChanged(int32 NewLevel)
+void UOverlayWidgetController::OnPlayerLevelChanged(int32 NewLevel, bool bIsLoading)
 {
-	OnPlayerLevelChangedDelegate.Broadcast(NewLevel);
+	OnPlayerLevelChangedDelegate.Broadcast(NewLevel, bIsLoading);
 }
 
 void UOverlayWidgetController::OnExpChanged(int32 NewExp)

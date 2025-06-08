@@ -38,6 +38,7 @@ void UMVVM_LoadScreen::LoadSaveData()
 			TempLoadSlot.Value->SlotStatus = SaveObject->LoadSlotStatus;
 			TempLoadSlot.Value->SetMapName(SaveObject->MapName);
 			TempLoadSlot.Value->PlayerStartTag = SaveObject->PlayerStartTag;
+			TempLoadSlot.Value->SetPlayerLevel(SaveObject->Level);
 			// 广播初始加载的数据
 			TempLoadSlot.Value->InitializeSlot();
 		}

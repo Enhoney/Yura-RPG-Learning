@@ -59,6 +59,10 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "YuraAbilitySystemLibrary|AbilityInfo")
 	static UAbilityInfo* GetAbilityInfoOnGameMode(const UObject* InWorldContextObject);
 
+	// 获取能力的TypeTag--主动还是被动，还是固有技能--用于读档和存档
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "YuraAbilitySystemLibrary|AbilityInfo")
+	static FGameplayTag GetAbilityTypeTagFromSpec(const UObject* InWorldContextObject, const FGameplayAbilitySpec& InAbilitySpec);
+
 	/** 
 	 * 用于自定义的GameplayEffectContext
 	 */

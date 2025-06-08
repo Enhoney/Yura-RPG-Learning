@@ -14,6 +14,8 @@ class ULevelUpInfo;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FPlayerStateChangedSingnature, int32);
 
+DECLARE_MULTICAST_DELEGATE_TwoParams(FPlayerLevelChangedSingnature, int32 /** NewLevel*/, bool /** bIsLoading*/);
+
 /**
  * 
  */
@@ -72,7 +74,7 @@ private:
 
 public:
 
-	FPlayerStateChangedSingnature OnPlayerLevelChangedDelegate;
+	FPlayerLevelChangedSingnature OnPlayerLevelChangedDelegate;
 
 	FPlayerStateChangedSingnature OnPlayerExpChangedDelegate;
 

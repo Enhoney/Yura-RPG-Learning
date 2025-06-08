@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerStart.h"
+#include "Interaction/SaveMapDataInterface.h"
 #include "CheckPoint.generated.h"
 
 class USphereComponent;
@@ -14,7 +15,7 @@ class UStaticMeshComponent;
  * 
  */
 UCLASS()
-class YURARPG_API ACheckPoint : public APlayerStart
+class YURARPG_API ACheckPoint : public APlayerStart, public ISaveMapDataInterface
 {
 	GENERATED_BODY()
 
@@ -40,6 +41,11 @@ protected:
 	// 在变亮完成之后调用，执行存档，回设材质，启用碰撞
 	UFUNCTION(BlueprintCallable)
 	void FinishCheckpoint(AActor* Player);
+
+public:
+	// 是否激活
+	UPROPERTY(SaveGame)
+	bool bReached = false;
 
 protected:
 	UPROPERTY(BlueprintReadOnly)

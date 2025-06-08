@@ -213,4 +213,14 @@ void FYuraGameplayTags::InitializeGameplayTags()
 
 	YuraGameplayTags.GameplayCue_FireBlast = 
 		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.FireBlast"), FString("GameplayCue for Fire Blast."));
+
+
+	YuraGameplayTags.SaveAndLoad_Attribute_Strength =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("SaveAndLoad.Attribute.Strength"), FString("Load Player Strength Attribute."));
+	YuraGameplayTags.SaveAndLoad_Attribute_Intelligence =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("SaveAndLoad.Attribute.Intelligence"), FString("Load Player Intelligence Attribute."));
+	YuraGameplayTags.SaveAndLoad_Attribute_Resilience =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("SaveAndLoad.Attribute.Resilience"), FString("Load Player Resilience Attribute."));
+	YuraGameplayTags.SaveAndLoad_Attribute_Vigor =
+		UGameplayTagsManager::Get().AddNativeGameplayTag(FName("SaveAndLoad.Attribute.Vigor"), FString("Load Player Vigor Attribute."));
 }

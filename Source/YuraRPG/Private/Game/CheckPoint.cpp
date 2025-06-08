@@ -38,6 +38,7 @@ void ACheckPoint::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 {
 	if (OtherActor->ActorHasTag(TEXT("YuraCharacter.Player")))
 	{
+		bReached = true;
 		HandleGlowEffect(OtherActor);
 	}
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
+#include "Game/LoadScreenSaveGame.h"
 #include "YuraAbilitySystemComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTagsDelegate, const FGameplayTagContainer& /** EffectAssetTags*/);
@@ -34,6 +35,9 @@ class YURARPG_API UYuraAbilitySystemComponent : public UAbilitySystemComponent
 	GENERATED_BODY()
 
 public:
+	// 从存档中获取能力并赋予
+	void LoadingAbilities(const TArray<FSavedAbilityInfo>& InSavedAbilities);
+
 	void AbilityActorInfoSet();
 
 	void GrantCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& AbilitiesToGrant);

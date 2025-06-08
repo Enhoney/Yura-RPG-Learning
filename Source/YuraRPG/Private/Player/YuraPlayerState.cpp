@@ -49,14 +49,14 @@ void AYuraPlayerState::SetCharacterLevel(int32 NewLevel)
 {
 	Level = FMath::Max<int32>(0, NewLevel);
 
-	OnPlayerLevelChangedDelegate.Broadcast(Level);
+	OnPlayerLevelChangedDelegate.Broadcast(Level, true);
 }
 
 void AYuraPlayerState::AddToCharacterLevel(int32 LevelToAdd)
 {
 	Level = FMath::Max<int32>(0, Level + LevelToAdd);
 
-	OnPlayerLevelChangedDelegate.Broadcast(Level);
+	OnPlayerLevelChangedDelegate.Broadcast(Level, false);
 }
 
 
@@ -118,7 +118,7 @@ void AYuraPlayerState::ConsumeSpellPoint(int32 SpellPointToUse)
 
 void AYuraPlayerState::OnRep_Level(int32 OldLevel)
 {
-	OnPlayerLevelChangedDelegate.Broadcast(Level);
+	OnPlayerLevelChangedDelegate.Broadcast(Level, false);
 }
 
 void AYuraPlayerState::OnRep_Exp(int32 OldExp)

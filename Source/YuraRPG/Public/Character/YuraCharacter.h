@@ -62,9 +62,13 @@ protected:
 
 	virtual void OnRep_Burned() override;
 
+	virtual void InitializeDefaultAttributes() const override;
+
 private:
 
 	virtual void InitAbilityActorInfo() override;
+
+	void LoadProgress();
 
 	// 播放升级的粒子特效
 	UFUNCTION(NetMulticast, Unreliable)
@@ -92,4 +96,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Passive Ability")
 	TObjectPtr<UPassiveNiagaraComponent> ManaSiphonNiagara;
+
+	// 读档使用的GE--设置主要属性
+	UPROPERTY(EditDefaultsOnly, Category = "SaveGame")
+	TSubclassOf<UGameplayEffect> LoadAttributeEffectClass;
 };
