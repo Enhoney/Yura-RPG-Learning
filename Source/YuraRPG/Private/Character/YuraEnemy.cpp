@@ -39,7 +39,7 @@ AYuraEnemy::AYuraEnemy()
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 360.f, 0.f);
 }
 
-void AYuraEnemy::HighlightActor()
+void AYuraEnemy::HighlightActor_Implementation()
 {
 	// 开启高亮（这个设置和材质有关，不必深究）
 	GetMesh()->SetRenderCustomDepth(true);
@@ -49,7 +49,7 @@ void AYuraEnemy::HighlightActor()
 	Weapon->SetCustomDepthStencilValue(CUSTOM_DEPTH_FOR_HIGHLIGHT_RED);
 }
 
-void AYuraEnemy::UnhighlightActor()
+void AYuraEnemy::UnhighlightActor_Implementation()
 {
 	GetMesh()->SetRenderCustomDepth(false);
 	Weapon->SetRenderCustomDepth(false);

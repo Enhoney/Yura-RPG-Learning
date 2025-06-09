@@ -1,6 +1,6 @@
 // Copyright Muci Yun.
 
 
-#include "EnemyInterface.h"
+#include "HighlightInterface.h"
 
 // Add default functionality here for any IEnemyInterface functions that are not pure virtual.

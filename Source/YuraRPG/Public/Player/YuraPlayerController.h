@@ -8,7 +8,7 @@
 class UInputMappingContext;
 class UInputAction;
 class UYuraAbilitySystemComponent;
-class IEnemyInterface;
+class IHighlightInterface;
 class UYuraInputConfig;
 class USplineComponent;
 class UDamageFloatingComponent;
@@ -17,6 +17,14 @@ class AMagicCircle;
 
 struct FGameplayTag;
 struct FInputActionValue;
+
+enum class ETargetingStatus : uint8
+{
+	NoTargeting,
+	TargetingEnemy,
+	TragetingMapEntrance
+	
+};
 
 /**
  * 
@@ -93,8 +101,8 @@ private:
 	bool bShiftDown = false;
 
 	// 记录上一帧和这一帧命中的对象
-	IEnemyInterface* LastActor =  nullptr;
-	IEnemyInterface* ThisActor = nullptr;
+	AActor* LastActor =  nullptr;
+	AActor* ThisActor = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UYuraInputConfig> AbilityInputConfig;
@@ -114,7 +122,7 @@ private:
 	// 是否需要绕路，如果不需要绕路，走的就是直线，不需要改变方向
 	bool bAutoRunning;
 	// 鼠标位置是否为一个敌人
-	bool bTargeting = false;
+	ETargetingStatus TargetingStatus = ETargetingStatus::NoTargeting;
 
 	// 到达目标点距离阈值
 	UPROPERTY(EditDefaultsOnly)

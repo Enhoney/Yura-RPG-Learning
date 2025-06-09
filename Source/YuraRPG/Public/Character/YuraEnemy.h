@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Character/YuraCharacterBase.h"
-#include "EnemyInterface.h"
+#include "Interaction/HighlightInterface.h"
 #include "Interaction/CombatInterface.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
 #include "YuraEnemy.generated.h"
@@ -18,7 +18,7 @@ class AYuraAIController;
  * 
  */
 UCLASS()
-class YURARPG_API AYuraEnemy : public AYuraCharacterBase, public IEnemyInterface
+class YURARPG_API AYuraEnemy : public AYuraCharacterBase, public IHighlightInterface
 {
 	GENERATED_BODY()
 
@@ -26,10 +26,10 @@ public:
 
 	AYuraEnemy();
 
-	/** Enemy Interface start*/
-	virtual void HighlightActor() override;
-	virtual void UnhighlightActor() override;
-	/** Enemy Interface end*/
+	/** Highlight Interface start*/
+	virtual void HighlightActor_Implementation() override;
+	virtual void UnhighlightActor_Implementation() override;
+	/** Highlight Interface end*/
 
 	/** Combat Interface start*/
 	virtual int32 GetCharacterLevel() const override;

@@ -8,7 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "GameplayTagContainer.h"
 #include "Input/YuraInputComponent.h"
-#include "EnemyInterface.h"
+#include "HighlightInterface.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "YuraAbilitySystemComponent.h"
 #include "Components/SplineComponent.h"
@@ -191,11 +191,11 @@ void AYuraPlayerController::CursorTrace()
 	{
 		if (LastActor)
 		{
-			LastActor->UnhighlightActor();
+			IHighlightInterface::Execute_UnhighlightActor(LastActor);
 		}
 		if (ThisActor)
 		{
-			ThisActor->UnhighlightActor();
+			IHighlightInterface::Execute_UnhighlightActor(ThisActor);
 		}
 		LastActor = nullptr;
 		ThisActor = nullptr;
@@ -215,26 +215,25 @@ void AYuraPlayerController::CursorTrace()
 
 	LastActor = ThisActor;
 
-	ThisActor = Cast<IEnemyInterface>(CursorHit.GetActor());
-
-	/** 
-	 * 下面是几个场景
-	 * 1、两个都是空指针--啥也不干
-	 * 2、LastActor是空指针，ThisActor不是--有命中的对象了--开启高亮
-	 * 3、LastActor不是空指针，ThisActor是空指针--关闭高亮
-	 * 4、两个都不是空指针，并且二者相同--啥也不干--维持高亮
-	 * 5、两个都不是空指针，但是两个对象不一样了--关闭上一个的高亮，开启这个的高亮
-	 */
-
+	// 只有在命中目标实现了接口时才赋值
+	if (CursorHit.GetActor()->Implements<UHighlightInterface>())
+	{
+		ThisActor = CursorHit.GetActor();
+	}
+	else
+	{
+		ThisActor = nullptr;
+	}
+	
 	if (LastActor != ThisActor)
 	{
 		if (LastActor)
 		{
-			LastActor->UnhighlightActor();
+			IHighlightInterface::Execute_UnhighlightActor(LastActor);
 		}
 		if (ThisActor)
 		{
-			ThisActor->HighlightActor();
+			IHighlightInterface::Execute_HighlightActor(ThisActor);
 		}
 	}
 
@@ -250,7 +249,23 @@ void AYuraPlayerController::AbilityInputTagPressed(FGameplayTag AbilityActionTag
 	// 只针对鼠标左键输入响应
 	if (AbilityActionTag.MatchesTagExact(FYuraGameplayTags::Get().InputTag_LMB))
 	{
-		bTargeting = (ThisActor == nullptr) ? false : true;
+
+		if (!IsValid(ThisActor))
+		{
+			// 如果它连HithlightInterface都没实现，那就是没有NoTargeting
+			TargetingStatus = ETargetingStatus::NoTargeting;
+		}
+		else
+		{
+			if (ThisActor->ActorHasTag(FName("YuraCharacter.Enemy")))
+			{
+				TargetingStatus = ETargetingStatus::TargetingEnemy;
+			}
+			else
+			{
+				TargetingStatus = ETargetingStatus::TragetingMapEntrance;
+			}
+		}
 		bAutoRunning = false;	// 默认值
 	}
 
@@ -280,7 +295,7 @@ void AYuraPlayerController::AbilityInputTagReleased(FGameplayTag AbilityActionTa
 	}
 
 	GetAbilitySystemComponent()->AbilityInputTagReleased(AbilityActionTag);
-	if (!bTargeting && !bShiftDown)
+	if (TargetingStatus != ETargetingStatus::TargetingEnemy && !bShiftDown)
 	{
 		APawn* ControlledPawn = GetPawn<APawn>();
 		// 这就表示短按，这个时候我们要去创建一条路径，这需要导航系统了
@@ -318,7 +333,7 @@ void AYuraPlayerController::AbilityInputTagReleased(FGameplayTag AbilityActionTa
 		}
 		// 重置FollowingTime
 		FollowingTime = 0.f;
-		bTargeting = false;
+		TargetingStatus = ETargetingStatus::NoTargeting;
 	}
 }
 
@@ -341,7 +356,7 @@ void AYuraPlayerController::AbilityInputTagHeld(FGameplayTag AbilityActionTag)
 	}
 	// 如果锁定了目标--鼠标下方是敌人，并且按住了鼠标左键
 	// 或者这个时候按下了鼠标左键
-	if (bTargeting || bShiftDown)
+	if (TargetingStatus == ETargetingStatus::TargetingEnemy || bShiftDown)
 	{
 		// 这对吗，这对应的是什么能力--通常就是攻击能力
 		GetAbilitySystemComponent()->AbilityInputTagHeld(AbilityActionTag);
