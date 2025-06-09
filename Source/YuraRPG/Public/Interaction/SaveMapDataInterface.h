@@ -22,4 +22,10 @@ class YURARPG_API ISaveMapDataInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	// 是否要存储Transform
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool ShouldLoadingTransform() const;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void LoadActor();
 };

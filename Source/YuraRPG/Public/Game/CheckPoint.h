@@ -22,6 +22,12 @@ class YURARPG_API ACheckPoint : public APlayerStart, public ISaveMapDataInterfac
 public:
 	ACheckPoint(const FObjectInitializer& ObjectInitializer);
 
+	/** SavedMapData Interface start*/
+	virtual bool ShouldLoadingTransform_Implementation() const override;
+
+	virtual void LoadActor_Implementation() override;
+	/** SavedMapData Interface end*/
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -58,6 +64,12 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USphereComponent> CheckpointSphere;
+
+	// 发光材质使用的--ValueName
+	UPROPERTY(EditDefaultsOnly)
+	FName MatParamName = FName("Glow");
+	UPROPERTY(EditDefaultsOnly)
+	float MatGlowValue = 50.f;
 
 	
 };

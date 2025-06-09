@@ -23,4 +23,7 @@ public:
 
 	// 保存MapData到存档
 	void SaveMapData(UWorld* World, ULoadScreenSaveGame* SaveGame);
+
+	// 读取MapData到关卡
+	void LoadMapData(UWorld* World, const ULoadScreenSaveGame* SaveGame);
 };

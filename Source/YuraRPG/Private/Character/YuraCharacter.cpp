@@ -23,6 +23,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystem/YuraAbilitySystemLibrary.h"
 #include "AbilitySystem/Data/AbilityInfo.h"
+#include "Subsystem/YuraGameInstanceSubsystem.h"
 
 AYuraCharacter::AYuraCharacter()
 {
@@ -172,6 +173,13 @@ void AYuraCharacter::SaveProgress_Implementation(const FName& CheckpointTag)
 			});
 		// 知道不会Cast失败，否则需要验证一下的
 		Cast<UYuraAbilitySystemComponent>(GetAbilitySystemComponent())->ForEachAbility(SaveAbilityDelegate);
+
+		// 保存MapData
+		// 首先要拿到Subsystem
+		if (UYuraGameInstanceSubsystem* YuraSubsystem = GetGameInstance()->GetSubsystem<UYuraGameInstanceSubsystem>())
+		{
+			YuraSubsystem->SaveMapData(GetWorld(), GameProgress);
+		}
 
 
 		// 存档，即便有存档，也是直接覆盖
@@ -434,6 +442,12 @@ void AYuraCharacter::LoadProgress()
 			YuraASC->GrantCharacterPassiveAbilities(StartupPassiveAbilities);
 			// 赋予主动与被动技能
 			YuraASC->LoadingAbilities(GameProgress->SavedAbilities);
+
+			// 读取MapData
+			if (UYuraGameInstanceSubsystem* YuraSubsystem = GetGameInstance()->GetSubsystem<UYuraGameInstanceSubsystem>())
+			{
+				YuraSubsystem->LoadMapData(GetWorld(), GameProgress);
+			}
 
 		}
 		else

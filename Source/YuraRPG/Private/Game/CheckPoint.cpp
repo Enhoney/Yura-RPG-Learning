@@ -27,6 +27,30 @@ ACheckPoint::ACheckPoint(const FObjectInitializer& ObjectInitializer)
 	CheckpointSphere->SetGenerateOverlapEvents(true);
 }
 
+bool ACheckPoint::ShouldLoadingTransform_Implementation() const
+{
+	return false;
+}
+
+void ACheckPoint::LoadActor_Implementation()
+{
+	if (bReached)
+	{
+		// 直接修改为无碰撞
+		CheckpointSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+
+		// 保存原来的材质
+		OriginCheckpointMeshMat = CheckpointMesh->GetMaterial(0);
+		// 创建动态材质
+		UMaterialInstanceDynamic* GlowMaterialInstanceDynamic = UMaterialInstanceDynamic::Create(OriginCheckpointMeshMat, this);
+		// 发光
+		GlowMaterialInstanceDynamic->SetScalarParameterValue(MatParamName, MatGlowValue);
+		// 修改材质为动态材质
+		CheckpointMesh->SetMaterial(0, GlowMaterialInstanceDynamic);
+	}
+}
+
 void ACheckPoint::BeginPlay()
 {
 	Super::BeginPlay();

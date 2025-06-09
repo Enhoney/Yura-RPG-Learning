@@ -41,7 +41,10 @@ void UYuraGameInstanceSubsystem::SaveMapData(UWorld* World, ULoadScreenSaveGame*
 
 			FSavedActor SavedActor;
 			SavedActor.ActorName = Actor->GetFName();
-			SavedActor.ActorTransform = Actor->GetActorTransform();
+			if (ISaveMapDataInterface::Execute_ShouldLoadingTransform(Actor))
+			{
+				SavedActor.ActorTransform = Actor->GetActorTransform();
+			}
 
 			// 序列化
 			FMemoryWriter MemoryWriter(SavedActor.Bytes);
@@ -55,5 +58,46 @@ void UYuraGameInstanceSubsystem::SaveMapData(UWorld* World, ULoadScreenSaveGame*
 			MapDataSaved.SavedActors.AddUnique(SavedActor);
 		}
 
+	}
+}
+
+void UYuraGameInstanceSubsystem::LoadMapData(UWorld* World, const ULoadScreenSaveGame* SaveGame)
+{
+	if (!IsValid(World)) return;
+
+	// 获取MapName
+	FString MapName = World->GetMapName();
+	MapName.RemoveFromStart(World->StreamingLevelsPrefix);
+	// 查找MapData
+	FSavedMapData MapDataSaved = SaveGame->GetSavedMapDataFromName(MapName);
+
+	// 寻找地图中所有需要保存的Actor
+	for (FActorIterator It(World); It; ++It)
+	{
+		AActor* Actor = *It;
+		if (!IsValid(Actor) || !Actor->Implements<USaveMapDataInterface>()) continue;
+
+		for (FSavedActor SavedAcor : MapDataSaved.SavedActors)
+		{
+			if (SavedAcor.ActorName == Actor->GetFName())
+			{
+				if (ISaveMapDataInterface::Execute_ShouldLoadingTransform(Actor))
+				{
+					Actor->SetActorTransform(SavedAcor.ActorTransform);
+				}
+
+				// 反序列化存储的Actor成员
+				FMemoryReader MemoryReader(SavedAcor.Bytes);
+
+				FObjectAndNameAsStringProxyArchive Archve(MemoryReader, true);
+				Archve.ArIsSaveGame = true;
+				// Actor的反序列化
+				Actor->Serialize(Archve);
+
+				// 使读取的参数生效
+				ISaveMapDataInterface::Execute_LoadActor(Actor);
+			}
+			
+		}
 	}
 }
