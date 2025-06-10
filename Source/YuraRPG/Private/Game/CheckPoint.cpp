@@ -5,6 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "Interaction/PlayerInterface.h"
 
+
 ACheckPoint::ACheckPoint(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
@@ -18,6 +19,9 @@ ACheckPoint::ACheckPoint(const FObjectInitializer& ObjectInitializer)
 	CheckpointMesh->SetCollisionResponseToAllChannels(ECR_Block);
 	CheckpointMesh->SetGenerateOverlapEvents(false);
 
+	CheckpointMesh->SetCustomDepthStencilValue(HighlightValue);
+	CheckpointMesh->MarkRenderStateDirty();
+
 	// 仅对Pawn响应Overlap，响应重叠事件
 	CheckpointSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CheckpointSphere"));
 	CheckpointSphere->SetupAttachment(CheckpointMesh);
@@ -25,6 +29,9 @@ ACheckPoint::ACheckPoint(const FObjectInitializer& ObjectInitializer)
 	CheckpointSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
 	CheckpointSphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	CheckpointSphere->SetGenerateOverlapEvents(true);
+
+	DestionationPoint = CreateDefaultSubobject<USceneComponent>(TEXT("DestinationPoint"));
+	DestionationPoint->SetupAttachment(CheckpointMesh);
 }
 
 bool ACheckPoint::ShouldLoadingTransform_Implementation() const
@@ -39,16 +46,28 @@ void ACheckPoint::LoadActor_Implementation()
 		// 直接修改为无碰撞
 		CheckpointSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-
-		// 保存原来的材质
-		OriginCheckpointMeshMat = CheckpointMesh->GetMaterial(0);
 		// 创建动态材质
-		UMaterialInstanceDynamic* GlowMaterialInstanceDynamic = UMaterialInstanceDynamic::Create(OriginCheckpointMeshMat, this);
+		UMaterialInstanceDynamic* GlowMaterialInstanceDynamic = UMaterialInstanceDynamic::Create(CheckpointMesh->GetMaterial(0), this);
 		// 发光
 		GlowMaterialInstanceDynamic->SetScalarParameterValue(MatParamName, MatGlowValue);
 		// 修改材质为动态材质
 		CheckpointMesh->SetMaterial(0, GlowMaterialInstanceDynamic);
 	}
+}
+
+void ACheckPoint::HighlightActor_Implementation()
+{
+	CheckpointMesh->SetRenderCustomDepth(true);
+}
+
+void ACheckPoint::UnhighlightActor_Implementation()
+{
+	CheckpointMesh->SetRenderCustomDepth(false);
+}
+
+void ACheckPoint::SetMoveToDestination_Implementation(FVector& OutDestination)
+{
+	OutDestination = DestionationPoint->GetComponentLocation();
 }
 
 void ACheckPoint::BeginPlay()
@@ -72,11 +91,8 @@ void ACheckPoint::HandleGlowEffect(AActor* Player)
 	// 直接修改为无碰撞
 	CheckpointSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-
-	// 保存原来的材质
-	OriginCheckpointMeshMat = CheckpointMesh->GetMaterial(0);
 	// 创建动态材质
-	UMaterialInstanceDynamic* GlowMaterialInstanceDynamic = UMaterialInstanceDynamic::Create(OriginCheckpointMeshMat, this);
+	UMaterialInstanceDynamic* GlowMaterialInstanceDynamic = UMaterialInstanceDynamic::Create(CheckpointMesh->GetMaterial(0), this);
 
 	// 修改材质为动态材质
 	CheckpointMesh->SetMaterial(0, GlowMaterialInstanceDynamic);
@@ -90,7 +106,9 @@ void ACheckPoint::FinishCheckpoint(AActor* Player)
 	// 存档
 	if (Player->Implements<UPlayerInterface>())
 	{
-		IPlayerInterface::Execute_SaveProgress(Player, PlayerStartTag);
+		FString CurrentMapName = GetWorld()->GetMapName();
+		CurrentMapName.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
+		IPlayerInterface::Execute_SaveProgress(Player, PlayerStartTag, CurrentMapName);
 	}
 
 }

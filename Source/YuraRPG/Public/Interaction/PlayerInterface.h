@@ -74,6 +74,6 @@ public:
 
 	// 存档
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void SaveProgress(const FName& CheckpointTag);
+	void SaveProgress(const FName& CheckpointTag, const FString& WorldNameToSave);
 
 };

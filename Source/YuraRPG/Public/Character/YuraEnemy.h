@@ -51,6 +51,8 @@ public:
 	// 被Controlelr掌控的时候--敌人类在这里获取AIController
 	virtual void PossessedBy(AController* NewController) override;
 
+	FORCEINLINE  void SetCharacterLevel(int32 InLevel) { CharacterLevel = InLevel; }
+
 protected:
 	void BeginPlay() override;
 

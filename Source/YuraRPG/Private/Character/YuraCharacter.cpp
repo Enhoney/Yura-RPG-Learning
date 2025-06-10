@@ -116,7 +116,7 @@ int32 AYuraCharacter::GetCharacterLevel() const
 }
 
 
-void AYuraCharacter::SaveProgress_Implementation(const FName& CheckpointTag)
+void AYuraCharacter::SaveProgress_Implementation(const FName& CheckpointTag, const FString& WorldNameToSave)
 {
 	if (AYuraGameModeBase* YuraGameMode = Cast<AYuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
 	{
@@ -128,7 +128,9 @@ void AYuraCharacter::SaveProgress_Implementation(const FName& CheckpointTag)
 
 		// 赋值
 		GameProgress->PlayerStartTag = CheckpointTag;
-
+		// 存储WorldMapName
+		GameProgress->MapName = WorldNameToSave;
+		// 是否存储了关键数据
 		GameProgress->bVitalDataSaved = true;
 
 		// PlayerState上的重要参数

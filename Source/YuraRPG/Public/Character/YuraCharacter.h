@@ -54,7 +54,7 @@ public:
 	virtual void HideMagicCircle_Implementation() override;
 	virtual void SetMagicCircleMaterial_Implementation(UMaterialInterface* InMagicMaterial) override;
 
-	virtual void SaveProgress_Implementation(const FName& CheckpointTag) override;
+	virtual void SaveProgress_Implementation(const FName& CheckpointTag, const FString& WorldNameToSave) override;
 	/** IPlayerInterface end*/
 
 protected:

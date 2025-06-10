@@ -301,10 +301,19 @@ void AYuraPlayerController::AbilityInputTagReleased(FGameplayTag AbilityActionTa
 		// 这就表示短按，这个时候我们要去创建一条路径，这需要导航系统了
 		if (FollowingTime <= ShortPressThreshould && ControlledPawn)
 		{
-			if (AbilitySystemComponent && !AbilitySystemComponent->HasMatchingGameplayTag(FYuraGameplayTags::Get().Player_Block_InputPressed))
+			if (TargetingStatus == ETargetingStatus::TragetingMapEntrance && IsValid(ThisActor))
 			{
-				// 在这个位置放一个箭头
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagaraSystem, CachedDestinationLocation);
+				// 短按，移动到HighlightActor的指定位置
+				IHighlightInterface::Execute_SetMoveToDestination(ThisActor, CachedDestinationLocation);
+			}
+
+			if (TargetingStatus == ETargetingStatus::NoTargeting)
+			{
+				if (AbilitySystemComponent && !AbilitySystemComponent->HasMatchingGameplayTag(FYuraGameplayTags::Get().Player_Block_InputPressed))
+				{
+					// 在这个位置放一个箭头
+					UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagaraSystem, CachedDestinationLocation);
+				}
 			}
 
 			const FVector CurrentLocation = ControlledPawn->GetActorLocation();

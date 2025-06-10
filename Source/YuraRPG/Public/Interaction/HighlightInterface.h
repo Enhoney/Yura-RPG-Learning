@@ -27,4 +27,8 @@ public:
 	void HighlightActor();
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void UnhighlightActor();
+
+	// 设置目的地
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetMoveToDestination(FVector& OutDestination);
 };

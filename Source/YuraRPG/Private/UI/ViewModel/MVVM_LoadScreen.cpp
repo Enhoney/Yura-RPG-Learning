@@ -63,6 +63,10 @@ void UMVVM_LoadScreen::OnNewSlotButtonClicked(int32 SlotIndex, const FString& In
 		// 切换到Taken
 		LoadSlots[SlotIndex]->InitializeSlot();
 	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(1, 15.f, FColor::Magenta, TEXT("This game is designed for Standalone Game, please run on Standalone Mode"));
+	}
 	
 }
 
