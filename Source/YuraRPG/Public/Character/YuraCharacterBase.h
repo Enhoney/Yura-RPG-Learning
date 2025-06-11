@@ -209,8 +209,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartupPassiveAbilities;
 
-private:
+	UPROPERTY(BlueprintReadOnly)
 	bool bIsDead = false;
+
+private:
 
 	/** Monion Count*/
 	int32 MinionCount = 0;

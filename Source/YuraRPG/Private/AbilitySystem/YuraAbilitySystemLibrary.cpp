@@ -188,6 +188,19 @@ UAbilityInfo* UYuraAbilitySystemLibrary::GetAbilityInfoOnGameMode(const UObject*
 	return AbilityInfo;
 }
 
+ULootTiers* UYuraAbilitySystemLibrary::GetLootTiersOnGameMode(const UObject* InWorldContextObject)
+{
+	AYuraGameModeBase* YuraGameMode = Cast<AYuraGameModeBase>(UGameplayStatics::GetGameMode(InWorldContextObject));
+	if (YuraGameMode == nullptr)
+	{
+		return nullptr;
+	}
+
+	// 获取LootTiers
+	ULootTiers* LootTiers = YuraGameMode->LootTiers;
+	return LootTiers;
+}
+
 FGameplayTag UYuraAbilitySystemLibrary::GetAbilityTypeTagFromSpec(const UObject* InWorldContextObject, const FGameplayAbilitySpec& InAbilitySpec)
 {
 	FGameplayTag OutAbilityTypeTag = FYuraGameplayTags::Get().Ability_Type_None;

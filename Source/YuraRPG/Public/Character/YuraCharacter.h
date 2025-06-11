@@ -31,6 +31,8 @@ public:
 
 	/** Combat Interface start*/
 	virtual int32 GetCharacterLevel() const override;
+
+	virtual void Die(const FVector& InDeathImpulse) override;
 	/** Combat Interface end*/
 
 	/** IPlayerInterface start*/
@@ -100,4 +102,10 @@ private:
 	// 读档使用的GE--设置主要属性
 	UPROPERTY(EditDefaultsOnly, Category = "SaveGame")
 	TSubclassOf<UGameplayEffect> LoadAttributeEffectClass;
+
+	// 死亡倒计时--回档的时间
+	UPROPERTY(EditDefaultsOnly, Category = "Death")
+	float DeathTime = 5.f;
+
+	FTimerHandle DeathTimer;
 };

@@ -11,6 +11,7 @@ class UOverlayWidgetController;
 class UAttributeMenuWidgetController;
 class USpellMenuWidgetController;
 class AYuraHUD;
+class ULootTiers;
 
 struct FWidgetControllerParam;
 
@@ -58,6 +59,9 @@ public:
 	// 获取GameMode上面的AbilityInfo
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "YuraAbilitySystemLibrary|AbilityInfo")
 	static UAbilityInfo* GetAbilityInfoOnGameMode(const UObject* InWorldContextObject);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "YuraAbilitySystemLibrary|LootTiers", meta = (DefaultToSelf = "InWorldContextObject"))
+	static ULootTiers* GetLootTiersOnGameMode(const UObject* InWorldContextObject);
 
 	// 获取能力的TypeTag--主动还是被动，还是固有技能--用于读档和存档
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "YuraAbilitySystemLibrary|AbilityInfo")

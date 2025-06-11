@@ -66,6 +66,9 @@ void AYuraEnemy::Die(const FVector& InDeathImpulse)
 	{
 		EnemyAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsDead"), true);
 	}
+
+	// 生成战利品
+	SpawnLootTiers();
 	
 	// 设置寿命
 	SetLifeSpan(LifeSpawnOnDeath);

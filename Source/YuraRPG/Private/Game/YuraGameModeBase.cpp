@@ -7,6 +7,7 @@
 #include "LoadScreenSaveGame.h"
 #include "GameFramework/PlayerStart.h"
 #include "Game/YuraGameInstance.h"
+#include "GameFramework/Character.h"
 
 void AYuraGameModeBase::SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex)
 {
@@ -116,6 +117,15 @@ AActor* AYuraGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 	}
 
 	return nullptr;
+}
+
+void AYuraGameModeBase::HandlePlayerDeath(ACharacter* DeathCharacter)
+{
+	ULoadScreenSaveGame* SaveProgress = GetSaveProgress();
+	if (SaveProgress)
+	{
+		UGameplayStatics::OpenLevel(DeathCharacter, FName(SaveProgress->MapName));
+	}
 }
 
 void AYuraGameModeBase::BeginPlay()

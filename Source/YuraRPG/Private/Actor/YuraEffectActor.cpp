@@ -14,10 +14,35 @@ AYuraEffectActor::AYuraEffectActor()
 	SetRootComponent(CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent")));
 }
 
+void AYuraEffectActor::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	RunningTime += DeltaSeconds;
+	// 周期
+	if (RunningTime >  2 * PI / SinPeriod)
+	{
+		RunningTime = 0.f;
+	}
+
+	if (bRotates)
+	{
+		const FRotator DeltaRotation(0.f, DeltaSeconds * RotateRate, 0.f);
+		AddActorWorldRotation(DeltaRotation);
+	}
+	if (bSinMovement)
+	{
+		const float SinMovementDistance = SinAmplitude * FMath::Sin(RunningTime * SinPeriod);
+		SetActorLocation(ActorInitialLocation + FVector(0.f, 0.f, SinMovementDistance));
+	}
+}
+
 
 void AYuraEffectActor::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ActorInitialLocation = GetActorLocation();
 
 }
 
@@ -140,6 +165,17 @@ void AYuraEffectActor::OnEndOverlap(AActor* TargetActor)
 			ActiveEffectHandles.FindAndRemoveChecked(TmpHandle);
 		}
 	}
+}
+
+void AYuraEffectActor::StartSinMovement()
+{
+	bSinMovement = true;
+	ActorInitialLocation = GetActorLocation();
+}
+
+void AYuraEffectActor::StartRotateMovement()
+{
+	bRotates = true;
 }
 
 

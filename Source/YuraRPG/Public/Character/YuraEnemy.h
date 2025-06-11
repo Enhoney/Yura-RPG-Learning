@@ -60,6 +60,10 @@ protected:
 
 	void HandleStunDebuffInAnim(const FGameplayTag InDebuffTag, int32 NewCount) override;
 
+	// 生成战利品
+	UFUNCTION(BlueprintImplementableEvent)
+	void SpawnLootTiers();
+
 private:
 
 	virtual void InitAbilityActorInfo() override;

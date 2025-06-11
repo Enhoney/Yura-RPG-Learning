@@ -33,6 +33,8 @@ class YURARPG_API AYuraEffectActor : public AActor
 public:	
 	AYuraEffectActor();
 
+	virtual void Tick(float DeltaSeconds) override;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -44,6 +46,12 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void OnEndOverlap(AActor* TargetActor);
+
+	UFUNCTION(BlueprintCallable)
+	void StartSinMovement();
+
+	UFUNCTION(BlueprintCallable)
+	void StartRotateMovement();
 
 protected:
 
@@ -81,4 +89,34 @@ protected:
 private:
 
 	TMap<FActiveGameplayEffectHandle, UAbilitySystemComponent*> ActiveEffectHandles;
+
+	// 是否周期性旋转
+	UPROPERTY(EditDefaultsOnly, Category = "Loot Effect")
+	bool bRotates = false;
+
+	// 旋转速度
+	UPROPERTY(EditDefaultsOnly, Category = "Loot Effect")
+	float RotateRate = 45.f;
+
+	// 是否在Z轴向正弦运动
+	UPROPERTY(EditDefaultsOnly, Category = "Loot Effect")
+	bool bSinMovement = false;
+
+	// 振幅
+	UPROPERTY(EditDefaultsOnly, Category = "Loot Effect")
+	float SinAmplitude = 1.f;
+
+	// 频率
+	UPROPERTY(EditDefaultsOnly, Category = "Loot Effect")
+	float SinPeriod = 1.f;	// 2PI
+
+	// 运动的时间
+	UPROPERTY(EditDefaultsOnly, Category = "Loot Effect")
+	float RunningTime = 0.f;
+
+	// 初始位置
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite,Category = "Loot Effect", meta = (AllowPrivateAccess = "true"))
+	FVector ActorInitialLocation = FVector();
+
+
 };

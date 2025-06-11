@@ -115,6 +115,28 @@ int32 AYuraCharacter::GetCharacterLevel() const
 	return YuraPlayerState->GetCharacterLevel();
 }
 
+void AYuraCharacter::Die(const FVector& InDeathImpulse)
+{
+	Super::Die(InDeathImpulse);
+
+	FTimerDelegate DetahTimerDelegate;
+	DetahTimerDelegate.BindLambda([this]()
+		{
+			if (AYuraGameModeBase* YuraGameMode = Cast<AYuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
+			{
+				GetWorldTimerManager().ClearTimer(DeathTimer);
+				YuraGameMode->HandlePlayerDeath(this);
+			}
+		});
+
+	FTimerManagerTimerParameters TimerManagerTimerParams;
+	TimerManagerTimerParams.bLoop = false;
+	GetWorldTimerManager().SetTimer(DeathTimer, DetahTimerDelegate, DeathTime, FTimerManagerTimerParameters());
+	
+	// 摄像机脱落
+	Camera->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+}
+
 
 void AYuraCharacter::SaveProgress_Implementation(const FName& CheckpointTag, const FString& WorldNameToSave)
 {

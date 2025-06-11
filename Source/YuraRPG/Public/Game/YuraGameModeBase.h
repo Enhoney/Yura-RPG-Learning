@@ -10,6 +10,7 @@ class UCharacterClassInfo;
 class UAbilityInfo;
 class UMVVM_LoadSlot;
 class ULoadScreenSaveGame;
+class ULootTiers;
 
 /**
  * 
@@ -43,6 +44,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SaveGame")
 	ULoadScreenSaveGame* GetSaveProgress() const;
 
+
+	void HandlePlayerDeath(ACharacter* DeathCharacter);
 protected:
 	virtual void BeginPlay() override;
 
@@ -59,7 +62,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Load Screen Save Game")
 	TSubclassOf<ULoadScreenSaveGame> LoadScreenSaveGameClass;
 
-
+	// 战利品
+	UPROPERTY(EditDefaultsOnly, Category = "Loot Tiers")
+	TObjectPtr<ULootTiers> LootTiers;
 
 	// 初始地图
 	UPROPERTY(EditDefaultsOnly)
